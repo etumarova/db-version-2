@@ -9,7 +9,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
-import useSocket from 'hooks/useSocket';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useHistory } from 'react-router-dom';
 
@@ -44,7 +43,6 @@ const useStyles = makeStyles(theme => ({
     },
 
     dropzone: {
-        // height: '4rem',
         padding: '1rem',
         border: '1px dashed salmon',
         display: 'flex',
@@ -56,7 +54,6 @@ const useStyles = makeStyles(theme => ({
     row: {
         display: 'flex',
         flexWrap: 'wrap',
-        // justifyContent: 'space-around',
         marginBottom: '1em',
     },
 }));
@@ -64,7 +61,6 @@ const useStyles = makeStyles(theme => ({
 export default function CreateEditSchool() {
     const history = useHistory();
     const { user } = useAuth0();
-    const { socket } = useSocket();
     const [name, setName] = useState('');
     const [director, setDirector] = useState('');
     const [foto, setFoto] = useState(null);
@@ -89,23 +85,19 @@ export default function CreateEditSchool() {
     };
 
     useEffect(() => {
-        socket.on('school', data => {
-            if (data.length !== 0) setSchoolData(data[0]);
-        });
+        (async () => {
+            if (user?.sub) {
+                try {
+                    const res = await fetch(`/school/?userId=${user.sub}`);
+                    const { school } = await res.json();
 
-        socket.on('saveSchoolSuccess', data => {
-            history.push('/mySchool');
-        });
-        socket.on('editSchoolSuccess', data => {
-            history.push('/mySchool');
-        });
-    }, [socket, history]);
-
-    useEffect(() => {
-        if (user?.sub) {
-            socket.emit('getSchool', { idUser: user.sub });
-        }
-    }, [socket, user?.sub]);
+                    setSchoolData(school);
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        })();
+    }, [user?.sub]);
 
     const onDrop = async acceptedFiles => {
         const url = `https://api.cloudinary.com/v1_1/dgeev9d6l/image/upload`;
@@ -126,7 +118,7 @@ export default function CreateEditSchool() {
         multiple: false,
     });
 
-    const saveData = e => {
+    const saveData = async e => {
         e.preventDefault();
         const data = {
             idUser: user.sub,
@@ -139,10 +131,24 @@ export default function CreateEditSchool() {
             adress: adress,
             telephone: telephone,
         };
-        socket.emit('saveSchool', data);
+
+        try {
+            await fetch('/saveSchool', {
+                method: 'post',
+                headers: {
+                    Accept: 'application/json, text/plain, */*',
+                    'Content-Type': 'application/json',
+                },
+                body: data,
+            });
+
+            history.push('/mySchool');
+        } catch (error) {
+            console.log(error);
+        }
     };
 
-    const editData = e => {
+    const editData = async e => {
         e.preventDefault();
         const data = {
             _id: school._id,
@@ -156,7 +162,21 @@ export default function CreateEditSchool() {
             adress: adress,
             telephone: telephone,
         };
-        socket.emit('editSchool', data);
+
+        try {
+            await fetch('/editSchool', {
+                method: 'post',
+                headers: {
+                    Accept: 'application/json, text/plain, */*',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            history.push('/mySchool');
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     return (

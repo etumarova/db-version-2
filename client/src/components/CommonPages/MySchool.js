@@ -3,49 +3,36 @@ import { Image } from 'cloudinary-react';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import { useAuth0 } from '@auth0/auth0-react';
-import useSocket from 'hooks/useSocket';
 import { Link } from 'react-router-dom';
 
 export default function MySchool() {
-    const { socket } = useSocket();
     const [school, setSchool] = useState(null);
     const { isAuthenticated, user } = useAuth0();
 
     useEffect(() => {
-        if (user?.sub) {
-            socket.emit('getSchool', { idUser: user.sub });
-        }
-    }, [socket, user?.sub]);
+        (async () => {
+            if (user?.sub) {
+                try {
+                    const res = await fetch(`/school/?userId=${user.sub}`);
+                    const { school } = await res.json();
 
-    useEffect(() => {
-        socket.on('school', data => {
-            if (data.length !== 0) setSchool(data);
-        });
-    }, [socket]);
+                    setSchool(school);
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        })();
+    }, [user?.sub]);
 
     return (
         <div>
             {isAuthenticated && (
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    {school ? (
-                        <Link to="createEditSchool">
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={e => {
-                                    localStorage.setItem('editSchool', JSON.stringify(school[0]));
-                                }}
-                            >
-                                Редактировать
-                            </Button>
-                        </Link>
-                    ) : (
-                        <Link to="createEditSchool">
-                            <Button variant="contained" color="primary" href="/createEditSchool">
-                                Создать
-                            </Button>
-                        </Link>
-                    )}
+                    <Link to="createEditSchool">
+                        <Button variant="contained" color="primary">
+                            {school ? 'Редактировать' : 'Создать'}
+                        </Button>
+                    </Link>
                 </div>
             )}
             {school && (
@@ -63,7 +50,7 @@ export default function MySchool() {
                                 <div className="d-flex flex-column align-items-center text-center">
                                     <Image
                                         cloud_name="dgeev9d6l"
-                                        publicId={school[0].foto}
+                                        publicId={school.foto}
                                         width="250"
                                     />
                                 </div>
@@ -77,17 +64,15 @@ export default function MySchool() {
                                     </div>
 
                                     <div className="col-sm-9">
-                                        <h6 className="mb-0">{school[0].name}</h6>
+                                        <h6 className="mb-0">{school.name}</h6>
                                     </div>
                                 </div>
                                 <hr />
                                 <div className="row">
-                                    <div className="col-sm-3 text-secondary">
-                                        {school[0].director}
-                                    </div>
+                                    <div className="col-sm-3 text-secondary">{school.director}</div>
 
                                     <div className="col-sm-9">
-                                        <h6 className="mb-0">{school[0].director}</h6>
+                                        <h6 className="mb-0">{school.director}</h6>
                                     </div>
                                 </div>
                                 <hr />
@@ -95,7 +80,7 @@ export default function MySchool() {
                                     <div className="col-sm-3 text-secondary">Регион</div>
 
                                     <div className="col-sm-9">
-                                        <h6 className="mb-0">{school[0].region}</h6>
+                                        <h6 className="mb-0">{school.region}</h6>
                                     </div>
                                 </div>
                                 <hr />
@@ -103,7 +88,7 @@ export default function MySchool() {
                                     <div className="col-sm-3  text-secondary">Адрес</div>
                                     <div className="col-sm-9">
                                         <h6 className="mb-0">
-                                            {school[0].city + ', ' + school[0].adress}
+                                            {school.city + ', ' + school.adress}
                                         </h6>
                                     </div>
                                 </div>
@@ -111,7 +96,7 @@ export default function MySchool() {
                                 <div className="row">
                                     <div className="col-sm-3  text-secondary">Телефон</div>
                                     <div className="col-sm-9">
-                                        <h6 className="mb-0">{school[0].telephone}</h6>
+                                        <h6 className="mb-0">{school.telephone}</h6>
                                     </div>
                                 </div>
                             </div>
@@ -130,7 +115,7 @@ export default function MySchool() {
                                         Об учреждении
                                     </Typography>
                                     <Typography variant="body2" gutterBottom>
-                                        {school[0].description}
+                                        {school.description}
                                     </Typography>
                                 </div>
                             </div>

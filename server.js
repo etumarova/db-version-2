@@ -24,6 +24,84 @@ if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging')
     });
 }
 
+app.get('/school', (req, res) => {
+    const userId = req.query.userId;
+
+    schools
+        .findOne({ idUser: userId })
+        .then(school => res.json({ school }))
+        .catch(e => console.log(e));
+});
+
+app.post('/saveSchool', (req, res) => {
+    const { idUser, foto, name, director, description, region, city, adress, telephone } = req.body;
+
+    schools
+        .find({ idUser: idUser })
+        .then(data => {
+            if (data.length == 0) {
+                schools.create({
+                    idUser: idUser,
+                    foto: foto,
+                    name: name,
+                    director: director,
+                    description: description,
+                    region: region,
+                    city: city,
+                    adress: adress,
+                    telephone: telephone,
+                });
+            }
+        })
+        .then(() => res.sendStatus(200))
+        .catch(err => {
+            socket.emit('saveSchoolFail');
+            console.log(err);
+        });
+});
+
+app.post('/editSchool', (req, res) => {
+    const {
+        _id,
+        idUser,
+        foto,
+        name,
+        director,
+        description,
+        region,
+        city,
+        adress,
+        telephone,
+    } = req.body;
+
+    schools.updateOne(
+        {
+            _id: _id,
+        },
+        {
+            $set: {
+                idUser: idUser,
+                foto: foto,
+                name: name,
+                director: director,
+                description: description,
+                region: region,
+                city: city,
+                adress: adress,
+                telephone: telephone,
+            },
+        },
+        (err, result) => {
+            if (err) {
+                res.sendStatus(403);
+                console.log(err);
+            }
+
+            res.sendStatus(200);
+        }
+    );
+});
+
 const server = app.listen(PORT, () => {
     console.log('listening on *:3001');
 });
