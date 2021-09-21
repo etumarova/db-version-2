@@ -144,6 +144,9 @@ function Dashboard() {
     const userId = isAuthenticated && user.sub;
     const isAdmin = isAuthenticated && JSON.parse(admins).some(admin => admin.user_id === userId);
 
+    const shouldRenderDrawer = isAuthenticated;
+    const drawerItems = isAdmin ? adminPanelItems : userPanelItems;
+
     return (
         <SocketContext.Provider value={useMemo(() => ({ socket: socketRef.current }), [])}>
             <Router>
@@ -196,28 +199,17 @@ function Dashboard() {
                         <div className={classes.drawerContainer}>
                             {isAuthenticated && localStorage.setItem('user', user.sub)}
 
-                            {isAdmin && (
+                            {shouldRenderDrawer && (
                                 <List>
-                                    {adminPanelItems.map(({ text, path }, index) => (
-                                        <ListItem button key={text}>
-                                            <ListItemIcon>
-                                                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                                            </ListItemIcon>
-                                            <Link to={path}>{text}</Link>
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            )}
-
-                            {isAuthenticated && !isAdmin && (
-                                <List>
-                                    {userPanelItems.map(({ text, path }, index) => (
-                                        <ListItem button key={text}>
-                                            <ListItemIcon>
-                                                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                                            </ListItemIcon>
-                                            <Link to={path}>{text}</Link>
-                                        </ListItem>
+                                    {drawerItems.map(({ text, path }, index) => (
+                                        <Link to={path}>
+                                            <ListItem button key={text}>
+                                                <ListItemIcon>
+                                                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                                                </ListItemIcon>
+                                                {text}
+                                            </ListItem>
+                                        </Link>
                                     ))}
                                 </List>
                             )}
