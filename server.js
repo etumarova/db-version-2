@@ -103,13 +103,19 @@ io.on('connection', function(socket) {
                         .catch(err => console.log(err));
                 }
             })
-            .catch(err => console.log(err));
+            .then(data => socket.emit('saveSchoolSuccess', data))
+            .catch(err => {
+                socket.emit('saveSchoolFail');
+                console.log(err);
+            });
     });
     socket.on('getSchool', data => {
         const { idUser } = data;
         schools
             .find({ idUser: idUser })
-            .then(data => socket.emit('school', data))
+            .then(data => {
+                socket.emit('school', data);
+            })
             .catch(e => console.log(e));
     });
 
@@ -352,7 +358,12 @@ io.on('connection', function(socket) {
                 },
             },
             (err, result) => {
-                if (err) console.log(err);
+                if (err) {
+                    console.log(err);
+                    socket.emit('editSchoolFail');
+                }
+
+                socket.emit('editSchoolSuccess', result);
             }
         );
     });

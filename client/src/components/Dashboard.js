@@ -18,7 +18,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 import Calendary from 'components/CommonPages/Calendary';
 import MySchool from 'components/CommonPages/MySchool';
-import CreateEditSchool from 'components/CommonPages/CreateEditScholl';
+import CreateEditSchool from 'components/CommonPages/CreateEditSchool';
 import MySportsmens from 'components/CommonPages/MySportsmens';
 import CreateSportsmen from 'components/CommonPages/CreateSportsmen';
 import SportsmenPage from 'components/CommonPages/SportsmenPage';

@@ -4,15 +4,23 @@ import { DataGrid } from '@material-ui/data-grid';
 import Button from '@material-ui/core/Button';
 import { Link } from 'react-router-dom';
 import useSocket from 'hooks/useSocket';
+import { useAuth0 } from '@auth0/auth0-react';
 
 export default function MyTraners() {
+    const { user } = useAuth0();
     const { socket } = useSocket();
     const [traners, setTraners] = useState(null);
     useEffect(() => {
-        socket.emit('getTraners', { idSchool: localStorage.getItem('user') });
+        if (user?.sub) {
+            socket.emit('getTraners', { idSchool: user.sub });
+        }
+    }, [socket, user?.sub]);
+
+    useEffect(() => {
         socket.on('traners', data => {
             data.forEach(el => (el['id'] = el['_id']));
-            setTraners(data);
+            const trainerData = [...data.map(trainer => ({ ...trainer, id: trainer._id }))];
+            setTraners(trainerData);
         });
     }, [socket]);
 
