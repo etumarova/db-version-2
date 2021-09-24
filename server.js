@@ -14,6 +14,7 @@ const schools = require('./config/schoolSchema');
 const sportsmens = require('./config/sportsmenSchema');
 const traners = require('./config/tranerSchema');
 const entries = require('./config/entriesSchema');
+const users = require('./config/userSchema');
 
 app.use(express.json());
 
@@ -23,6 +24,24 @@ if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging')
         res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
     });
 }
+
+app.post('/checkUserRole', async (req, res) => {
+    try {
+        const userData = req.body;
+        const userId = userData.sub;
+
+        const user = await users.findOne({ userId });
+        const isUserAdmin = user && user.isAdmin;
+
+        if (!user) {
+            await users.create({ userId, name: `${userData.firstName} ${userData.lastName}` });
+        }
+
+        res.json({ isAdmin: isUserAdmin });
+    } catch (error) {
+        res.status(500).json({ message: `Something went wrong while registering: ${error}` });
+    }
+});
 
 app.get('/school', (req, res) => {
     const userId = req.query.userId;

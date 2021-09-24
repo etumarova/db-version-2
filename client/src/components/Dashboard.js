@@ -85,8 +85,8 @@ const useStyles = makeStyles(theme => ({
 }));
 function Dashboard() {
     const classes = useStyles();
-    const { loginWithRedirect, isAuthenticated, logout, user, getAccessTokenSilently } = useAuth0();
-    const [admins, setAdmins] = useState(localStorage.getItem('admins') || '[]');
+    const { loginWithRedirect, isAuthenticated, logout, user } = useAuth0();
+    const [isAdmin, setIsAdmin] = useState(false);
 
     const socketRef = useRef(io('http://localhost:3001'));
 
@@ -95,54 +95,23 @@ function Dashboard() {
     }, []);
 
     useEffect(() => {
-        const fetchAdmins = async () => {
-            const domain = auth0Domain;
-            try {
-                const accessToken = await getAccessTokenSilently({
-                    audience: `https://${domain}/api/v2/`,
-                    scope: 'read:current_user',
-                });
+        const fetchAdmin = async () => {
+            const res = await fetch(`/checkUserRole/`, {
+                method: 'post',
+                headers: {
+                    Accept: 'application/json, text/plain, */*',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(user),
+            });
 
-                const userDetailsByIdUrl = `https://${domain}/api/v2/users/${user.sub}`;
+            const { isAdmin } = await res.json();
 
-                const metadataResponse = await fetch(userDetailsByIdUrl, {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                });
-
-                const data = await metadataResponse.json();
-                console.log(data);
-                // setUserMetadata(user_metadata);
-            } catch (e) {
-                console.log(e.message);
-            }
-
-            // try {
-            //     const accessToken = await getAccessTokenSilently({
-            //         audience: `https://${domain}/api/v2/`,
-            //         scope: 'read:users',
-            //     });
-
-            //     const usersUrl = `https://${domain}/api/v2/users/`
-            //     const usersResponse = await fetch(usersUrl, {
-            //         headers: {
-            //             Authorization: `Bearer ${accessToken}`,
-            //         },
-            //     });
-
-            //     const data = await usersResponse.json();
-            //     console.log(data);
-            // } catch (e) {
-            //     console.log(e);
-            // }
+            if (isAdmin) setIsAdmin(true);
         };
 
-        if (isAuthenticated) fetchAdmins();
-    }, [isAuthenticated]);
-
-    const userId = isAuthenticated && user.sub;
-    const isAdmin = isAuthenticated && JSON.parse(admins).some(admin => admin.user_id === userId);
+        if (isAuthenticated) fetchAdmin();
+    }, [isAuthenticated, user?.sub]);
 
     const shouldRenderDrawer = isAuthenticated;
     const drawerItems = isAdmin ? adminPanelItems : userPanelItems;
@@ -163,26 +132,34 @@ function Dashboard() {
                                         Войти или Зарегистрироваться
                                     </Button>
                                 )}
+
                                 {isAuthenticated && (
-                                    <Button
-                                        variant="contained"
-                                        onClick={() => {
-                                            logout({ returnTo: window.location.origin });
-                                            localStorage.clear();
-                                        }}
-                                    >
-                                        Выйти
-                                    </Button>
-                                )}
-                                {isAuthenticated && (
-                                    <div style={{ display: 'flex', marginLeft: '10px' }}>
-                                        <img
-                                            src={user.picture}
-                                            alt={user.name}
-                                            style={{ width: '45px', marginRight: '10px' }}
-                                        />
-                                        <p>{user.name}</p>
-                                    </div>
+                                    <>
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                marginRight: '2em',
+                                            }}
+                                        >
+                                            <img
+                                                src={user.picture}
+                                                alt={user.name}
+                                                style={{ width: '45px', marginRight: '1em' }}
+                                            />
+                                            <p style={{ margin: 0 }}>{user.name}</p>
+                                        </div>
+
+                                        <Button
+                                            variant="contained"
+                                            onClick={() => {
+                                                logout({ returnTo: window.location.origin });
+                                                localStorage.clear();
+                                            }}
+                                        >
+                                            Выйти
+                                        </Button>
+                                    </>
                                 )}
                             </div>
                         </Toolbar>

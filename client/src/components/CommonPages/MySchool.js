@@ -26,6 +26,10 @@ export default function MySchool() {
 
     return (
         <div>
+            <Typography variant="h3" component="h4" gutterBottom>
+                Моя школа
+            </Typography>
+
             {isAuthenticated && (
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <Link to="createEditSchool">
@@ -35,6 +39,7 @@ export default function MySchool() {
                     </Link>
                 </div>
             )}
+
             {school && (
                 <div className="main-body">
                     <div
