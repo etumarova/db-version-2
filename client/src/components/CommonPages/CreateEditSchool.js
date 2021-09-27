@@ -91,7 +91,9 @@ export default function CreateEditSchool() {
                     const res = await fetch(`/school/?userId=${user.sub}`);
                     const { school } = await res.json();
 
-                    setSchoolData(school);
+                    if (school) {
+                        setSchoolData(school);
+                    }
                 } catch (error) {
                     console.log(error);
                 }
@@ -299,7 +301,7 @@ export default function CreateEditSchool() {
             </div>
 
             <div className={classes.row}>
-                {school.name ? (
+                {school?.name ? (
                     <Button variant="contained" color="primary" onClick={editData}>
                         Сохранить изменения
                     </Button>

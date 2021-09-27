@@ -88,11 +88,6 @@ function Dashboard() {
     const { loginWithRedirect, isAuthenticated, logout, user } = useAuth0();
     const [isAdmin, setIsAdmin] = useState(false);
 
-    const socketRef = useRef(io('http://localhost:3001'));
-
-    useEffect(() => {
-        return () => socketRef.current.close();
-    }, []);
 
     useEffect(() => {
         const fetchAdmin = async () => {
@@ -117,7 +112,6 @@ function Dashboard() {
     const drawerItems = isAdmin ? adminPanelItems : userPanelItems;
 
     return (
-        <SocketContext.Provider value={useMemo(() => ({ socket: socketRef.current }), [])}>
             <Router>
                 <div className={classes.root}>
                     <CssBaseline />
@@ -197,7 +191,12 @@ function Dashboard() {
                         <Toolbar />
 
                         <Switch>
-                            <PrivateRoute exact path="/calendary" component={Calendary} />
+                            <PrivateRoute
+                                exact
+                                path="/calendary"
+                                isAdmin={isAdmin}
+                                component={Calendary}
+                            />
                             <PrivateRoute exact path="/competition" component={CompetitionPage} />
                             <PrivateRoute
                                 exact
@@ -237,7 +236,6 @@ function Dashboard() {
                     </main>
                 </div>
             </Router>
-        </SocketContext.Provider>
     );
 }
 

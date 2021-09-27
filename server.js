@@ -121,6 +121,28 @@ app.post('/editSchool', (req, res) => {
     );
 });
 
+app.get('/competitions', async (req, res) => {
+    try {
+        const competitions = await competitions.find();
+
+        res.json({ competitions });
+    } catch (error) {
+        res.status(500).json({ message: `Something went wrong while registering: ${error}` });
+    }
+});
+
+app.get('/entries/:idSchool', async (req, res) => {
+    try {
+        const idSchool = req.params.idSchool;
+        const myEntries = await entries.find({ idSchool });
+        const competitionEntries = await competitions.find();
+
+        res.json({ myEntries, competitionEntries });
+    } catch (error) {
+        res.status(500).json(error.toString());
+    }
+});
+
 const server = app.listen(PORT, () => {
     console.log('listening on *:3001');
 });

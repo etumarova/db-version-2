@@ -31,7 +31,7 @@ export default function MySchool() {
             </Typography>
 
             {isAuthenticated && (
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <div style={{ float: 'right' }}>
                     <Link to="createEditSchool">
                         <Button variant="contained" color="primary">
                             {school ? 'Редактировать' : 'Создать'}
