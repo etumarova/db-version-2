@@ -44,7 +44,7 @@ app.post('/checkUserRole', async (req, res) => {
 });
 
 app.get('/school', (req, res) => {
-    const userId = req.query.userId;
+    const { userId } = req.query;
 
     schools
         .findOne({ idUser: userId })
@@ -143,6 +143,97 @@ app.get('/entries/:idSchool', async (req, res) => {
     }
 });
 
+app.get('/sportsmen', (req, res) => {
+    const { idSchool } = req.query;
+    sportsmens
+        .find({ idSchool })
+        .then(sportsmen => res.json({ sportsmen }))
+        .catch(e => res.status(500).json(e.toString()));
+});
+
+app.get('/sportsmen/:id', (req, res) => {
+    const { id } = req.params;
+    sportsmens
+        .findById(id)
+        .then(sportsman => res.json({ sportsman }))
+        .catch(e => res.status(500).json(e.toString()));
+});
+
+app.post('/saveSportsman', (req, res) => {
+    const {
+        idSchool,
+        foto,
+        name,
+        birthday,
+        fTraner,
+        nowTraner,
+        school,
+        adress,
+        telephone,
+        listResults,
+    } = req.body;
+
+    sportsmens
+        .create({
+            idSchool: idSchool,
+            foto: foto,
+            name: name,
+            birthday: birthday,
+            fTraner: fTraner,
+            nowTraner: nowTraner,
+            school: school,
+            adress: adress,
+            telephone: telephone,
+            listResults: listResults,
+        })
+        .then(() => res.sendStatus(200))
+        .catch(err => res.status(500).json(err.toString()));
+});
+
+app.post('/editSportsman', (req, res) => {
+    const {
+        _id,
+        idSchool,
+        foto,
+        name,
+        birthday,
+        fTraner,
+        nowTraner,
+        school,
+        adress,
+        telephone,
+        listResults,
+    } = req.body;
+
+    sportsmens.updateOne(
+        {
+            _id: _id,
+        },
+        {
+            $set: {
+                idSchool: idSchool,
+                foto: foto,
+                name: name,
+                birthday: birthday,
+                fTraner: fTraner,
+                nowTraner: nowTraner,
+                school: school,
+                adress: adress,
+                telephone: telephone,
+                listResults: listResults,
+            },
+        },
+        (err, result) => {
+            if (err) {
+                res.status(500).json(err.toString());
+                return;
+            }
+
+            res.sendStatus(200);
+        }
+    );
+});
+
 const server = app.listen(PORT, () => {
     console.log('listening on *:3001');
 });
@@ -201,42 +292,6 @@ io.on('connection', function(socket) {
             .then(data => socket.emit('competition', data))
             .catch(err => console.log(err));
     });
-    socket.on('saveSchool', data => {
-        const { idUser, foto, name, director, description, region, city, adress, telephone } = data;
-        schools
-            .find({ idUser: idUser })
-            .then(data => {
-                if (data.length == 0) {
-                    schools
-                        .create({
-                            idUser: idUser,
-                            foto: foto,
-                            name: name,
-                            director: director,
-                            description: description,
-                            region: region,
-                            city: city,
-                            adress: adress,
-                            telephone: telephone,
-                        })
-                        .catch(err => console.log(err));
-                }
-            })
-            .then(data => socket.emit('saveSchoolSuccess', data))
-            .catch(err => {
-                socket.emit('saveSchoolFail');
-                console.log(err);
-            });
-    });
-    socket.on('getSchool', data => {
-        const { idUser } = data;
-        schools
-            .find({ idUser: idUser })
-            .then(data => {
-                socket.emit('school', data);
-            })
-            .catch(e => console.log(e));
-    });
 
     socket.on('getAdminSchools', data => {
         schools
@@ -279,14 +334,6 @@ io.on('connection', function(socket) {
                 }
             })
             .catch(err => console.log(err));
-    });
-
-    socket.on('getSportsmens', data => {
-        const { idSchool } = data;
-        sportsmens
-            .find({ idSchool: idSchool })
-            .then(data => socket.emit('sportsmens', data))
-            .catch(e => console.log(e));
     });
 
     socket.on('getAdminSportsmens', data => {
@@ -483,44 +530,6 @@ io.on('connection', function(socket) {
                 }
 
                 socket.emit('editSchoolSuccess', result);
-            }
-        );
-    });
-
-    socket.on('editSportsmen', data => {
-        const {
-            _id,
-            idSchool,
-            foto,
-            name,
-            birthday,
-            fTraner,
-            nowTraner,
-            school,
-            adress,
-            telephone,
-            listResults,
-        } = data;
-        sportsmens.updateOne(
-            {
-                _id: _id,
-            },
-            {
-                $set: {
-                    idSchool: idSchool,
-                    foto: foto,
-                    name: name,
-                    birthday: birthday,
-                    fTraner: fTraner,
-                    nowTraner: nowTraner,
-                    school: school,
-                    adress: adress,
-                    telephone: telephone,
-                    listResults: listResults,
-                },
-            },
-            (err, result) => {
-                if (err) console.log(err);
             }
         );
     });

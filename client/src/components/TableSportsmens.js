@@ -1,5 +1,6 @@
 import React from 'react';
 import { DataGrid } from '@material-ui/data-grid';
+import { useHistory } from 'react-router';
 
 const columns = [
     { field: 'id', headerName: 'ID', width: 70 },
@@ -8,21 +9,23 @@ const columns = [
     { field: 'nowTraner', headerName: 'Личный тренер', width: 260 },
     { field: 'school', headerName: 'Принадлежность', width: 180 },
     { field: 'telephone', headerName: 'Телефон', width: 140 },
-  ];
+];
 
 export default function TableSportsmens(props) {
+    const history = useHistory();
     const { sportsmens } = props;
     return (
         <div style={{ height: 500, width: '100%' }}>
-            <DataGrid 
-                rows={sportsmens} 
-                columns={columns} 
+            <DataGrid
+                rows={sportsmens}
+                columns={columns}
                 pageSize={15}
-                className='table-style' 
-                onRowClick={(e)=>{
-                    window.location.assign('/sportsmen');
-                    localStorage.setItem('sportsmen', JSON.stringify(e.row))
-                }}/>
+                className="table-style"
+                onRowClick={e => {
+                    const userId = e.row.id;
+                    history.push(`/sportsmen/${userId}`);
+                }}
+            />
         </div>
-    )
+    );
 }

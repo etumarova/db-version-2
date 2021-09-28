@@ -1,45 +1,37 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const SportsmenSchema = new mongoose.Schema({
-  idSchool: {
-    type: String,
-    require: true,
-  },
-  foto: {
-    type: String,
-    require: true,
-  },
-  name: {
-    type: String,
-    require: true,
-  },
-  birthday: {
-    type: String,
-    require: true,
-  },
-  fTraner: {
-    type: String,
-    require: true,
-  },
-  nowTraner: {
-    type: String,
-    require: true,
-  },
-  school: {
-    type: String,
-    require: true,
-  },
-  adress: {
-    type: String,
-    require: true,
-  },
-  telephone: {
-    type: String,
-    require: true,
-  },
-  listResults: {
-    type: String,
-    require: true,
-  },
+    idSchool: {
+        type: String,
+        require: true,
+    },
+    foto: {
+        type: String,
+    },
+    name: {
+        type: String,
+        require: true,
+    },
+    birthday: {
+        type: String,
+    },
+    fTraner: {
+        type: String,
+    },
+    nowTraner: {
+        type: String,
+    },
+    school: {
+        type: String,
+    },
+    adress: {
+        type: String,
+    },
+    telephone: {
+        type: String,
+    },
+    listResults: {
+        type: String,
+    },
 });
-SportsmenSchema.index({ "$**": "text" });
-module.exports = mongoose.model("sportsmen", SportsmenSchema);
+// SportsmenSchema.index({ '$**': 'text' });
+module.exports = mongoose.model('sportsmen', SportsmenSchema);

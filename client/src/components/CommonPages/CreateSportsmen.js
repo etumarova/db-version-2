@@ -10,7 +10,10 @@ import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import { DataGrid } from '@material-ui/data-grid';
-import useSocket from 'hooks/useSocket';
+import { useMutation, useQuery } from 'react-query';
+import { fetchSportsmenBySchoolId, saveSportsman, editSportsman } from 'services/sportsmen';
+import { useHistory } from 'react-router-dom';
+import { queryClient } from 'features/queryClient';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -33,6 +36,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function CreateSportsmen() {
+    const history = useHistory();
     const [foto, setFoto] = useState(null);
     const [name, setName] = useState(null);
     const [birthday, setBirthday] = useState(null);
@@ -48,35 +52,68 @@ export default function CreateSportsmen() {
     const classes = useStyles();
     const [sportsmen, setSportsmen] = useState({});
 
-    const { socket } = useSocket();
+    const saveSportsmanMutation = useMutation(saveSportsman, {
+        onSuccess: () => {
+            queryClient.invalidateQueries('sportsmen');
+            history.push('/mySportsmens');
+        },
+        onError: error => console.log(error),
+    });
+    const editSportsmanMutation = useMutation(editSportsman, {
+        onSuccess: () => {
+            queryClient.invalidateQueries('sportsmen');
+            history.push('/mySportsmens');
+        },
+        onError: error => console.log(error),
+    });
 
-    useEffect(() => {
-        socket.emit('getAdminTraners');
-        socket.on('adminTraners', data => {
-            data.forEach(el => (el['id'] = el['_id']));
-            setTraners(data);
-        });
-        try {
-            const editSportsmen = localStorage.getItem('sportsmen');
-            if (editSportsmen) {
-                const data = JSON.parse(editSportsmen);
-                setSportsmen(data);
-                setFoto(data.foto);
-                setListResults(JSON.parse(data.listResults));
-                setName(data.name);
-                setBirthday(data.birthday);
-                setAdress(data.adress);
-                setTelephone(data.telephone);
-                setFTraner(data.fTraner);
-                setNowTraner(data.nowTraner);
-                setSchool(data.school);
-                localStorage.clear();
-                row(JSON.parse(data.listResults));
-            }
-        } catch (e) {
-            console.log(e);
-        }
-    }, []);
+    const setSportsmanData = data => {
+        setSportsmen(data);
+        setFoto(data.foto);
+        setListResults(JSON.parse(data.listResults));
+        setName(data.name);
+        setBirthday(data.birthday);
+        setAdress(data.adress);
+        setTelephone(data.telephone);
+        setFTraner(data.fTraner);
+        setNowTraner(data.nowTraner);
+        setSchool(data.school);
+    };
+
+    // const { data } = useQuery(['sportsmen', user?.sub], () => fetchSportsmenBySchoolId(user?.sub));
+    // const { sportsmen } = data || {};
+
+    // useEffect(() => {
+    //     // setSportsmanData();
+    // }, [sportsmen])
+
+    // useEffect(() => {
+    //     socket.emit('getAdminTraners');
+    //     socket.on('adminTraners', data => {
+    //         data.forEach(el => (el['id'] = el['_id']));
+    //         setTraners(data);
+    //     });
+    //     try {
+    //         const editSportsmen = localStorage.getItem('sportsmen');
+    //         if (editSportsmen) {
+    //             const data = JSON.parse(editSportsmen);
+    //             setSportsmen(data);
+    //             setFoto(data.foto);
+    //             setListResults(JSON.parse(data.listResults));
+    //             setName(data.name);
+    //             setBirthday(data.birthday);
+    //             setAdress(data.adress);
+    //             setTelephone(data.telephone);
+    //             setFTraner(data.fTraner);
+    //             setNowTraner(data.nowTraner);
+    //             setSchool(data.school);
+    //             localStorage.clear();
+    //             row(JSON.parse(data.listResults));
+    //         }
+    //     } catch (e) {
+    //         console.log(e);
+    //     }
+    // }, []);
 
     const onDrop = async acceptedFiles => {
         const url = `https://api.cloudinary.com/v1_1/dgeev9d6l/image/upload`;
@@ -111,7 +148,8 @@ export default function CreateSportsmen() {
             telephone: telephone,
             listResults: JSON.stringify(listResults),
         };
-        socket.emit('addSportsmen', data);
+        // socket.emit('addSportsmen', data);
+        saveSportsmanMutation.mutate(data);
     };
 
     const editData = e => {
@@ -129,7 +167,8 @@ export default function CreateSportsmen() {
             telephone: telephone,
             listResults: JSON.stringify(listResults),
         };
-        socket.emit('editSportsmen', data);
+        editSportsmanMutation.mutate(data);
+        // socket.emit('editSportsmen', data);
     };
 
     const addResult = e => {

@@ -4,25 +4,19 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Link } from 'react-router-dom';
+import { useQuery } from 'react-query';
+import { fetchSchoolByUserId } from 'services/school';
 
 export default function MySchool() {
-    const [school, setSchool] = useState(null);
+    // const [school, setSchool] = useState(null);
     const { isAuthenticated, user } = useAuth0();
+    const { isSuccess, isError, data } = useQuery(['school', user?.sub], () =>
+        fetchSchoolByUserId(user?.sub)
+    );
 
-    useEffect(() => {
-        (async () => {
-            if (user?.sub) {
-                try {
-                    const res = await fetch(`/school/?userId=${user.sub}`);
-                    const { school } = await res.json();
+    const { school } = data || {};
 
-                    setSchool(school);
-                } catch (error) {
-                    console.log(error);
-                }
-            }
-        })();
-    }, [user?.sub]);
+    const showNoDataWarning = user?.sub && (isSuccess || isError) && !school;
 
     return (
         <div>
@@ -40,6 +34,7 @@ export default function MySchool() {
                 </div>
             )}
 
+            {showNoDataWarning && <p>Нет сохраненной школы</p>}
             {school && (
                 <div className="main-body">
                     <div

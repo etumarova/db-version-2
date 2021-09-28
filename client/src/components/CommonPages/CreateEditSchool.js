@@ -11,6 +11,9 @@ import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useHistory } from 'react-router-dom';
+import { useQuery, useMutation } from 'react-query';
+import { editSchool, saveSchool, fetchSchoolByUserId } from 'services/school';
+import { queryClient } from 'features/queryClient';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -59,8 +62,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function CreateEditSchool() {
+    const classes = useStyles();
     const history = useHistory();
     const { user } = useAuth0();
+
     const [name, setName] = useState('');
     const [director, setDirector] = useState('');
     const [foto, setFoto] = useState(null);
@@ -69,11 +74,26 @@ export default function CreateEditSchool() {
     const [city, setCity] = useState('');
     const [adress, setAdress] = useState('');
     const [telephone, setTelephone] = useState('');
-    const classes = useStyles();
-    const [school, setSchool] = useState({});
+
+    // const [school, setSchool] = useState({});
+    const { data } = useQuery(['school', user?.sub], () => fetchSchoolByUserId(user?.sub));
+    const { school } = data || {};
+    const saveSchoolMutation = useMutation(saveSchool, {
+        onSuccess: () => {
+            queryClient.invalidateQueries('school');
+            history.push('/mySchool');
+        },
+        onError: error => console.log(error),
+    });
+    const editSchoolMutation = useMutation(editSchool, {
+        onSuccess: () => {
+            queryClient.invalidateQueries('school');
+            history.push('/mySchool');
+        },
+        onError: error => console.log(error),
+    });
 
     const setSchoolData = data => {
-        setSchool(data);
         setRegion(data.region);
         setFoto(data.foto);
         setName(data.name);
@@ -85,21 +105,8 @@ export default function CreateEditSchool() {
     };
 
     useEffect(() => {
-        (async () => {
-            if (user?.sub) {
-                try {
-                    const res = await fetch(`/school/?userId=${user.sub}`);
-                    const { school } = await res.json();
-
-                    if (school) {
-                        setSchoolData(school);
-                    }
-                } catch (error) {
-                    console.log(error);
-                }
-            }
-        })();
-    }, [user?.sub]);
+        if (school) setSchoolData(school);
+    }, [school]);
 
     const onDrop = async acceptedFiles => {
         const url = `https://api.cloudinary.com/v1_1/dgeev9d6l/image/upload`;
@@ -120,65 +127,39 @@ export default function CreateEditSchool() {
         multiple: false,
     });
 
-    const saveData = async e => {
+    const saveData = e => {
         e.preventDefault();
         const data = {
             idUser: user.sub,
-            foto: foto,
-            name: name,
-            director: director,
-            description: description,
-            region: region,
-            city: city,
-            adress: adress,
-            telephone: telephone,
+            foto,
+            name,
+            director,
+            description,
+            region,
+            city,
+            adress,
+            telephone,
         };
 
-        try {
-            await fetch('/saveSchool', {
-                method: 'post',
-                headers: {
-                    Accept: 'application/json, text/plain, */*',
-                    'Content-Type': 'application/json',
-                },
-                body: data,
-            });
-
-            history.push('/mySchool');
-        } catch (error) {
-            console.log(error);
-        }
+        saveSchoolMutation.mutate(data);
     };
 
-    const editData = async e => {
+    const editData = e => {
         e.preventDefault();
         const data = {
             _id: school._id,
             idUser: user.sub,
-            foto: foto,
-            name: name,
-            director: director,
-            description: description,
-            region: region,
-            city: city,
-            adress: adress,
-            telephone: telephone,
+            foto,
+            name,
+            director,
+            description,
+            region,
+            city,
+            adress,
+            telephone,
         };
 
-        try {
-            await fetch('/editSchool', {
-                method: 'post',
-                headers: {
-                    Accept: 'application/json, text/plain, */*',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
-
-            history.push('/mySchool');
-        } catch (error) {
-            console.log(error);
-        }
+        editSchoolMutation.mutate(data);
     };
 
     return (
