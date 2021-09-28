@@ -1,28 +1,24 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const TranerSchema = new mongoose.Schema({
-  idSchool: {
-    type: String,
-    require: true,
-  },
-  foto: {
-    type: String,
-    require: true,
-  },
-  name: {
-    type: String,
-    require: true,
-  },
-  birthday: {
-    type: String,
-    require: true,
-  },
-  school: {
-    type: String,
-    require: true,
-  },
-  telephone: {
-    type: String,
-    require: true,
-  },
+    idSchool: {
+        type: String,
+        require: true,
+    },
+    foto: {
+        type: String,
+    },
+    name: {
+        type: String,
+        require: true,
+    },
+    birthday: {
+        type: String,
+    },
+    school: {
+        type: String,
+    },
+    telephone: {
+        type: String,
+    },
 });
-module.exports = mongoose.model("traner", TranerSchema);
+module.exports = mongoose.model('traner', TranerSchema);

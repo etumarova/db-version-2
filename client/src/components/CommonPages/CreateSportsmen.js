@@ -148,7 +148,6 @@ export default function CreateSportsmen() {
             telephone: telephone,
             listResults: JSON.stringify(listResults),
         };
-        // socket.emit('addSportsmen', data);
         saveSportsmanMutation.mutate(data);
     };
 
@@ -168,7 +167,6 @@ export default function CreateSportsmen() {
             listResults: JSON.stringify(listResults),
         };
         editSportsmanMutation.mutate(data);
-        // socket.emit('editSportsmen', data);
     };
 
     const addResult = e => {

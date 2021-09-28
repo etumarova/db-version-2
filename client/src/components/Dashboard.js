@@ -204,7 +204,7 @@ function Dashboard() {
                         <PrivateRoute exact path="/sportsmen/:id" component={SportsmenPage} />
                         <PrivateRoute exact path="/myTraners" component={MyTraners} />
                         <PrivateRoute exact path="/createTraner" component={CreateTraner} />
-                        <PrivateRoute exact path="/traner" component={TranerPage} />
+                        <PrivateRoute exact path="/traner/:id" component={TranerPage} />
                         <PrivateRoute exact path="/myEntries" component={MyEntries} />
                         <PrivateRoute exact path="/createEntries" component={CreateEntries} />
                         <PrivateRoute exact path="/entrie" component={EntriePage} />

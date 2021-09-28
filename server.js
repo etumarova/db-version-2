@@ -144,9 +144,20 @@ app.get('/entries/:idSchool', async (req, res) => {
 });
 
 app.get('/sportsmen', (req, res) => {
-    const { idSchool } = req.query;
+    const possibleQueryParams = ['idSchool', 'nowTrainer'];
+    const queryEntries = possibleQueryParams
+        .map(param => [param, req.query[param]])
+        .filter(entry => entry[1]);
+
+    // const query = Object.fromEntries(queryEntries); add polyfills/core-js?
+
+    const query = {};
+    queryEntries.forEach(([param, value]) => {
+        query[param] = value;
+    });
+
     sportsmens
-        .find({ idSchool })
+        .find(query)
         .then(sportsmen => res.json({ sportsmen }))
         .catch(e => res.status(500).json(e.toString()));
 });
@@ -221,6 +232,65 @@ app.post('/editSportsman', (req, res) => {
                 adress: adress,
                 telephone: telephone,
                 listResults: listResults,
+            },
+        },
+        (err, result) => {
+            if (err) {
+                res.status(500).json(err.toString());
+                return;
+            }
+
+            res.sendStatus(200);
+        }
+    );
+});
+
+app.get('/trainers', (req, res) => {
+    const { idSchool } = req.query;
+    traners
+        .find({ idSchool })
+        .then(trainers => res.json({ trainers }))
+        .catch(e => res.status(500).json(e.toString()));
+});
+
+app.get('/trainers/:id', (req, res) => {
+    const { id } = req.params;
+    traners
+        .findById(id)
+        .then(trainer => res.json({ trainer }))
+        .catch(e => res.status(500).json(e.toString()));
+});
+
+app.post('/saveTrainer', (req, res) => {
+    const { idSchool, foto, name, birthday, school, telephone } = req.body;
+
+    traners
+        .create({
+            idSchool,
+            foto,
+            name,
+            birthday,
+            school,
+            telephone,
+        })
+        .then(() => res.sendStatus(200))
+        .catch(err => res.status(500).json(err.toString()));
+});
+
+app.post('/editTrainer', (req, res) => {
+    const { _id, idSchool, foto, name, birthday, school, telephone } = req.body;
+    traners.updateOne(
+        {
+            _id: _id,
+        },
+        {
+            $set: {
+                idSchool: idSchool,
+                foto: foto,
+                name: name,
+                birthday: birthday,
+                school: school,
+                telephone: telephone,
             },
         },
         (err, result) => {

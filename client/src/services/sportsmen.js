@@ -3,6 +3,9 @@ export const fetchSportsmenBySchoolId = schoolId =>
 
 export const fetchSportsmanById = id => fetch(`/sportsmen/${id}`).then(res => res.json());
 
+export const fetchSportsmenByTrainerId = trainerId =>
+    fetch(`/sportsmen/?nowTrainer=${trainerId}`).then(res => res.json());
+
 export const saveSportsman = data =>
     fetch('/saveSportsman', {
         method: 'post',
