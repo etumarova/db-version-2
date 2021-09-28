@@ -11,6 +11,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import { DataGrid } from '@material-ui/data-grid';
 import { useAuth0 } from '@auth0/auth0-react';
+import { fetchCompetitions } from 'services/competition';
+import { useQuery } from 'react-query';
 
 const useStyles = makeStyles(theme => ({
     formControl: {
@@ -29,10 +31,9 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function CreateEntries() {
-    const socket = io();
     const classes = useStyles();
     const [sportsmens, setSportsmens] = useState([]);
-    const [competitions, setCompetitions] = useState(null);
+    // const [competitions, setCompetitions] = useState(null);
     const [traners, setTraners] = useState(null);
     const [selectCompetition, setSelectCompetition] = useState(null);
     const [selectTraner, setSelectTraner] = useState(null);
@@ -47,12 +48,15 @@ export default function CreateEntries() {
     const today = Date.now();
     const { user, isAuthenticated } = useAuth0();
 
+    const { data: competitionsData } = useQuery('competitions', fetchCompetitions);
+    const { competitions } = competitionsData || {};
+
     useEffect(() => {
         (async () => {
             if (user?.sub) {
                 try {
-                    const competitionsResponse = fetch('/competitions');
-                    const { competitions } = await competitionsResponse.json();
+                    // const competitionsResponse = fetch('/competitions');
+                    // const { competitions } = await competitionsResponse.json();
 
                     const sportsmenResponse = fetch(`/sportsmen/${user.sub}`);
                     const { sportsmen } = await sportsmenResponse.json();
@@ -60,9 +64,9 @@ export default function CreateEntries() {
                     const trainersResponse = fetch(`/trainers/${user.sub}`);
                     const { trainers } = await trainersResponse.json();
 
-                    if (competitions) {
-                        setCompetitions(competitions);
-                    }
+                    // if (competitions) {
+                    //     setCompetitions(competitions);
+                    // }
 
                     if (sportsmen) {
                         setSportsmens(sportsmen);
@@ -161,7 +165,7 @@ export default function CreateEntries() {
                 dateSend: today.toUTCString(),
                 sportsmensList: JSON.stringify(selectSportsmens),
             };
-            socket.emit('addEntries', data);
+            // socket.emit('addEntries', data);
         } else {
             alert('Не введены данные!');
         }
@@ -180,7 +184,7 @@ export default function CreateEntries() {
             dateSend: today.toUTCString(),
             sportsmensList: JSON.stringify(selectSportsmens),
         };
-        socket.emit('editEntries', data);
+        // socket.emit('editEntries', data);
     };
 
     const deleteCeill = e => {
@@ -194,6 +198,8 @@ export default function CreateEntries() {
             row();
         }
     };
+
+    const validCompetitions = competitions?.filter(comp => new Date(comp.deadLine) < new Date());
 
     return (
         <div>
@@ -218,12 +224,10 @@ export default function CreateEntries() {
                         }}
                     >
                         <MenuItem value="">None</MenuItem>
-                        {competitions &&
-                            competitions.map(el => {
-                                if (new Date(el.deadLine) >= new Date(today)) {
-                                    return <MenuItem value={el._id}>{el.name}</MenuItem>;
-                                }
-                            })}
+                        {validCompetitions &&
+                            validCompetitions.map(el => (
+                                <MenuItem value={el._id}>{el.name}</MenuItem>
+                            ))}
                     </Select>
                 </FormControl>
             </div>
