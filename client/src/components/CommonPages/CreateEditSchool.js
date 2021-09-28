@@ -10,7 +10,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
 import { useAuth0 } from '@auth0/auth0-react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { useQuery, useMutation } from 'react-query';
 import { editSchool, saveSchool, fetchSchoolByUserId } from 'services/school';
 import { queryClient } from 'features/queryClient';
@@ -62,9 +62,12 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function CreateEditSchool() {
+    const { id } = useParams();
     const classes = useStyles();
     const history = useHistory();
     const { user } = useAuth0();
+
+    const userId = id || user?.sub;
 
     const [name, setName] = useState('');
     const [director, setDirector] = useState('');
@@ -76,19 +79,21 @@ export default function CreateEditSchool() {
     const [telephone, setTelephone] = useState('');
 
     // const [school, setSchool] = useState({});
-    const { data } = useQuery(['school', user?.sub], () => fetchSchoolByUserId(user?.sub));
+    const { data } = useQuery(['school', userId], () => fetchSchoolByUserId(userId));
     const { school } = data || {};
     const saveSchoolMutation = useMutation(saveSchool, {
         onSuccess: () => {
             queryClient.invalidateQueries('school');
-            history.push('/mySchool');
+            // history.push('/mySchool');
+            history.goBack();
         },
         onError: error => console.log(error),
     });
     const editSchoolMutation = useMutation(editSchool, {
         onSuccess: () => {
             queryClient.invalidateQueries('school');
-            history.push('/mySchool');
+            // history.push('/mySchool');
+            history.goBack();
         },
         onError: error => console.log(error),
     });
@@ -130,7 +135,7 @@ export default function CreateEditSchool() {
     const saveData = e => {
         e.preventDefault();
         const data = {
-            idUser: user.sub,
+            idUser: userId,
             foto,
             name,
             director,
@@ -148,7 +153,7 @@ export default function CreateEditSchool() {
         e.preventDefault();
         const data = {
             _id: school._id,
-            idUser: user.sub,
+            idUser: userId,
             foto,
             name,
             director,

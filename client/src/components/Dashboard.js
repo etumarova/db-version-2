@@ -197,14 +197,14 @@ function Dashboard() {
                             path="/createCompetition"
                             component={CreateCompetition}
                         />
-                        <PrivateRoute exact path="/mySchool" component={MySchool} />
-                        <PrivateRoute exact path="/createEditSchool" component={CreateEditSchool} />
+                        <PrivateRoute path="/mySchool/:id" component={MySchool} />
+                        <PrivateRoute path="/createEditSchool/:id" component={CreateEditSchool} />
                         <PrivateRoute exact path="/mySportsmens" component={MySportsmens} />
                         <PrivateRoute exact path="/createSportsmen" component={CreateSportsmen} />
-                        <PrivateRoute exact path="/sportsmen/:id" component={SportsmenPage} />
+                        <PrivateRoute path="/sportsmen/:id" component={SportsmenPage} />
                         <PrivateRoute exact path="/myTraners" component={MyTraners} />
                         <PrivateRoute exact path="/createTraner" component={CreateTraner} />
-                        <PrivateRoute exact path="/traner/:id" component={TranerPage} />
+                        <PrivateRoute path="/traner/:id" component={TranerPage} />
                         <PrivateRoute exact path="/myEntries" component={MyEntries} />
                         <PrivateRoute exact path="/createEntries" component={CreateEntries} />
                         <PrivateRoute exact path="/entrie" component={EntriePage} />

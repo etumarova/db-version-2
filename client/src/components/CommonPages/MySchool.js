@@ -3,30 +3,33 @@ import { Image } from 'cloudinary-react';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import { useAuth0 } from '@auth0/auth0-react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { fetchSchoolByUserId } from 'services/school';
 
 export default function MySchool() {
-    // const [school, setSchool] = useState(null);
+    const { id } = useParams();
     const { isAuthenticated, user } = useAuth0();
-    const { isSuccess, isError, data } = useQuery(['school', user?.sub], () =>
-        fetchSchoolByUserId(user?.sub)
+
+    const userId = id || user?.sub;
+    const { isSuccess, isError, data } = useQuery(['school', userId], () =>
+        fetchSchoolByUserId(userId)
     );
 
     const { school } = data || {};
 
     const showNoDataWarning = user?.sub && (isSuccess || isError) && !school;
 
+    const title = id ? 'Школа' : 'Моя школа';
     return (
         <div>
             <Typography variant="h3" component="h4" gutterBottom>
-                Моя школа
+                {title}
             </Typography>
 
             {isAuthenticated && (
                 <div style={{ float: 'right' }}>
-                    <Link to="createEditSchool">
+                    <Link to={`/createEditSchool/${userId}`}>
                         <Button variant="contained" color="primary">
                             {school ? 'Редактировать' : 'Создать'}
                         </Button>

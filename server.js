@@ -43,6 +43,13 @@ app.post('/checkUserRole', async (req, res) => {
     }
 });
 
+app.get('/schools', (req, res) => {
+    schools
+        .find()
+        .then(schools => res.json({ schools }))
+        .catch(e => console.log(e));
+});
+
 app.get('/school', (req, res) => {
     const { userId } = req.query;
 
