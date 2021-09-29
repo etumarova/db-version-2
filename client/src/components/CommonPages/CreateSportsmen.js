@@ -11,8 +11,8 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import { DataGrid } from '@material-ui/data-grid';
 import { useMutation, useQuery } from 'react-query';
-import { fetchSportsmenBySchoolId, saveSportsman, editSportsman } from 'services/sportsmen';
-import { useHistory } from 'react-router-dom';
+import { fetchSportsmanById, saveSportsman, editSportsman } from 'services/sportsmen';
+import { useHistory, useParams } from 'react-router-dom';
 import { queryClient } from 'features/queryClient';
 
 const useStyles = makeStyles(theme => ({
@@ -36,6 +36,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function CreateSportsmen() {
+    const { id } = useParams();
+
     const history = useHistory();
     const [foto, setFoto] = useState(null);
     const [name, setName] = useState(null);
@@ -50,35 +52,41 @@ export default function CreateSportsmen() {
     const [traners, setTraners] = useState(null);
     const [rowTable, setRowTabel] = useState([]);
     const classes = useStyles();
-    const [sportsmen, setSportsmen] = useState({});
 
+    const shouldFetch = !!id;
+    const { data: sportsmanData } = useQuery(['sportsman', id], () => fetchSportsmanById(id), {
+        enabled: shouldFetch,
+    });
+    const { sportsman } = sportsmanData || {};
     const saveSportsmanMutation = useMutation(saveSportsman, {
         onSuccess: () => {
             queryClient.invalidateQueries('sportsmen');
-            history.push('/mySportsmens');
+            history.goBack();
         },
         onError: error => console.log(error),
     });
     const editSportsmanMutation = useMutation(editSportsman, {
         onSuccess: () => {
-            queryClient.invalidateQueries('sportsmen');
-            history.push('/mySportsmens');
+            queryClient.invalidateQueries(['sportsman', id]);
+            history.goBack();
         },
         onError: error => console.log(error),
     });
 
-    const setSportsmanData = data => {
-        setSportsmen(data);
-        setFoto(data.foto);
-        setListResults(JSON.parse(data.listResults));
-        setName(data.name);
-        setBirthday(data.birthday);
-        setAdress(data.adress);
-        setTelephone(data.telephone);
-        setFTraner(data.fTraner);
-        setNowTraner(data.nowTraner);
-        setSchool(data.school);
-    };
+    useEffect(() => {
+        if (sportsman) {
+            // setSportsmen(data);
+            setFoto(sportsman.foto);
+            setListResults(JSON.parse(sportsman.listResults));
+            setName(sportsman.name);
+            setBirthday(sportsman.birthday);
+            setAdress(sportsman.adress);
+            setTelephone(sportsman.telephone);
+            setFTraner(sportsman.fTraner);
+            setNowTraner(sportsman.nowTraner);
+            setSchool(sportsman.school);
+        }
+    }, [sportsman]);
 
     // const { data } = useQuery(['sportsmen', user?.sub], () => fetchSportsmenBySchoolId(user?.sub));
     // const { sportsmen } = data || {};
@@ -154,7 +162,7 @@ export default function CreateSportsmen() {
     const editData = e => {
         e.preventDefault();
         const data = {
-            _id: sportsmen._id,
+            _id: sportsman._id,
             idSchool: localStorage.getItem('user'),
             foto: foto,
             name: name,
@@ -222,7 +230,7 @@ export default function CreateSportsmen() {
                     style={{ margin: 8 }}
                     placeholder="Введите ФИО спортсмена"
                     fullWidth
-                    defaultValue={sportsmen.name}
+                    value={name}
                     onChange={e => setName(e.target.value)}
                     margin="normal"
                     InputLabelProps={{
@@ -234,7 +242,7 @@ export default function CreateSportsmen() {
                     label="Дата рождения"
                     type="date"
                     className={classes.textField}
-                    defaultValue={sportsmen.birthday}
+                    value={birthday}
                     onChange={e => setBirthday(e.target.value)}
                     InputLabelProps={{
                         shrink: true,
@@ -244,7 +252,7 @@ export default function CreateSportsmen() {
                     label="Контактный номер телефона"
                     id="outlined-margin-normal"
                     className={classes.textField}
-                    defaultValue={sportsmen.telephone}
+                    value={telephone}
                     placeholder="Введите номер телефона"
                     variant="outlined"
                     onChange={e => setTelephone(e.target.value)}
@@ -254,7 +262,7 @@ export default function CreateSportsmen() {
                     id="margin-none"
                     style={{ margin: 8 }}
                     placeholder="Введите адрес прописки"
-                    defaultValue={sportsmen.adress}
+                    value={adress}
                     fullWidth
                     onChange={e => setAdress(e.target.value)}
                     margin="normal"
@@ -269,7 +277,7 @@ export default function CreateSportsmen() {
                     id="outlined-margin-none"
                     className={classes.textField}
                     placeholder="Введите ФИО первого тренера"
-                    defaultValue={sportsmen.fTraner}
+                    value={fTraner}
                     variant="outlined"
                     onChange={e => setFTraner(e.target.value)}
                 />
@@ -288,7 +296,7 @@ export default function CreateSportsmen() {
                 <TextField
                     label="Принадлежность"
                     className={classes.textField}
-                    defaultValue={sportsmen.school}
+                    value={school}
                     placeholder="Введите спортивный клуб"
                     variant="outlined"
                     onChange={e => setSchool(e.target.value)}
@@ -360,13 +368,13 @@ export default function CreateSportsmen() {
                     />
                 </div>
 
-                {!sportsmen.name && (
+                {!sportsman && (
                     <Button variant="contained" color="primary" onClick={saveData}>
                         Сохранить
                     </Button>
                 )}
 
-                {sportsmen.name && (
+                {sportsman && (
                     <Button variant="contained" color="primary" onClick={editData}>
                         Редактировать
                     </Button>

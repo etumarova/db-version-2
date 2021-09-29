@@ -30,7 +30,7 @@ export default function MyTraners() {
     return (
         <div>
             <div style={{ float: 'right' }}>
-                <Link to="createTraner">
+                <Link to="createTrainer">
                     <Button variant="contained" color="primary">
                         Добавить тренера
                     </Button>

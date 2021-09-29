@@ -1,3 +1,5 @@
+export const fetchTrainers = () => fetch(`/trainers`).then(res => res.json());
+
 export const fetchTrainersBySchoolId = schoolId =>
     fetch(`/trainers/?idSchool=${schoolId}`).then(res => res.json());
 

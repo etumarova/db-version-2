@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import Typography from '@material-ui/core/Typography';
 import TableSportsmens from 'components/TableSportsmens';
 import Button from '@material-ui/core/Button';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { useAuth0 } from '@auth0/auth0-react';
 import { fetchSportsmenBySchoolId } from 'services/sportsmen';

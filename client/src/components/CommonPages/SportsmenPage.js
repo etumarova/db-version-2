@@ -44,7 +44,7 @@ export default function SportsmenPage() {
                                             width="250"
                                         />
 
-                                        <Link to="createSportsmen">
+                                        <Link to={`/createSportsmen/${id}`}>
                                             <Button
                                                 variant="contained"
                                                 size="small"

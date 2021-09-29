@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import io from 'socket.io-client';
 import Typography from '@material-ui/core/Typography';
 import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';

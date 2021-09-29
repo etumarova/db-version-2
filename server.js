@@ -25,6 +25,33 @@ if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging')
     });
 }
 
+const buildMongoQuery = (possibleQueryParams, reqQuery) => {
+    const queryEntries = possibleQueryParams
+        .map(param => [param, reqQuery[param]])
+        .filter(entry => entry[1]);
+
+    // const query = Object.fromEntries(queryEntries); add polyfills/core-js?
+
+    const query = {};
+    queryEntries.forEach(([param, value]) => {
+        query[param] = value;
+    });
+
+    return query;
+};
+
+// todo: code splitting, service routers
+
+// USER
+
+app.get('/users', (req, res) => {
+    // fetch additional info from auth0
+    users
+        .find()
+        .then(users => res.json({ users }))
+        .catch(e => res.status(500).json(error.toString()));
+});
+
 app.post('/checkUserRole', async (req, res) => {
     try {
         const userData = req.body;
@@ -43,11 +70,12 @@ app.post('/checkUserRole', async (req, res) => {
     }
 });
 
+// SCHOOLS
 app.get('/schools', (req, res) => {
     schools
         .find()
         .then(schools => res.json({ schools }))
-        .catch(e => console.log(e));
+        .catch(e => e.sen);
 });
 
 app.get('/school', (req, res) => {
@@ -80,9 +108,8 @@ app.post('/saveSchool', (req, res) => {
             }
         })
         .then(() => res.sendStatus(200))
-        .catch(err => {
-            socket.emit('saveSchoolFail');
-            console.log(err);
+        .catch(error => {
+            res.status(500).json(error.toString());
         });
 });
 
@@ -128,6 +155,10 @@ app.post('/editSchool', (req, res) => {
     );
 });
 
+// ENTRIES / COMPETITIONS
+
+app.get('entries', (req, res) => {});
+
 app.get('/entries/:idSchool', async (req, res) => {
     try {
         const idSchool = req.params.idSchool;
@@ -140,19 +171,17 @@ app.get('/entries/:idSchool', async (req, res) => {
     }
 });
 
+app.get('/competitions', (req, res) => {
+    return competitions
+        .find()
+        .then(competitions => res.json({ competitions }))
+        .catch(e => res.status(500).json(e.toString()));
+});
+
+// SPORTSMEN
+
 app.get('/sportsmen', (req, res) => {
-    const possibleQueryParams = ['idSchool', 'nowTrainer'];
-    const queryEntries = possibleQueryParams
-        .map(param => [param, req.query[param]])
-        .filter(entry => entry[1]);
-
-    // const query = Object.fromEntries(queryEntries); add polyfills/core-js?
-
-    const query = {};
-    queryEntries.forEach(([param, value]) => {
-        query[param] = value;
-    });
-
+    const query = buildMongoQuery(['idSchool', 'nowTrainer'], req.query);
     sportsmens
         .find(query)
         .then(sportsmen => res.json({ sportsmen }))
@@ -242,10 +271,13 @@ app.post('/editSportsman', (req, res) => {
     );
 });
 
+// TRAINERS
+
 app.get('/trainers', (req, res) => {
-    const { idSchool } = req.query;
+    const query = buildMongoQuery(['idSchool'], req.query);
+
     traners
-        .find({ idSchool })
+        .find(query)
         .then(trainers => res.json({ trainers }))
         .catch(e => res.status(500).json(e.toString()));
 });
@@ -299,13 +331,6 @@ app.post('/editTrainer', (req, res) => {
             res.sendStatus(200);
         }
     );
-});
-
-app.get('/competitions', (req, res) => {
-    return competitions
-        .find()
-        .then(competitions => res.json({ competitions }))
-        .catch(e => res.status(500).json(e.toString()));
 });
 
 const server = app.listen(PORT, () => {

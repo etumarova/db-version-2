@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import io from 'socket.io-client';
 import Typography from '@material-ui/core/Typography';
 import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
@@ -7,53 +6,52 @@ import Paper from '@material-ui/core/Paper';
 import InputBase from '@material-ui/core/InputBase';
 import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
+import { fetchSportsmen } from 'services/sportsmen';
+import { useQuery } from 'react-query';
+import { useHistory } from 'react-router';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
     root: {
-      padding: '2px 4px',
-      display: 'flex',
-      alignItems: 'center',
-      width: 400,
-      height: 40
+        padding: '2px 4px',
+        display: 'flex',
+        alignItems: 'center',
+        width: 400,
+        height: 40,
     },
     input: {
-      marginLeft: theme.spacing(1),
-      flex: 1,
+        marginLeft: theme.spacing(1),
+        flex: 1,
     },
     iconButton: {
-      padding: 10,
+        padding: 10,
     },
     divider: {
-      height: 28,
-      margin: 4,
+        height: 28,
+        margin: 4,
     },
-  }));
+}));
+
+const columns = [
+    { field: 'id', headerName: 'ID', width: 80 },
+    { field: 'name', headerName: 'ФИО тренера', width: 300 },
+    { field: 'birthday', headerName: 'Дата рождения', width: 170 },
+    { field: 'nowTraner', headerName: 'Личный тренер', width: 200 },
+    { field: 'school', headerName: 'Школа', width: 200 },
+    { field: 'telephone', headerName: 'Телефон', width: 150 },
+];
 
 export default function AdminSportsmens() {
-    const socket = io();
-    const [sportsmens, setSportsmens] = useState(null);
+    const history = useHistory();
+
+    const { data: sportsmenData } = useQuery('sportsmen', fetchSportsmen);
+    const { sportsmen } = sportsmenData || {};
+    const formattedSportsmen = sportsmen?.map(sportsman => ({ ...sportsman, id: sportsman._id }));
+
     const classes = useStyles();
 
-    useEffect(()=>{
-        socket.emit('getAdminSportsmens');
-        socket.on('adminSportsmens', (data) => {
-            data.forEach((el) => el['id'] = el['_id'])
-            setSportsmens(data);
-        })
-    }, [])
-
-    const columns = [
-        { field: 'id', headerName: 'ID', width: 80 },
-        { field: 'name', headerName: 'ФИО тренера', width: 300 },
-        { field: 'birthday', headerName: 'Дата рождения', width: 170 },
-        { field: 'nowTraner', headerName: 'Личный тренер', width: 200 },
-        { field: 'school', headerName: 'Школа', width: 200 },
-        { field: 'telephone', headerName: 'Телефон', width: 150 },
-      ];
-
     return (
-        (JSON.parse(localStorage.getItem('admins')).filter(el=> el.user_id == localStorage.getItem('user')).length!=0)&&(<div>
-            <div style={{display: 'flex',justifyContent: 'space-between'}}>
+        <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h3" component="h4" gutterBottom>
                     Спортсмены
                 </Typography>
@@ -68,19 +66,19 @@ export default function AdminSportsmens() {
                     </IconButton>
                 </Paper>
             </div>
-            {(sportsmens)&&(
+            {sportsmen && (
                 <div style={{ height: 500, width: '100%' }}>
-                    <DataGrid 
-                        rows={sportsmens} 
-                        columns={columns} 
+                    <DataGrid
+                        rows={formattedSportsmen}
+                        columns={columns}
                         pageSize={15}
-                        className='table-style'
-                        onRowClick={(e)=>{
-                            window.location.assign('/sportsmen');
-                            localStorage.setItem('sportsmen', JSON.stringify(e.row))
-                        }}/>
+                        className="table-style"
+                        onRowClick={e => {
+                            history.push(`/sportsmen/${e.row.id}`);
+                        }}
+                    />
                 </div>
             )}
-        </div>)
-    )
+        </div>
+    );
 }

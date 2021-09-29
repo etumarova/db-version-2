@@ -31,18 +31,16 @@ export default function TranerPage() {
                                             publicId={trainer.foto}
                                             width="250"
                                         />
-                                        <Button
-                                            variant="contained"
-                                            size="small"
-                                            color="primary"
-                                            style={{ margin: '5px' }}
-                                            onClick={e => {
-                                                e.preventDefault();
-                                                window.location.assign('/createTraner');
-                                            }}
-                                        >
-                                            Редактировать
-                                        </Button>
+                                        <Link to={`/createTrainer/${id}`}>
+                                            <Button
+                                                variant="contained"
+                                                size="small"
+                                                color="primary"
+                                                style={{ margin: '5px' }}
+                                            >
+                                                Редактировать
+                                            </Button>
+                                        </Link>
                                     </div>
                                 </div>
                             </div>

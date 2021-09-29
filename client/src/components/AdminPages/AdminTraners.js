@@ -6,6 +6,9 @@ import Paper from '@material-ui/core/Paper';
 import InputBase from '@material-ui/core/InputBase';
 import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
+import { fetchTrainers } from 'services/trainer';
+import { useQuery } from 'react-query';
+import { useHistory } from 'react-router';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -28,65 +31,53 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
+const columns = [
+    { field: 'id', headerName: 'ID', width: 80 },
+    { field: 'name', headerName: 'ФИО тренера', width: 370 },
+    { field: 'birthday', headerName: 'Дата рождения', width: 270 },
+    { field: 'school', headerName: 'Школа', width: 180 },
+    { field: 'telephone', headerName: 'Телефон', width: 150 },
+];
+
 export default function AdminTraners() {
-    const [traners, setTraners] = useState(null);
+    const history = useHistory();
+
+    const { data: trainersData } = useQuery('trainers', fetchTrainers);
+    const { trainers } = trainersData || {};
+    const formattedTrainers = trainers?.map(trainer => ({ ...trainer, id: trainer._id }));
+
     const classes = useStyles();
 
-    useEffect(() => {
-        socket.emit('getAdminTraners');
-        socket.on('adminTraners', data => {
-            data.forEach(el => (el['id'] = el['_id']));
-            setTraners(data);
-        });
-    }, []);
-
-    const columns = [
-        { field: 'id', headerName: 'ID', width: 80 },
-        { field: 'name', headerName: 'ФИО тренера', width: 370 },
-        { field: 'birthday', headerName: 'Дата рождения', width: 270 },
-        { field: 'school', headerName: 'Школа', width: 180 },
-        { field: 'telephone', headerName: 'Телефон', width: 150 },
-    ];
-
     return (
-        JSON.parse(localStorage.getItem('admins')).filter(
-            el => el.user_id == localStorage.getItem('user')
-        ).length != 0 && (
-            <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="h3" component="h4" gutterBottom>
-                        Тренера
-                    </Typography>
+        <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant="h3" component="h4" gutterBottom>
+                    Тренеры
+                </Typography>
 
-                    <Paper component="form" className={classes.root}>
-                        <InputBase
-                            className={classes.input}
-                            inputProps={{ 'aria-label': 'search google maps' }}
-                        />
-                        <IconButton
-                            type="submit"
-                            className={classes.iconButton}
-                            aria-label="search"
-                        >
-                            <SearchIcon />
-                        </IconButton>
-                    </Paper>
-                </div>
-                {traners && (
-                    <div style={{ height: 500, width: '100%' }}>
-                        <DataGrid
-                            rows={traners}
-                            columns={columns}
-                            pageSize={15}
-                            className="table-style"
-                            onRowClick={e => {
-                                window.location.assign('/traner');
-                                localStorage.setItem('traner', JSON.stringify(e.row));
-                            }}
-                        />
-                    </div>
-                )}
+                <Paper component="form" className={classes.root}>
+                    <InputBase
+                        className={classes.input}
+                        inputProps={{ 'aria-label': 'search google maps' }}
+                    />
+                    <IconButton type="submit" className={classes.iconButton} aria-label="search">
+                        <SearchIcon />
+                    </IconButton>
+                </Paper>
             </div>
-        )
+            {formattedTrainers && (
+                <div style={{ height: 500, width: '100%' }}>
+                    <DataGrid
+                        rows={formattedTrainers}
+                        columns={columns}
+                        pageSize={15}
+                        className="table-style"
+                        onRowClick={e => {
+                            history.push(`/traner/${e.row.id}`);
+                        }}
+                    />
+                </div>
+            )}
+        </div>
     );
 }

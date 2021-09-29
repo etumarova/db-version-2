@@ -5,9 +5,10 @@ import { useDropzone } from 'react-dropzone';
 import { Image } from 'cloudinary-react';
 import Button from '@material-ui/core/Button';
 import { fetchTrainerById, saveTrainer, editTrainer } from 'services/trainer';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { queryClient } from 'features/queryClient';
 import { useMutation, useQuery } from 'react-query';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -30,6 +31,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function CreateTraner() {
+    const { id } = useParams();
     const history = useHistory();
     const [foto, setFoto] = useState(null);
     const [name, setName] = useState(null);
@@ -37,39 +39,39 @@ export default function CreateTraner() {
     const [telephone, setTelephone] = useState(null);
     const [school, setSchool] = useState(null);
     const classes = useStyles();
-    const [traner, setTraner] = useState({});
+    const { user } = useAuth0();
+    // const [traner, setTraner] = useState({});
+
+    const shouldFetchTrainer = !!id;
+    const { data: trainerData } = useQuery(['trainer', id], () => fetchTrainerById(id), {
+        enabled: shouldFetchTrainer,
+    });
+    const { trainer } = trainerData || {};
+
     const saveTrainerMutation = useMutation(saveTrainer, {
         onSuccess: () => {
             queryClient.invalidateQueries('trainers');
-            history.push('/myTraners');
+            history.goBack();
         },
         onError: error => console.log(error),
     });
     const editTrainerMutation = useMutation(editTrainer, {
         onSuccess: () => {
-            queryClient.invalidateQueries('trainers');
-            history.push('/myTraners');
+            queryClient.invalidateQueries(['trainer', id]);
+            history.goBack();
         },
         onError: error => console.log(error),
     });
 
     useEffect(() => {
-        try {
-            const editTraner = localStorage.getItem('traner');
-            if (editTraner) {
-                const data = JSON.parse(editTraner);
-                setTraner(data);
-                setFoto(data.foto);
-                setName(data.name);
-                setBirthday(data.birthday);
-                setTelephone(data.telephone);
-                setSchool(data.school);
-                localStorage.clear();
-            }
-        } catch (e) {
-            console.log(e);
+        if (trainer) {
+            setFoto(trainer.foto);
+            setName(trainer.name);
+            setBirthday(trainer.birthday);
+            setTelephone(trainer.telephone);
+            setSchool(trainer.school);
         }
-    }, []);
+    }, [trainer]);
 
     const onDrop = async acceptedFiles => {
         const url = `https://api.cloudinary.com/v1_1/dgeev9d6l/image/upload`;
@@ -93,7 +95,8 @@ export default function CreateTraner() {
     const saveData = e => {
         e.preventDefault();
         const data = {
-            idSchool: localStorage.getItem('user'),
+            idSchool: user?.sub,
+            // idSchool: localStorage.getItem('user'),
             foto: foto,
             name: name,
             birthday: birthday,
@@ -106,8 +109,8 @@ export default function CreateTraner() {
     const editData = e => {
         e.preventDefault();
         const data = {
-            _id: traner._id,
-            idSchool: localStorage.getItem('user'),
+            _id: trainer._id,
+            idSchool: school,
             foto: foto,
             name: name,
             birthday: birthday,
@@ -134,6 +137,7 @@ export default function CreateTraner() {
                     style={{ margin: 8 }}
                     placeholder="Введите ФИО тренера"
                     fullWidth
+                    value={name}
                     onChange={e => setName(e.target.value)}
                     margin="normal"
                     InputLabelProps={{
@@ -144,6 +148,7 @@ export default function CreateTraner() {
                     id="date"
                     label="Дата рождения"
                     type="date"
+                    value={birthday}
                     className={classes.textField}
                     onChange={e => setBirthday(e.target.value)}
                     InputLabelProps={{
@@ -156,6 +161,7 @@ export default function CreateTraner() {
                     className={classes.textField}
                     placeholder="Введите номер телефона"
                     variant="outlined"
+                    value={telephone}
                     onChange={e => setTelephone(e.target.value)}
                 />
             </div>
@@ -165,18 +171,18 @@ export default function CreateTraner() {
                     className={classes.textField}
                     placeholder="Введите спортивный клуб"
                     variant="outlined"
+                    value={school}
                     onChange={e => setSchool(e.target.value)}
                 />
             </div>
             <div>
-                {!traner.name && (
-                    <Button variant="contained" color="primary" onClick={saveData}>
-                        Сохранить
-                    </Button>
-                )}
-                {traner.name && (
+                {trainer ? (
                     <Button variant="contained" color="primary" onClick={editData}>
                         Редактировать
+                    </Button>
+                ) : (
+                    <Button variant="contained" color="primary" onClick={saveData}>
+                        Сохранить
                     </Button>
                 )}
             </div>
