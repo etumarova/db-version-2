@@ -1,57 +1,68 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import ruLocale from '@fullcalendar/core/locales/ru';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useContext } from 'react';
+import { UserContext } from 'context/UserContext';
+import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router';
+import { useQuery } from 'react-query';
+import { fetchCompetitions } from 'services/competition';
 
-const Calendary = ({ isAdmin }) => {
-    const [events, setEvents] = useState([]);
-    const { user, isAuthenticated } = useAuth0();
+const Calendary = () => {
+    const { isAdmin } = useContext(UserContext);
+    const history = useHistory();
+    const { data } = useQuery('competitions', fetchCompetitions);
+    const { competitions } = data || {};
 
-    // useEffect(() => {
-    //     socket.emit('getCompetition');
-    //     socket.on('competition', data => {
-    //         data.forEach(el => {
-    //             el['title'] = el.name;
-    //             el['start'] = el.startDate;
-    //             el['end'] = el.endDate;
-    //             el['id'] = el._id;
-    //         });
-    //         setEvents(data);
-    //     });
-    // }, [socket]);
+    const calendarEvents = useMemo(() => {
+        if (competitions) {
+            const formattedCompetition = competitions
+                .map(event => {
+                    const calendaryEvents = [];
 
-    useEffect(() => {
-        (async () => {
-            try {
-                const res = await fetch(`/competitions`);
-                const { competitions } = await res.json();
+                    if (event.deadLine) {
+                        calendaryEvents.push({
+                            title: `Последний день регистрации: ${event.name}`,
+                            date: event.deadLine,
+                            color: 'red',
 
-                if (competitions) {
-                    setEvents(competitions);
-                }
-            } catch (error) {
-                console.log(error);
-            }
-        })();
-    }, []);
+                            extendedProps: {
+                                id: event._id,
+                            },
+                        });
+                    }
 
-    // rewrite using useHistory
-    const openCompetition = e => {
-        localStorage.setItem('competition', JSON.stringify(e.event._def.extendedProps));
-        window.location.assign('/competition');
-    };
+                    calendaryEvents.push({
+                        title: event.name,
+                        start: event.startDate,
+                        end: event.endDate,
+
+                        extendedProps: {
+                            id: event._id,
+                        },
+                    });
+
+                    return calendaryEvents;
+                })
+                .flat();
+
+            return formattedCompetition;
+        }
+    }, [competitions]);
 
     return (
         <div>
-            {isAuthenticated && isAdmin && (
+            {isAdmin && (
                 <div style={{ float: 'right' }}>
-                    <Button variant="contained" color="primary" href="/createCompetition">
-                        Добавить мероприятие
-                    </Button>
+                    <Link to="createCompetition">
+                        <Button variant="contained" color="primary">
+                            Добавить мероприятие
+                        </Button>
+                    </Link>
                 </div>
             )}
             <Typography variant="h3" component="h4" gutterBottom>
@@ -60,10 +71,14 @@ const Calendary = ({ isAdmin }) => {
             <FullCalendar
                 plugins={[interactionPlugin, dayGridPlugin]}
                 initialView="dayGridMonth"
-                events={events}
+                events={calendarEvents}
                 className="table-style"
                 locale={ruLocale}
-                eventClick={openCompetition}
+                eventClick={e => {
+                    const id = e.event._def.extendedProps.id;
+
+                    history.push(`/competition/${id}`);
+                }}
             />
         </div>
     );

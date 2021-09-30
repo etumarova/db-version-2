@@ -172,10 +172,97 @@ app.get('/entries/:idSchool', async (req, res) => {
 });
 
 app.get('/competitions', (req, res) => {
-    return competitions
+    competitions
         .find()
         .then(competitions => res.json({ competitions }))
         .catch(e => res.status(500).json(e.toString()));
+});
+
+app.get('/competitions/:id', (req, res) => {
+    const { id } = req.params;
+
+    competitions
+        .findById(id)
+        .then(competition => res.json({ competition }))
+        .catch(e => res.status(500).json(e.toString()));
+});
+
+app.post('/competitions/save', (req, res) => {
+    const {
+        logo,
+        name,
+        startDate,
+        endDate,
+        deadLine,
+        mainJudge,
+        secretary,
+        telephone,
+        place,
+        description,
+        discepline,
+    } = req.body;
+
+    competitions
+        .create({
+            logo: logo,
+            name: name,
+            startDate: startDate,
+            endDate: endDate,
+            deadLine: deadLine,
+            mainJudge: mainJudge,
+            secretary: secretary,
+            telephone: telephone,
+            place: place,
+            description: description,
+            discepline: discepline,
+        })
+        .then(() => res.sendStatus(200))
+        .catch(err => res.status(500).json(err.toString()));
+});
+
+app.post('/competitions/edit', (req, res) => {
+    const {
+        _id,
+        logo,
+        name,
+        startDate,
+        endDate,
+        deadLine,
+        mainJudge,
+        secretary,
+        telephone,
+        place,
+        description,
+        discepline,
+    } = req.body;
+
+    competitions.updateOne(
+        {
+            _id: _id,
+        },
+        {
+            $set: {
+                logo: logo,
+                name: name,
+                startDate: startDate,
+                endDate: endDate,
+                deadLine: deadLine,
+                mainJudge: mainJudge,
+                secretary: secretary,
+                telephone: telephone,
+                place: place,
+                description: description,
+                discepline: discepline,
+            },
+        },
+        (err, result) => {
+            if (err) {
+                res.status(500).json(err.toString());
+            }
+
+            res.sendStatus(200);
+        }
+    );
 });
 
 // SPORTSMEN
@@ -355,129 +442,6 @@ mongoose
 mongoose.set('useCreateIndex', true);
 
 io.on('connection', function(socket) {
-    socket.on('addCompetition', data => {
-        const {
-            logo,
-            name,
-            startDate,
-            endDate,
-            deadLine,
-            mainJudge,
-            secretary,
-            telephone,
-            place,
-            description,
-            discepline,
-        } = data;
-        competitions
-            .create({
-                logo: logo,
-                name: name,
-                startDate: startDate,
-                endDate: endDate,
-                deadLine: deadLine,
-                mainJudge: mainJudge,
-                secretary: secretary,
-                telephone: telephone,
-                place: place,
-                description: description,
-                discepline: discepline,
-            })
-            .catch(err => console.log(err));
-    });
-    socket.on('getCompetition', data => {
-        competitions
-            .find()
-            .then(data => socket.emit('competition', data))
-            .catch(err => console.log(err));
-    });
-
-    socket.on('getAdminSchools', data => {
-        schools
-            .find()
-            .then(data => socket.emit('adminSchools', data))
-            .catch(e => console.log(e));
-    });
-
-    socket.on('addSportsmen', data => {
-        const {
-            idSchool,
-            foto,
-            name,
-            birthday,
-            fTraner,
-            nowTraner,
-            school,
-            adress,
-            telephone,
-            listResults,
-        } = data;
-        sportsmens
-            .find({ name: name })
-            .then(data => {
-                if (data.length == 0) {
-                    sportsmens
-                        .create({
-                            idSchool: idSchool,
-                            foto: foto,
-                            name: name,
-                            birthday: birthday,
-                            fTraner: fTraner,
-                            nowTraner: nowTraner,
-                            school: school,
-                            adress: adress,
-                            telephone: telephone,
-                            listResults: listResults,
-                        })
-                        .catch(err => console.log(err));
-                }
-            })
-            .catch(err => console.log(err));
-    });
-
-    socket.on('getAdminSportsmens', data => {
-        sportsmens
-            .find()
-            .then(data => socket.emit('adminSportsmens', data))
-            .catch(e => console.log(e));
-    });
-
-    socket.on('addTraner', data => {
-        const { idSchool, foto, name, birthday, school, telephone } = data;
-        traners
-            .find({ name: name })
-            .then(data => {
-                if (data.length == 0) {
-                    traners
-                        .create({
-                            idSchool: idSchool,
-                            foto: foto,
-                            name: name,
-                            birthday: birthday,
-                            school: school,
-                            telephone: telephone,
-                        })
-                        .catch(err => console.log(err));
-                }
-            })
-            .catch(err => console.log(err));
-    });
-
-    socket.on('getTraners', data => {
-        const { idSchool } = data;
-        traners
-            .find({ idSchool: idSchool })
-            .then(data => socket.emit('traners', data))
-            .catch(e => console.log(e));
-    });
-
-    socket.on('getAdminTraners', data => {
-        traners
-            .find()
-            .then(data => socket.emit('adminTraners', data))
-            .catch(e => console.log(e));
-    });
-
     socket.on('getTranerSportsmens', data => {
         const { name } = data;
         sportsmens
@@ -677,45 +641,7 @@ io.on('connection', function(socket) {
         );
     });
 
-    socket.on('editCompetition', data => {
-        const {
-            _id,
-            logo,
-            name,
-            startDate,
-            endDate,
-            deadLine,
-            mainJudge,
-            secretary,
-            telephone,
-            place,
-            description,
-            discepline,
-        } = data;
-        competitions.updateOne(
-            {
-                _id: _id,
-            },
-            {
-                $set: {
-                    logo: logo,
-                    name: name,
-                    startDate: startDate,
-                    endDate: endDate,
-                    deadLine: deadLine,
-                    mainJudge: mainJudge,
-                    secretary: secretary,
-                    telephone: telephone,
-                    place: place,
-                    description: description,
-                    discepline: discepline,
-                },
-            },
-            (err, result) => {
-                if (err) console.log(err);
-            }
-        );
-    });
+    socket.on('editCompetition', data => {});
 
     socket.on('findSportsmen', data => {
         const { id } = data;

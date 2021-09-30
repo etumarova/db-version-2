@@ -1,27 +1,67 @@
 import React from 'react';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import { useAuth0 } from "@auth0/auth0-react";
+import { Link } from 'react-router-dom';
+import { useContext } from 'react';
+import { UserContext } from 'context/UserContext';
+import { useParams } from 'react-router';
+import { useQuery } from 'react-query';
+import { fetchCompetitionById } from 'services/competition';
+import { Image } from 'cloudinary-react';
 
 export default function CompetitionPage() {
-    const competition = JSON.parse(localStorage.getItem('competition'));
-    const discepline = JSON.parse(competition.discepline);
-    const { user, isAuthenticated } = useAuth0();
+    const { id } = useParams();
+    const { data } = useQuery(['competition', id], () => fetchCompetitionById(id));
+    const { competition } = data || {};
+
+    const { isAdmin } = useContext(UserContext);
+
+    const discepline = competition?.discepline ? JSON.parse(competition.discepline) : [];
+
     return (
         <div>
-            {(isAuthenticated)&&(<div style={{float: 'right'}}>
-                {(JSON.parse(localStorage.getItem('admins')).filter(el=> el.user_id == localStorage.getItem('user')).length!=0)&&(
-                <Button variant="contained" color="primary" href="/createCompetition">
-                    Редактировать
-                </Button>)}
-            </div>)}
-            {(competition)&&(
-                <div style={{display: 'flex', flexFlow: 'column', margin: '10px'}}>
-                    <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'start', margin: '10px'}}>
-                        <div style={{display: 'flex', flexFlow: 'column', justifyContent: 'end', marginTop: '10px'}}>
+            {isAdmin && (
+                <div style={{ float: 'right' }}>
+                    <Link to={`/createCompetition/${id}`}>
+                        <Button variant="contained" color="primary">
+                            Редактировать
+                        </Button>
+                    </Link>
+                </div>
+            )}
+            {competition && (
+                <div style={{ display: 'flex', flexFlow: 'column', margin: '10px' }}>
+                    <div className="card mb-3">
+                        <div className="card-body">
+                            <div className="d-flex flex-column align-items-center text-center">
+                                <Image
+                                    cloud_name="dgeev9d6l"
+                                    publicId={competition.logo}
+                                    width="250"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            justifyContent: 'start',
+                            margin: '10px',
+                        }}
+                    >
+                        <div
+                            style={{
+                                display: 'flex',
+                                flexFlow: 'column',
+                                justifyContent: 'end',
+                                marginTop: '10px',
+                            }}
+                        >
                             <div>
                                 <Typography variant="h4" component="h5" gutterBottom>
-                                {competition.name}
+                                    {competition.name}
                                 </Typography>
                                 <Typography variant="body1" gutterBottom>
                                     Место проведения: <b>{competition.place}</b>
@@ -40,7 +80,13 @@ export default function CompetitionPage() {
                                 <Typography variant="h5" component="h6" gutterBottom>
                                     Контактные данные
                                 </Typography>
-                                <div style={{display: 'flex', flexFlow: 'column', justifyContent: 'start'}}>
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        flexFlow: 'column',
+                                        justifyContent: 'start',
+                                    }}
+                                >
                                     <Typography variant="body1" gutterBottom>
                                         Главный судья: <b>{competition.mainJudge}</b>
                                     </Typography>
@@ -54,22 +100,30 @@ export default function CompetitionPage() {
                             </div>
                         </div>
                     </div>
-                    <div style={{display: 'flex', flexFlow: 'column', justifyContent: 'end', margin: '10px'}}>
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexFlow: 'column',
+                            justifyContent: 'end',
+                            margin: '10px',
+                        }}
+                    >
                         <Typography variant="body1" gutterBottom>
                             {competition.description}
                         </Typography>
                     </div>
-                    {discepline.map((el)=>{
-                            return(
-                                <div style={{ marginLeft: '10px'}}>
-                                    <Typography variant="body1" gutterBottom key={el}>
-                                        {el}
-                                    </Typography>
-                                </div>
-                            )
-                        })}
+
+                    {discepline.map(el => {
+                        return (
+                            <div style={{ marginLeft: '10px' }}>
+                                <Typography variant="body1" gutterBottom key={el}>
+                                    {el}
+                                </Typography>
+                            </div>
+                        );
+                    })}
                 </div>
             )}
         </div>
-    )
+    );
 }

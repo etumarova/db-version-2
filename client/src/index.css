@@ -44,6 +44,12 @@ a {
     background-color: white;
 }
 
+.fc-event-time,
+.fc-event-title {
+    padding: 0 1px;
+    white-space: pre-wrap !important;
+}
+
 .main-body {
     padding: 15px;
 }

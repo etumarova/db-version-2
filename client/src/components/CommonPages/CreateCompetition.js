@@ -8,6 +8,12 @@ import io from 'socket.io-client';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { useAuth0 } from '@auth0/auth0-react';
+import { useContext } from 'react';
+import { UserContext } from 'context/UserContext';
+import { fetchCompetitionById, saveCompetition, editCompetition } from 'services/competition';
+import { useHistory, useParams } from 'react-router-dom';
+import { queryClient } from 'features/queryClient';
+import { useMutation, useQuery } from 'react-query';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -33,6 +39,9 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function CreateCompetition() {
+    const { id } = useParams();
+    const history = useHistory();
+
     const [logo, setLogo] = useState(null);
     const [name, setName] = useState(null);
     const [startDate, setStartDate] = useState(null);
@@ -45,34 +54,44 @@ export default function CreateCompetition() {
     const [description, setDescription] = useState(null);
     const [discepline, setDiscepline] = useState([]);
     const [term, setTerm] = useState(null);
-    const socket = io();
     const classes = useStyles();
-    const [competition, setCompetition] = useState({});
-    const { user } = useAuth0();
+
+    const shouldFetchExisting = !!id;
+    const { data } = useQuery(['competition', id], () => fetchCompetitionById(id), {
+        enabled: shouldFetchExisting,
+    });
+    const { competition } = data || {};
+
+    const saveCompetitionMutation = useMutation(saveCompetition, {
+        onSuccess: () => {
+            queryClient.invalidateQueries('competitions');
+            history.goBack();
+        },
+        onError: error => console.log(error),
+    });
+    const editCompetitionMutation = useMutation(editCompetition, {
+        onSuccess: () => {
+            queryClient.invalidateQueries(['competition', id]);
+            history.goBack();
+        },
+        onError: error => console.log(error),
+    });
 
     useEffect(() => {
-        try {
-            const editCompetiton = localStorage.getItem('competition');
-            if (editCompetiton) {
-                const data = JSON.parse(editCompetiton);
-                setCompetition(data);
-                setLogo(data.logo);
-                setName(data.name);
-                setStartDate(data.startDate);
-                setEndDate(data.endDate);
-                setDeadLine(data.deadLine);
-                setTelephone(data.telephone);
-                setMainJudge(data.mainJudge);
-                setSecretary(data.secretary);
-                setPlace(data.place);
-                setDescription(data.description);
-                setDiscepline(JSON.parse(data.discepline));
-                localStorage.clear();
-            }
-        } catch (e) {
-            console.log(e);
+        if (competition) {
+            setLogo(competition.logo);
+            setName(competition.name);
+            setStartDate(competition.startDate);
+            setEndDate(competition.endDate);
+            setDeadLine(competition.deadLine);
+            setTelephone(competition.telephone);
+            setMainJudge(competition.mainJudge);
+            setSecretary(competition.secretary);
+            setPlace(competition.place);
+            setDescription(competition.description);
+            setDiscepline(JSON.parse(competition.discepline));
         }
-    }, []);
+    }, [competition]);
 
     const onDrop = async acceptedFiles => {
         const url = `https://api.cloudinary.com/v1_1/dgeev9d6l/image/upload`;
@@ -108,7 +127,9 @@ export default function CreateCompetition() {
             description: description,
             discepline: JSON.stringify(discepline),
         };
-        socket.emit('addCompetition', data);
+        saveCompetitionMutation.mutate(data);
+
+        // socket.emit('addCompetition', data);
     };
 
     const editData = e => {
@@ -127,7 +148,7 @@ export default function CreateCompetition() {
             description: description,
             discepline: JSON.stringify(discepline),
         };
-        socket.emit('editCompetition', data);
+        editCompetitionMutation.mutate(data);
     };
 
     const handleSubmit = e => {
@@ -143,164 +164,158 @@ export default function CreateCompetition() {
     };
 
     return (
-        JSON.parse(localStorage.getItem('admins')).filter(
-            el => el.user_id == localStorage.getItem('user')
-        ).length != 0 && (
-            <div className={classes.root}>
-                <div {...getRootProps()} className={`dropzone ${isDragActive ? 'active' : null}`}>
-                    <input {...getInputProps()} />
-                    {isDragActive ? <p>Вот прямо сюда!</p> : <p>Бросьте логотип сюда</p>}
-                </div>
-                <div>
-                    {logo != '' && (
-                        <Image cloud_name="dgeev9d6l" publicId={logo} width="50" crop="scale" />
-                    )}
-                </div>
-                <div style={{ float: 'right' }}>
-                    {!competition.name && (
-                        <Button variant="contained" color="primary" onClick={saveData}>
-                            Сохранить
-                        </Button>
-                    )}
-                    {competition.name && (
-                        <Button variant="contained" color="primary" onClick={editData}>
-                            Редактировать
-                        </Button>
-                    )}
-                </div>
-                <div>
-                    <TextField
-                        label="Наименование мероприятия"
-                        style={{ margin: 8 }}
-                        placeholder="Введите название"
-                        fullWidth
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                        margin="normal"
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                    />
-                    <TextField
-                        label="Место проведения мероприятия"
-                        style={{ margin: 8 }}
-                        placeholder="Введите место проведения"
-                        fullWidth
-                        value={place}
-                        onChange={e => setPlace(e.target.value)}
-                        margin="normal"
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                    />
-                    <TextField
-                        label="Начало соревнований"
-                        type="date"
-                        value={startDate}
-                        className={classes.textField}
-                        onChange={e => setStartDate(e.target.value)}
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                    />
-                    <TextField
-                        label="Окончание соревнований"
-                        type="date"
-                        className={classes.textField}
-                        onChange={e => setEndDate(e.target.value)}
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                    />
-                    <TextField
-                        label="Последний день приема заявок"
-                        type="date"
-                        className={classes.textField}
-                        onChange={e => setDeadLine(e.target.value)}
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                    />
-                </div>
-                <div>
-                    <TextField
-                        label="Главный судья"
-                        className={classes.textField}
-                        placeholder="Введите ФИО главного судьи"
-                        variant="outlined"
-                        onChange={e => setMainJudge(e.target.value)}
-                    />
-                    <TextField
-                        label="Секретарь соревнований"
-                        className={classes.textField}
-                        placeholder="Введите ФИО секретаря соревнований"
-                        variant="outlined"
-                        onChange={e => setSecretary(e.target.value)}
-                    />
-                    <TextField
-                        label="Контактный номер телефона"
-                        id="outlined-margin-normal"
-                        className={classes.textField}
-                        placeholder="Введите номер телефона"
-                        variant="outlined"
-                        onChange={e => setTelephone(e.target.value)}
-                    />
-                </div>
+        <div className={classes.root}>
+            <div {...getRootProps()} className={`dropzone ${isDragActive ? 'active' : null}`}>
+                <input {...getInputProps()} />
+                {isDragActive ? <p>Вот прямо сюда!</p> : <p>Бросьте логотип сюда</p>}
+            </div>
+            <div>
+                <Image cloud_name="dgeev9d6l" publicId={logo} width="50" crop="scale" />
+            </div>
+
+            <div style={{ float: 'right' }}>
+                {competition ? (
+                    <Button variant="contained" color="primary" onClick={editData}>
+                        Редактировать
+                    </Button>
+                ) : (
+                    <Button variant="contained" color="primary" onClick={saveData}>
+                        Сохранить
+                    </Button>
+                )}
+            </div>
+            <div>
                 <TextField
-                    label="Краткое описание мероприятия"
+                    label="Наименование мероприятия"
                     style={{ margin: 8 }}
-                    placeholder="Введите описание"
-                    multiline
+                    placeholder="Введите название"
                     fullWidth
-                    rows={5}
-                    onChange={e => setDescription(e.target.value)}
+                    value={name}
+                    onChange={e => setName(e.target.value)}
                     margin="normal"
                     InputLabelProps={{
                         shrink: true,
                     }}
                 />
+                <TextField
+                    label="Место проведения мероприятия"
+                    style={{ margin: 8 }}
+                    placeholder="Введите место проведения"
+                    fullWidth
+                    value={place}
+                    onChange={e => setPlace(e.target.value)}
+                    margin="normal"
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                />
+                <TextField
+                    label="Начало соревнований"
+                    type="date"
+                    value={startDate}
+                    className={classes.textField}
+                    onChange={e => setStartDate(e.target.value)}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                />
+                <TextField
+                    label="Окончание соревнований"
+                    type="date"
+                    className={classes.textField}
+                    onChange={e => setEndDate(e.target.value)}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                />
+                <TextField
+                    label="Последний день приема заявок"
+                    type="date"
+                    className={classes.textField}
+                    onChange={e => setDeadLine(e.target.value)}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                />
+            </div>
+            <div>
+                <TextField
+                    label="Главный судья"
+                    className={classes.textField}
+                    placeholder="Введите ФИО главного судьи"
+                    variant="outlined"
+                    onChange={e => setMainJudge(e.target.value)}
+                />
+                <TextField
+                    label="Секретарь соревнований"
+                    className={classes.textField}
+                    placeholder="Введите ФИО секретаря соревнований"
+                    variant="outlined"
+                    onChange={e => setSecretary(e.target.value)}
+                />
+                <TextField
+                    label="Контактный номер телефона"
+                    id="outlined-margin-normal"
+                    className={classes.textField}
+                    placeholder="Введите номер телефона"
+                    variant="outlined"
+                    onChange={e => setTelephone(e.target.value)}
+                />
+            </div>
+            <TextField
+                label="Краткое описание мероприятия"
+                style={{ margin: 8 }}
+                placeholder="Введите описание"
+                multiline
+                fullWidth
+                rows={5}
+                onChange={e => setDescription(e.target.value)}
+                margin="normal"
+                InputLabelProps={{
+                    shrink: true,
+                }}
+            />
 
+            <div>
                 <div>
                     <div>
-                        <div>
-                            {discepline.map((todo, index) => {
-                                return (
-                                    <div style={{ margin: '0' }}>
-                                        {todo}
-                                        <IconButton
-                                            aria-label="delete"
-                                            className={classes.margin}
-                                            name={index}
-                                            onClick={e => {
-                                                handleDelete(e.target.name);
-                                            }}
-                                        >
-                                            <DeleteIcon fontSize="small" />
-                                        </IconButton>
-                                    </div>
-                                );
-                            })}
-                            <form>
-                                <TextField
-                                    id="standard-basic"
-                                    placeholder="Введите класс лодки"
-                                    value={term}
-                                    onChange={e => setTerm(e.target.value)}
-                                />
-                                <Button
-                                    variant="contained"
-                                    size="small"
-                                    color="primary"
-                                    className={classes.margin}
-                                    onClick={handleSubmit}
-                                >
-                                    Добавить
-                                </Button>
-                            </form>
-                        </div>
+                        {discepline.map((todo, index) => {
+                            return (
+                                <div style={{ margin: '0' }}>
+                                    {todo}
+                                    <IconButton
+                                        aria-label="delete"
+                                        className={classes.margin}
+                                        name={index}
+                                        onClick={e => {
+                                            handleDelete(e.target.name);
+                                        }}
+                                    >
+                                        <DeleteIcon fontSize="small" />
+                                    </IconButton>
+                                </div>
+                            );
+                        })}
+                        <form>
+                            <TextField
+                                id="standard-basic"
+                                placeholder="Введите класс лодки"
+                                value={term}
+                                onChange={e => setTerm(e.target.value)}
+                            />
+                            <Button
+                                variant="contained"
+                                size="small"
+                                color="primary"
+                                className={classes.margin}
+                                onClick={handleSubmit}
+                            >
+                                Добавить
+                            </Button>
+                        </form>
                     </div>
                 </div>
             </div>
-        )
+        </div>
     );
 }
