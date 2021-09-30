@@ -1,5 +1,5 @@
 import { Typography } from '@material-ui/core';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import io from 'socket.io-client';
 import { makeStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -13,6 +13,9 @@ import { DataGrid } from '@material-ui/data-grid';
 import { useAuth0 } from '@auth0/auth0-react';
 import { fetchCompetitions } from 'services/competition';
 import { useQuery } from 'react-query';
+import { UserContext } from 'context/UserContext';
+import { fetchTrainersBySchoolId } from 'services/trainer';
+import { fetchSportsmenBySchoolId } from 'services/sportsmen';
 
 const useStyles = makeStyles(theme => ({
     formControl: {
@@ -34,7 +37,7 @@ export default function CreateEntries() {
     const classes = useStyles();
     const [sportsmens, setSportsmens] = useState([]);
     // const [competitions, setCompetitions] = useState(null);
-    const [traners, setTraners] = useState(null);
+    // const [traners, setTraners] = useState(null);
     const [selectCompetition, setSelectCompetition] = useState(null);
     const [selectTraner, setSelectTraner] = useState(null);
     const [selectSportsmens, setSelectSportsmens] = useState({});
@@ -46,41 +49,24 @@ export default function CreateEntries() {
     const [headersTabel, setHeadersTabel] = useState([]);
     const [rowTabel, setRowTabel] = useState([]);
     const today = Date.now();
-    const { user, isAuthenticated } = useAuth0();
+    const { user } = useAuth0();
+
+    const { userSub } = useContext(UserContext);
+
+    const { data: sportsmenData } = useQuery(['sportsmen', userSub], () =>
+        fetchSportsmenBySchoolId(userSub)
+    );
+    const { sportsmen } = sportsmenData || {};
 
     const { data: competitionsData } = useQuery('competitions', fetchCompetitions);
     const { competitions } = competitionsData || {};
 
+    const { data: trainersData } = useQuery(['trainers', userSub], () =>
+        fetchTrainersBySchoolId(userSub)
+    );
+    const { trainers } = trainersData || {};
+
     useEffect(() => {
-        (async () => {
-            if (user?.sub) {
-                try {
-                    // const competitionsResponse = fetch('/competitions');
-                    // const { competitions } = await competitionsResponse.json();
-
-                    const sportsmenResponse = fetch(`/sportsmen/${user.sub}`);
-                    const { sportsmen } = await sportsmenResponse.json();
-
-                    const trainersResponse = fetch(`/trainers/${user.sub}`);
-                    const { trainers } = await trainersResponse.json();
-
-                    // if (competitions) {
-                    //     setCompetitions(competitions);
-                    // }
-
-                    if (sportsmen) {
-                        setSportsmens(sportsmen);
-                    }
-
-                    if (trainers) {
-                        setTraners(trainers);
-                    }
-                } catch (error) {
-                    console.log(error);
-                }
-            }
-        })();
-
         // socket.emit('getCompetition');
         // socket.on('competition', (data)=>{
         //     setCompetitions(data);
@@ -143,18 +129,28 @@ export default function CreateEntries() {
         setRowTabel(arr);
     };
 
-    const makeDiscepline = id => {
-        const competition = competitions.filter(el => el._id == id);
-        setDiscepline(JSON.parse(competition[0].discepline));
-        JSON.parse(competition[0].discepline).forEach(e => {
-            selectSportsmens[e] = [];
-        });
-        setSelectSportsmens(selectSportsmens);
-    };
+    useEffect(() => {
+        const competition = competitions?.find(comp => comp._id === selectCompetition);
+        const getDisceplines = () => {
+            const disciplines = JSON.parse(competition.discepline);
+            setDiscepline(disciplines);
+
+            if (Array.isArray(selectSportsmens)) {
+                const newSportsmen = [...selectSportsmens];
+
+                disciplines.forEach(e => {
+                    newSportsmen[e] = [];
+                });
+                setSelectSportsmens(newSportsmen);
+            }
+        };
+
+        if (competition?.discepline) getDisceplines();
+    }, [selectCompetition, selectSportsmens, competitions]);
 
     const sendData = e => {
         e.preventDefault();
-        const telephone = traners.filter(el => el.name == selectTraner);
+        const telephone = trainers.filter(el => el.name == selectTraner);
         if (selectDiscepline && selectSportsmens && selectTraner && selectCompetition) {
             const today = new Date();
             const data = {
@@ -173,7 +169,7 @@ export default function CreateEntries() {
 
     const editData = e => {
         e.preventDefault();
-        const telephone = traners.filter(el => el.name == selectTraner);
+        const telephone = trainers.filter(el => el.name == selectTraner);
         const today = new Date();
         const data = {
             _id: entrie._id,
@@ -219,8 +215,8 @@ export default function CreateEntries() {
                     <Select
                         value={selectCompetition}
                         onChange={e => {
-                            makeDiscepline(e.target.value);
                             setSelectCompetition(e.target.value);
+                            // makeDiscepline(e.target.value);
                         }}
                     >
                         <MenuItem value="">None</MenuItem>
@@ -241,23 +237,22 @@ export default function CreateEntries() {
                     }}
                 >
                     <Typography variant="h6" component="h7" gutterBottom>
-                        Выберите руководителя делигации
+                        Выберите руководителя делегации
                     </Typography>
                     <FormControl className={classes.formControl}>
-                        <InputLabel>Выберите руководителя делигации</InputLabel>
+                        <InputLabel>Руководитель организации</InputLabel>
                         <Select
                             value={selectTraner}
                             onChange={e => {
                                 setSelectTraner(e.target.value);
-                                makeDiscepline(selectCompetition);
+                                // makeDiscepline(selectCompetition);
                                 headers();
                             }}
                         >
                             <MenuItem value="">None</MenuItem>
-                            {traners &&
-                                traners.map(el => {
-                                    return <MenuItem value={el.name}>{el.name}</MenuItem>;
-                                })}
+                            {trainers?.map(el => {
+                                return <MenuItem value={el.name}>{el.name}</MenuItem>;
+                            })}
                         </Select>
                     </FormControl>
                 </div>
@@ -273,10 +268,10 @@ export default function CreateEntries() {
                         }}
                     >
                         <Typography variant="h6" component="h7" gutterBottom>
-                            Выберите класс лодки
+                            Выберите дисциплину
                         </Typography>
                         <FormControl className={classes.formControl}>
-                            <InputLabel>Выберите класс лодки</InputLabel>
+                            <InputLabel>Дисциплина</InputLabel>
                             <Select
                                 value={selectDiscepline}
                                 onChange={e => setSelectDiscepline(e.target.value)}
@@ -306,7 +301,7 @@ export default function CreateEntries() {
                                 <InputLabel>Выберите спортсмена</InputLabel>
                                 <Select onChange={e => setChoiseSportsmen(e.target.value)}>
                                     <MenuItem value="">None</MenuItem>
-                                    {sportsmens.map(el => {
+                                    {sportsmen.map(el => {
                                         return <MenuItem value={el.name}>{el.name}</MenuItem>;
                                     })}
                                 </Select>
@@ -333,10 +328,6 @@ export default function CreateEntries() {
                                         self
                                             ? (nameSportsmen = choiseSportsmen + ' (Л)')
                                             : (nameSportsmen = choiseSportsmen);
-                                        selectSportsmens[selectDiscepline] = [
-                                            ...selectSportsmens[selectDiscepline],
-                                            nameSportsmen,
-                                        ];
                                         setSelectSportsmens(prev => (prev = selectSportsmens));
                                         setChoiseSportsmen('');
                                         row();
@@ -358,6 +349,7 @@ export default function CreateEntries() {
                     onCellClick={e => deleteCeill(e)}
                 />
             </div>
+
             {selectDiscepline && !entrie.traner && (
                 <div style={{ display: 'flex', flexDirection: 'row-reverse' }}>
                     <Button variant="contained" color="primary" onClick={sendData}>

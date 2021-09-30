@@ -111,7 +111,8 @@ function Dashboard() {
     const userContextValues = useMemo(
         () => ({
             userRole: isAdmin ? UserRole.Admin : UserRole.User,
-            userId: user?.sub,
+            userSub: user?.sub,
+            isAuthenticated,
             isAdmin,
         }),
         [isAdmin, user?.sub]
@@ -206,19 +207,22 @@ function Dashboard() {
                             />
                             <PrivateRoute path="/competition/:id" component={CompetitionPage} />
                             <PrivateRoute
-                                path="/createCompetition/:id"
+                                path="/createCompetition/:id?"
                                 component={CreateCompetition}
                             />
-                            <PrivateRoute path="/mySchool/:id" component={MySchool} />
+                            <PrivateRoute path="/mySchool/:id?" component={MySchool} />
                             <PrivateRoute
                                 path="/createEditSchool/:id"
                                 component={CreateEditSchool}
                             />
                             <PrivateRoute exact path="/mySportsmens" component={MySportsmens} />
-                            <PrivateRoute path="/createSportsmen/:id" component={CreateSportsmen} />
+                            <PrivateRoute
+                                path="/createSportsmen/:id?"
+                                component={CreateSportsmen}
+                            />
                             <PrivateRoute path="/sportsmen/:id" component={SportsmenPage} />
                             <PrivateRoute exact path="/myTraners" component={MyTraners} />
-                            <PrivateRoute path="/createTrainer/:id" component={CreateTraner} />
+                            <PrivateRoute path="/createTrainer/:id?" component={CreateTraner} />
                             <PrivateRoute path="/traner/:id" component={TranerPage} />
                             <PrivateRoute exact path="/myEntries" component={MyEntries} />
                             <PrivateRoute exact path="/createEntries" component={CreateEntries} />

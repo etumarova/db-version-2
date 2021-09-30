@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Image } from 'cloudinary-react';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
@@ -6,19 +6,20 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { fetchSchoolByUserId } from 'services/school';
+import { UserContext } from 'context/UserContext';
 
 export default function MySchool() {
     const { id } = useParams();
-    const { isAuthenticated, user } = useAuth0();
+    const { userSub, isAuthenticated } = useContext(UserContext);
 
-    const userId = id || user?.sub;
+    const userId = id || userSub;
     const { isSuccess, isError, data } = useQuery(['schools', userId], () =>
         fetchSchoolByUserId(userId)
     );
 
     const { school } = data || {};
 
-    const showNoDataWarning = user?.sub && (isSuccess || isError) && !school;
+    const showNoDataWarning = userSub && (isSuccess || isError) && !school;
 
     const title = id ? 'Школа' : 'Моя школа';
     return (

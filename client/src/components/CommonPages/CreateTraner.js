@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { useDropzone } from 'react-dropzone';
@@ -9,6 +9,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import { queryClient } from 'features/queryClient';
 import { useMutation, useQuery } from 'react-query';
 import { useAuth0 } from '@auth0/auth0-react';
+import { UserContext } from 'context/UserContext';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -31,6 +32,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function CreateTraner() {
+    const { userSub } = useContext(UserContext);
     const { id } = useParams();
     const history = useHistory();
     const [foto, setFoto] = useState(null);
@@ -39,14 +41,14 @@ export default function CreateTraner() {
     const [telephone, setTelephone] = useState(null);
     const [school, setSchool] = useState(null);
     const classes = useStyles();
-    const { user } = useAuth0();
-    // const [traner, setTraner] = useState({});
 
     const shouldFetchTrainer = !!id;
     const { data: trainerData } = useQuery(['trainers', id], () => fetchTrainerById(id), {
         enabled: shouldFetchTrainer,
     });
     const { trainer } = trainerData || {};
+
+    const schoolId = trainer?.idSchool || userSub;
 
     const saveTrainerMutation = useMutation(saveTrainer, {
         onSuccess: () => {
@@ -95,13 +97,12 @@ export default function CreateTraner() {
     const saveData = e => {
         e.preventDefault();
         const data = {
-            idSchool: user?.sub,
-            // idSchool: localStorage.getItem('user'),
-            foto: foto,
-            name: name,
-            birthday: birthday,
-            school: school,
-            telephone: telephone,
+            idSchool: schoolId,
+            foto,
+            name,
+            birthday,
+            school,
+            telephone,
         };
         saveTrainerMutation.mutate(data);
     };
@@ -110,12 +111,12 @@ export default function CreateTraner() {
         e.preventDefault();
         const data = {
             _id: trainer._id,
-            idSchool: school,
-            foto: foto,
-            name: name,
-            birthday: birthday,
-            school: school,
-            telephone: telephone,
+            idSchool: schoolId,
+            foto,
+            name,
+            birthday,
+            school,
+            telephone,
         };
         editTrainerMutation.mutate(data);
     };

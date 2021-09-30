@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import Typography from '@material-ui/core/Typography';
 import { DataGrid } from '@material-ui/data-grid';
 import Button from '@material-ui/core/Button';
@@ -7,6 +7,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useHistory } from 'react-router';
 import { fetchTrainersBySchoolId } from 'services/trainer';
 import { useQuery } from 'react-query';
+import { UserContext } from 'context/UserContext';
 
 const columns = [
     { field: 'id', headerName: 'ID', width: 150 },
@@ -18,8 +19,9 @@ const columns = [
 
 export default function MyTraners() {
     const history = useHistory();
-    const { user } = useAuth0();
-    const { data } = useQuery(['trainers', user?.sub], () => fetchTrainersBySchoolId(user?.sub));
+
+    const { userSub } = useContext(UserContext);
+    const { data } = useQuery(['trainers', userSub], () => fetchTrainersBySchoolId(userSub));
     const { trainers } = data || {};
 
     const formattedTrainers = useMemo(

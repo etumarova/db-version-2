@@ -1,15 +1,15 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useContext } from 'react';
 import Typography from '@material-ui/core/Typography';
 import TableSportsmens from 'components/TableSportsmens';
 import Button from '@material-ui/core/Button';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useQuery } from 'react-query';
-import { useAuth0 } from '@auth0/auth0-react';
 import { fetchSportsmenBySchoolId } from 'services/sportsmen';
+import { UserContext } from 'context/UserContext';
 
 export default function MySportsmens() {
-    const { user } = useAuth0();
-    const { data } = useQuery(['sportsmen', user?.sub], () => fetchSportsmenBySchoolId(user?.sub));
+    const { userSub } = useContext(UserContext);
+    const { data } = useQuery(['sportsmen', userSub], () => fetchSportsmenBySchoolId(userSub));
     const { sportsmen } = data || {};
 
     const formattedSportsmen = useMemo(
