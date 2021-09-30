@@ -79,11 +79,11 @@ export default function CreateEditSchool() {
     const [telephone, setTelephone] = useState('');
 
     // const [school, setSchool] = useState({});
-    const { data } = useQuery(['school', userId], () => fetchSchoolByUserId(userId));
+    const { data } = useQuery(['schools', userId], () => fetchSchoolByUserId(userId));
     const { school } = data || {};
     const saveSchoolMutation = useMutation(saveSchool, {
         onSuccess: () => {
-            queryClient.invalidateQueries('school');
+            queryClient.invalidateQueries('schools');
             // history.push('/mySchool');
             history.goBack();
         },
@@ -91,7 +91,7 @@ export default function CreateEditSchool() {
     });
     const editSchoolMutation = useMutation(editSchool, {
         onSuccess: () => {
-            queryClient.invalidateQueries('school');
+            queryClient.invalidateQueries('schools');
             // history.push('/mySchool');
             history.goBack();
         },

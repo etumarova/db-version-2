@@ -54,7 +54,7 @@ export default function CreateSportsmen() {
     const classes = useStyles();
 
     const shouldFetch = !!id;
-    const { data: sportsmanData } = useQuery(['sportsman', id], () => fetchSportsmanById(id), {
+    const { data: sportsmanData } = useQuery(['sportsmen', id], () => fetchSportsmanById(id), {
         enabled: shouldFetch,
     });
     const { sportsman } = sportsmanData || {};
@@ -67,7 +67,7 @@ export default function CreateSportsmen() {
     });
     const editSportsmanMutation = useMutation(editSportsman, {
         onSuccess: () => {
-            queryClient.invalidateQueries(['sportsman', id]);
+            queryClient.invalidateQueries('sportsmen');
             history.goBack();
         },
         onError: error => console.log(error),

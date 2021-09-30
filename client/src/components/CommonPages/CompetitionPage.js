@@ -11,7 +11,7 @@ import { Image } from 'cloudinary-react';
 
 export default function CompetitionPage() {
     const { id } = useParams();
-    const { data } = useQuery(['competition', id], () => fetchCompetitionById(id));
+    const { data } = useQuery(['competitions', id], () => fetchCompetitionById(id));
     const { competition } = data || {};
 
     const { isAdmin } = useContext(UserContext);

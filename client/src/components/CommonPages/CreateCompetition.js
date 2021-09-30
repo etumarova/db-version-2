@@ -57,7 +57,7 @@ export default function CreateCompetition() {
     const classes = useStyles();
 
     const shouldFetchExisting = !!id;
-    const { data } = useQuery(['competition', id], () => fetchCompetitionById(id), {
+    const { data } = useQuery(['competitions', id], () => fetchCompetitionById(id), {
         enabled: shouldFetchExisting,
     });
     const { competition } = data || {};
@@ -71,7 +71,7 @@ export default function CreateCompetition() {
     });
     const editCompetitionMutation = useMutation(editCompetition, {
         onSuccess: () => {
-            queryClient.invalidateQueries(['competition', id]);
+            queryClient.invalidateQueries('competitions');
             history.goBack();
         },
         onError: error => console.log(error),

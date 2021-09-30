@@ -15,7 +15,7 @@ const columns = [
 
 export default function SportsmenPage() {
     const { id } = useParams();
-    const { data } = useQuery(['sportsman', id], () => fetchSportsmanById(id));
+    const { data } = useQuery(['sportsmen', id], () => fetchSportsmanById(id));
     const { sportsman } = data || {};
 
     // const sportsmen = JSON.parse(localStorage.getItem('sportsmen'));

@@ -12,7 +12,7 @@ export default function MySchool() {
     const { isAuthenticated, user } = useAuth0();
 
     const userId = id || user?.sub;
-    const { isSuccess, isError, data } = useQuery(['school', userId], () =>
+    const { isSuccess, isError, data } = useQuery(['schools', userId], () =>
         fetchSchoolByUserId(userId)
     );
 

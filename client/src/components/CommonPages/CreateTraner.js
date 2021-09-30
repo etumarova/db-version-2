@@ -43,7 +43,7 @@ export default function CreateTraner() {
     // const [traner, setTraner] = useState({});
 
     const shouldFetchTrainer = !!id;
-    const { data: trainerData } = useQuery(['trainer', id], () => fetchTrainerById(id), {
+    const { data: trainerData } = useQuery(['trainers', id], () => fetchTrainerById(id), {
         enabled: shouldFetchTrainer,
     });
     const { trainer } = trainerData || {};
@@ -57,7 +57,7 @@ export default function CreateTraner() {
     });
     const editTrainerMutation = useMutation(editTrainer, {
         onSuccess: () => {
-            queryClient.invalidateQueries(['trainer', id]);
+            queryClient.invalidateQueries('trainers');
             history.goBack();
         },
         onError: error => console.log(error),

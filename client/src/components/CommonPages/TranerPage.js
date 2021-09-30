@@ -9,7 +9,7 @@ import { fetchSportsmenByTrainerId } from 'services/sportsmen';
 
 export default function TranerPage() {
     const { id } = useParams();
-    const { data: trainerData } = useQuery(['trainer', id], () => fetchTrainerById(id));
+    const { data: trainerData } = useQuery(['trainers', id], () => fetchTrainerById(id));
     const { trainer } = trainerData || {};
 
     const { data: sportsmenData } = useQuery(['sportsmen', trainer?._id], () =>
