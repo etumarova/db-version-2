@@ -25,13 +25,23 @@ if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging')
     });
 }
 
+const server = app.listen(PORT, () => {
+    console.log('listening on *:3001');
+});
+
+mongoose
+    .connect(process.env.MONGODB_URI, { useUnifiedTopology: true, useNewUrlParser: true })
+    .then(() => console.log('MongoDb connected'))
+    .catch(e => console.log(e));
+
+mongoose.set('useCreateIndex', true);
+
 const buildMongoQuery = (possibleQueryParams, reqQuery) => {
     const queryEntries = possibleQueryParams
         .map(param => [param, reqQuery[param]])
         .filter(entry => entry[1]);
 
     // const query = Object.fromEntries(queryEntries); add polyfills/core-js?
-
     const query = {};
     queryEntries.forEach(([param, value]) => {
         query[param] = value;
@@ -159,16 +169,68 @@ app.post('/editSchool', (req, res) => {
 
 app.get('entries', (req, res) => {});
 
-app.get('/entries/:idSchool', async (req, res) => {
+app.get('/entries', async (req, res) => {
     try {
-        const idSchool = req.params.idSchool;
-        const myEntries = await entries.find({ idSchool });
-        const competitionEntries = await competitions.find();
+        const query = buildMongoQuery(['idSchool'], req.query);
 
-        res.json({ entries: myEntries, competitions: competitionEntries });
+        const entryResult = await entries.find(query);
+        res.json({ entries: entryResult });
     } catch (error) {
         res.status(500).json(error.toString());
     }
+});
+
+app.get('/entries/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const entry = await entries.findById(id);
+        res.json({ entry });
+    } catch (error) {
+        res.status(500).json(error.toString());
+    }
+});
+
+app.post('/entries/save', (req, res) => {
+    const { idCompetition, idSchool, traner, telephone, dateSend, sportsmensList } = req.body;
+
+    entries
+        .create({
+            idCompetition,
+            idSchool,
+            traner,
+            telephone,
+            dateSend,
+            sportsmensList,
+        })
+        .then(() => res.sendStatus(200))
+        .catch(err => res.status(500).json(err.toString()));
+});
+
+app.post('/entries/edit', (req, res) => {
+    const { _id, idCompetition, idSchool, traner, telephone, dateSend, sportsmensList } = req.body;
+
+    entries.updateOne(
+        {
+            _id: _id,
+        },
+        {
+            $set: {
+                idCompetition,
+                idSchool,
+                traner,
+                telephone,
+                dateSend,
+                sportsmensList,
+            },
+        },
+        (err, result) => {
+            if (err) {
+                res.status(500).json(err.toString());
+            }
+
+            res.sendStatus(200);
+        }
+    );
 });
 
 app.get('/competitions', (req, res) => {
@@ -418,252 +480,4 @@ app.post('/editTrainer', (req, res) => {
             res.sendStatus(200);
         }
     );
-});
-
-const server = app.listen(PORT, () => {
-    console.log('listening on *:3001');
-});
-
-const io = socket(server, {
-    cors: {
-        origin: ['http://localhost:3000'],
-        // methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-        // credentials: true,
-    },
-    // reconnect: true,
-    // transports: ['websocket', 'polling', 'flashsocket'],
-});
-
-mongoose
-    .connect(process.env.MONGODB_URI, { useUnifiedTopology: true, useNewUrlParser: true })
-    .then(() => console.log('MongoDb connected'))
-    .catch(e => console.log(e));
-
-mongoose.set('useCreateIndex', true);
-
-io.on('connection', function(socket) {
-    socket.on('getTranerSportsmens', data => {
-        const { name } = data;
-        sportsmens
-            .find({ nowTraner: name })
-            .then(data => socket.emit('tranerSportsmens', data))
-            .catch(e => console.log(e));
-    });
-
-    socket.on('addEntries', data => {
-        const { idCompetition, idSchool, telephone, traner, dateSend, sportsmensList } = data;
-        entries
-            .create({
-                idCompetition: idCompetition,
-                idSchool: idSchool,
-                traner: traner,
-                telephone: telephone,
-                dateSend: dateSend,
-                sportsmensList: sportsmensList,
-            })
-            .catch(err => console.log(err));
-    });
-
-    socket.on('getEntries', data => {
-        entries
-            .find()
-            .then(data => socket.emit('entries', data))
-            .catch(e => console.log(e));
-        competitions
-            .find()
-            .then(data => socket.emit('competitionsEntries', data))
-            .catch(e => console.log(e));
-    });
-
-    socket.on('getMyEntries', data => {
-        const { idSchool } = data;
-        entries
-            .find({ idSchool: idSchool })
-            .then(data => socket.emit('myEntries', data))
-            .catch(e => console.log(e));
-        competitions
-            .find()
-            .then(data => socket.emit('myCompetitionsEntries', data))
-            .catch(e => console.log(e));
-    });
-
-    socket.on('getAdminEntries', data => {
-        entries
-            .find()
-            .then(data => socket.emit('adminEntries', data))
-            .catch(e => console.log(e));
-    });
-
-    socket.on('getUsers', data => {
-        const { message } = data;
-        const options = {
-            method: 'GET',
-            params: { q: 'logins_count:{0 TO *]', search_engine: 'v3' },
-            url: `https://${process.env.AUTH0_DOMAIN}/api/v2/users`,
-            headers: {
-                Authorization: `Bearer ${message}`,
-            },
-            scope: 'read:user_idp_tokens',
-        };
-
-        axios
-            .request(options)
-            .then(res => res.data)
-            .then(data => socket.emit('getUsersData', data))
-            .catch(function(error) {
-                console.error(error);
-            });
-    });
-
-    socket.on('deleteUser', data => {
-        const { message, idUser } = data;
-        const options = {
-            method: 'DELETE',
-            url: `https://${process.env.AUTH0_DOMAIN}/api/v2/users/${idUser}`,
-            headers: {
-                'content-type': 'application/json',
-                authorization: 'Bearer ' + message,
-                'cache-control': 'no-cache',
-            },
-            scope: 'delete:users',
-        };
-
-        axios
-            .request(options)
-            .then(function(response) {})
-            .catch(function(error) {
-                console.error(error);
-            });
-    });
-
-    socket.on('getAdmins', data => {
-        const { token } = data;
-        const options = {
-            method: 'GET',
-            url: `https://${process.env.AUTH0_DOMAIN}.com/api/v2/roles/rol_bEmrSh0gQV4jWfVd/users`,
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-            scope: 'read:users',
-        };
-
-        axios
-            .request(options)
-            .then(res => res.data)
-            .then(data => socket.emit('getAdminsData', data))
-            .catch(function(error) {
-                console.error(error);
-            });
-    });
-
-    socket.on('editSchool', data => {
-        const {
-            _id,
-            idUser,
-            foto,
-            name,
-            director,
-            description,
-            region,
-            city,
-            adress,
-            telephone,
-        } = data;
-        schools.updateOne(
-            {
-                _id: _id,
-            },
-            {
-                $set: {
-                    idUser: idUser,
-                    foto: foto,
-                    name: name,
-                    director: director,
-                    description: description,
-                    region: region,
-                    city: city,
-                    adress: adress,
-                    telephone: telephone,
-                },
-            },
-            (err, result) => {
-                if (err) {
-                    console.log(err);
-                    socket.emit('editSchoolFail');
-                }
-
-                socket.emit('editSchoolSuccess', result);
-            }
-        );
-    });
-
-    socket.on('editTraner', data => {
-        const { _id, idSchool, foto, name, birthday, school, telephone } = data;
-        traners.updateOne(
-            {
-                _id: _id,
-            },
-            {
-                $set: {
-                    idSchool: idSchool,
-                    foto: foto,
-                    name: name,
-                    birthday: birthday,
-                    school: school,
-                    telephone: telephone,
-                },
-            },
-            (err, result) => {
-                if (err) console.log(err);
-            }
-        );
-    });
-
-    socket.on('editEntries', data => {
-        const { _id, idCompetition, idSchool, telephone, traner, dateSend, sportsmensList } = data;
-        entries.updateOne(
-            {
-                _id: _id,
-            },
-            {
-                $set: {
-                    idCompetition: idCompetition,
-                    idSchool: idSchool,
-                    traner: traner,
-                    telephone: telephone,
-                    dateSend: dateSend,
-                    sportsmensList: sportsmensList,
-                },
-            },
-            (err, result) => {
-                if (err) console.log(err);
-            }
-        );
-    });
-
-    socket.on('editCompetition', data => {});
-
-    socket.on('findSportsmen', data => {
-        const { id } = data;
-        sportsmens
-            .find({ _id: id })
-            .then(data => socket.emit('resultSportsmen', data))
-            .catch(e => console.log(e));
-    });
-    socket.on('editResult', data => {
-        const { _id, listResults } = data;
-        sportsmens.updateOne(
-            {
-                _id: _id,
-            },
-            {
-                $set: {
-                    listResults: listResults,
-                },
-            },
-            (err, result) => {
-                if (err) console.log(err);
-            }
-        );
-    });
 });

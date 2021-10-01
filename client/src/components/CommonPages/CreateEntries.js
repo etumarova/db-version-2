@@ -1,5 +1,5 @@
 import { Typography } from '@material-ui/core';
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
 import io from 'socket.io-client';
 import { makeStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -12,10 +12,13 @@ import Checkbox from '@material-ui/core/Checkbox';
 import { DataGrid } from '@material-ui/data-grid';
 import { useAuth0 } from '@auth0/auth0-react';
 import { fetchCompetitions } from 'services/competition';
-import { useQuery } from 'react-query';
+import { useQuery, useMutation } from 'react-query';
 import { UserContext } from 'context/UserContext';
 import { fetchTrainersBySchoolId } from 'services/trainer';
 import { fetchSportsmenBySchoolId } from 'services/sportsmen';
+import { fetchEntryById, saveEntry, editEntry } from 'services/entry';
+import { useParams, useHistory } from 'react-router';
+import { queryClient } from 'features/queryClient';
 
 const useStyles = makeStyles(theme => ({
     formControl: {
@@ -35,10 +38,11 @@ const useStyles = makeStyles(theme => ({
 
 export default function CreateEntries() {
     const classes = useStyles();
-    const [sportsmens, setSportsmens] = useState([]);
     // const [competitions, setCompetitions] = useState(null);
     // const [traners, setTraners] = useState(null);
-    const [selectCompetition, setSelectCompetition] = useState(null);
+    const [selectedSportsmen, setSelectedSportsmen] = useState([]);
+
+    const [selectedCompetition, setSelectedCompetition] = useState(null);
     const [selectTraner, setSelectTraner] = useState(null);
     const [selectSportsmens, setSelectSportsmens] = useState({});
     const [discepline, setDiscepline] = useState([]);
@@ -46,7 +50,7 @@ export default function CreateEntries() {
     const [choiseSportsmen, setChoiseSportsmen] = useState(null);
     const [entrie, setEntrie] = useState({});
     const [self, setSelf] = useState(false);
-    const [headersTabel, setHeadersTabel] = useState([]);
+    // const [headersTabel, setHeadersTabel] = useState([]);
     const [rowTabel, setRowTabel] = useState([]);
     const today = Date.now();
     const { user } = useAuth0();
@@ -66,38 +70,29 @@ export default function CreateEntries() {
     );
     const { trainers } = trainersData || {};
 
-    useEffect(() => {
-        // socket.emit('getCompetition');
-        // socket.on('competition', (data)=>{
-        //     setCompetitions(data);
-        // })
-        // socket.emit('getSportsmens', { idSchool : localStorage.getItem('user')});
-        // socket.on('sportsmens', (data) => {
-        //     setSportsmens(data);
-        // })
-        // socket.emit('getTraners', { idSchool : localStorage.getItem('user')});
-        // socket.on('traners', (data) => {
-        //     setTraners(data);
-        // })
-        // try {
-        //     const editEntrie = localStorage.getItem('entrie');
-        //     if(editEntrie) {
-        //       const data = JSON.parse(editEntrie);
-        //       setEntrie(data);
-        //       setSelectCompetition(data.idCompetition);
-        //       setDiscepline(JSON.parse(data.discepline));
-        //       setSelectSportsmens(JSON.parse(data.sportsmensList));
-        //       setSelectTraner(data.traner)
-        //       headers();
-        //       row();
-        //     }
-        //     localStorage.clear();
-        // } catch(e) {
-        //     console.log(e);
-        // }
-    }, [user?.sub]);
+    const history = useHistory();
+    const { id } = useParams();
+    const shouldFetchEntry = !!id;
+    const { data: entryData } = useQuery(['entries', id], () => fetchEntryById(id), {
+        enabled: shouldFetchEntry,
+    });
+    const { entry } = entryData || {};
+    const saveEntryMutation = useMutation(saveEntry, {
+        onSuccess: () => {
+            queryClient.invalidateQueries('entries');
+            history.goBack();
+        },
+        onError: error => console.log(error),
+    });
+    const editEntryMutation = useMutation(editEntry, {
+        onSuccess: () => {
+            queryClient.invalidateQueries('entries');
+            history.goBack();
+        },
+        onError: error => console.log(error),
+    });
 
-    const headers = () => {
+    const headersTabel = useMemo(() => {
         const arr = [{ field: 'id', headerName: 'ID', width: 80 }];
         discepline.forEach(el => {
             arr.push({
@@ -106,31 +101,46 @@ export default function CreateEntries() {
                 width: 370,
             });
         });
-        setHeadersTabel(arr);
-    };
 
-    const row = () => {
-        let length = 0;
+        return arr;
+        // setHeadersTabel(arr);
+    }, [discepline]);
+
+    useEffect(() => {
+        if (entry) {
+            setSelectedCompetition(entry.idCompetition);
+            setSelectTraner(entry.traner);
+            if (entry.sportsmensList) setSelectedSportsmen(JSON.parse(entry.sportsmensList));
+        }
+    }, [entry]);
+
+    // build headers with discipline ?
+    // const headers = () => {
+
+    // };
+
+    const createRows = () => {
         const arr = [];
-        const copy = selectSportsmens;
-        Object.values(copy).forEach(el =>
-            el.length > length ? (length = el.length) : (length = length)
-        );
-        for (let i = 0; i < length; i++) {
+
+        for (let i = 0; i < selectedSportsmen.length; i++) {
+            const sportsman = selectedSportsmen[i];
             const obj = { id: i + 1 };
             discepline.forEach(el => (obj[el] = ''));
-            Object.keys(copy).forEach(keyName => {
-                if (copy[keyName][i]) {
-                    obj[keyName] = copy[keyName][i];
-                }
-            });
+
+            obj[sportsman.discipline] = sportsman.name;
+
+            obj.userId = sportsman.id;
             arr.push(obj);
         }
         setRowTabel(arr);
     };
 
     useEffect(() => {
-        const competition = competitions?.find(comp => comp._id === selectCompetition);
+        if (selectedSportsmen.length) createRows();
+    }, [selectedSportsmen]);
+
+    useEffect(() => {
+        const competition = competitions?.find(comp => comp._id === selectedCompetition);
         const getDisceplines = () => {
             const disciplines = JSON.parse(competition.discepline);
             setDiscepline(disciplines);
@@ -146,22 +156,23 @@ export default function CreateEntries() {
         };
 
         if (competition?.discepline) getDisceplines();
-    }, [selectCompetition, selectSportsmens, competitions]);
+    }, [selectedCompetition, selectSportsmens, competitions, selectTraner]);
 
     const sendData = e => {
         e.preventDefault();
         const telephone = trainers.filter(el => el.name == selectTraner);
-        if (selectDiscepline && selectSportsmens && selectTraner && selectCompetition) {
+        if (selectDiscepline && selectSportsmens && selectTraner && selectedCompetition) {
             const today = new Date();
             const data = {
-                idCompetition: selectCompetition,
+                idCompetition: selectedCompetition,
                 idSchool: localStorage.getItem('user'),
                 traner: selectTraner,
                 telephone: telephone[0].telephone,
                 dateSend: today.toUTCString(),
-                sportsmensList: JSON.stringify(selectSportsmens),
+                sportsmensList: JSON.stringify(selectedSportsmen),
             };
             // socket.emit('addEntries', data);
+            saveEntryMutation.mutate(data);
         } else {
             alert('Не введены данные!');
         }
@@ -172,14 +183,15 @@ export default function CreateEntries() {
         const telephone = trainers.filter(el => el.name == selectTraner);
         const today = new Date();
         const data = {
-            _id: entrie._id,
-            idCompetition: selectCompetition,
-            idSchool: localStorage.getItem('user'),
+            _id: entry._id,
+            idCompetition: selectedCompetition,
+            idSchool: userSub,
             traner: selectTraner,
             telephone: telephone[0].telephone,
             dateSend: today.toUTCString(),
-            sportsmensList: JSON.stringify(selectSportsmens),
+            sportsmensList: JSON.stringify(selectedSportsmen),
         };
+        editEntryMutation.mutate(data);
         // socket.emit('editEntries', data);
     };
 
@@ -187,11 +199,11 @@ export default function CreateEntries() {
         // eslint-disable-next-line no-restricted-globals
         const answer = confirm(`Удалить пользователя ${e.value}  в классе ${e.field}?`);
         if (answer) {
-            const data = selectSportsmens;
-            const newList = data[e.field].filter(el => el != e.value);
-            data[e.field] = newList;
-            setSelectSportsmens(data);
-            row();
+            const userId = e.row.userId;
+
+            setSelectedSportsmen(selectedSportsmen =>
+                selectedSportsmen.filter(sportsman => sportsman.id !== userId)
+            );
         }
     };
 
@@ -211,11 +223,11 @@ export default function CreateEntries() {
                     Выберите мероприятие
                 </Typography>
                 <FormControl className={classes.formControl}>
-                    <InputLabel>Выберите мероприятие</InputLabel>
+                    <InputLabel shrink={!!selectedCompetition}>Выберите мероприятие</InputLabel>
                     <Select
-                        value={selectCompetition}
+                        value={selectedCompetition}
                         onChange={e => {
-                            setSelectCompetition(e.target.value);
+                            setSelectedCompetition(e.target.value);
                             // makeDiscepline(e.target.value);
                         }}
                     >
@@ -227,7 +239,7 @@ export default function CreateEntries() {
                     </Select>
                 </FormControl>
             </div>
-            {selectCompetition && (
+            {selectedCompetition && (
                 <div
                     style={{
                         display: 'flex',
@@ -246,7 +258,6 @@ export default function CreateEntries() {
                             onChange={e => {
                                 setSelectTraner(e.target.value);
                                 // makeDiscepline(selectCompetition);
-                                headers();
                             }}
                         >
                             <MenuItem value="">None</MenuItem>
@@ -299,10 +310,17 @@ export default function CreateEntries() {
                         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
                             <FormControl className={classes.formControl}>
                                 <InputLabel>Выберите спортсмена</InputLabel>
-                                <Select onChange={e => setChoiseSportsmen(e.target.value)}>
+                                <Select
+                                    value={choiseSportsmen}
+                                    onChange={e => setChoiseSportsmen(e.target.value)}
+                                >
                                     <MenuItem value="">None</MenuItem>
-                                    {sportsmen.map(el => {
-                                        return <MenuItem value={el.name}>{el.name}</MenuItem>;
+                                    {sportsmen?.map(sportsman => {
+                                        return (
+                                            <MenuItem value={sportsman._id}>
+                                                {sportsman.name}
+                                            </MenuItem>
+                                        );
                                     })}
                                 </Select>
                             </FormControl>
@@ -324,13 +342,26 @@ export default function CreateEntries() {
                                 onClick={e => {
                                     e.preventDefault();
                                     if (selectDiscepline && choiseSportsmen) {
-                                        let nameSportsmen;
-                                        self
-                                            ? (nameSportsmen = choiseSportsmen + ' (Л)')
-                                            : (nameSportsmen = choiseSportsmen);
-                                        setSelectSportsmens(prev => (prev = selectSportsmens));
-                                        setChoiseSportsmen('');
-                                        row();
+                                        setSelectedSportsmen(selectedSportsmen => {
+                                            const restOfSportsmen = [
+                                                ...selectedSportsmen.filter(
+                                                    sportsman => sportsman._id !== choiseSportsmen
+                                                ),
+                                            ];
+
+                                            return [
+                                                ...restOfSportsmen,
+                                                {
+                                                    id: choiseSportsmen,
+                                                    discipline: selectDiscepline,
+                                                    name:
+                                                        sportsmen.find(
+                                                            sportsman =>
+                                                                sportsman._id === choiseSportsmen
+                                                        )?.name || '',
+                                                },
+                                            ];
+                                        });
                                     }
                                 }}
                             >
@@ -340,6 +371,7 @@ export default function CreateEntries() {
                     </div>
                 )}
             </div>
+
             <div style={{ height: 500, width: '100%' }}>
                 <DataGrid
                     rows={rowTabel}
@@ -350,17 +382,16 @@ export default function CreateEntries() {
                 />
             </div>
 
-            {selectDiscepline && !entrie.traner && (
-                <div style={{ display: 'flex', flexDirection: 'row-reverse' }}>
-                    <Button variant="contained" color="primary" onClick={sendData}>
-                        Отправить заявку
-                    </Button>
-                </div>
-            )}
-            {entrie.traner && (
+            {id ? (
                 <div style={{ display: 'flex', flexDirection: 'row-reverse' }}>
                     <Button variant="contained" color="primary" onClick={editData}>
                         Редактировать заявку
+                    </Button>
+                </div>
+            ) : (
+                <div style={{ display: 'flex', flexDirection: 'row-reverse' }}>
+                    <Button variant="contained" color="primary" onClick={sendData}>
+                        Отправить заявку
                     </Button>
                 </div>
             )}

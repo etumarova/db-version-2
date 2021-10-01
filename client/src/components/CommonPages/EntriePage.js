@@ -4,21 +4,36 @@ import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
+import { useQuery } from 'react-query';
+import { useParams } from 'react-router';
+import { Link } from 'react-router-dom';
+import { fetchEntryById } from 'services/entry';
 
 export default function EntriePage() {
-    const entrie = JSON.parse(localStorage.getItem('entrie'));
-    const discepline = JSON.parse(entrie.sportsmensList);
+    const { id } = useParams();
+    const { data: entryData } = useQuery(['entries', id], () => fetchEntryById(id));
+    const { entry } = entryData || {};
+
+    const sportsmenList = entry?.sportsmensList ? JSON.parse(entry?.sportsmensList) : [];
     const today = Date.now();
     return (
         <div>
-            {new Date(entrie.deadLine) >= new Date(today) && (
+            {/* {new Date(entry?.deadLine) >= new Date(today) && (
                 <div style={{ float: 'right' }}>
-                    <Button variant="contained" color="primary" href="/createEntries">
-                        Редактировать
-                    </Button>
+                    <Link to={`createEntries/${id}`}>
+                        <Button variant="contained" color="primary">
+                            Редактировать
+                        </Button>
+                    </Link>
                 </div>
-            )}
-            {entrie && (
+            )} */}
+
+            <Link to={`/createEntries/${id}`}>
+                <Button variant="contained" color="primary">
+                    Редактировать
+                </Button>
+            </Link>
+            {entry && (
                 <div style={{ display: 'flex', flexFlow: 'column', margin: '10px' }}>
                     <div
                         style={{
@@ -38,16 +53,16 @@ export default function EntriePage() {
                         >
                             <div>
                                 <Typography variant="h3" component="h4" gutterBottom>
-                                    {entrie.name}
+                                    {entry.name}
                                 </Typography>
                                 <Typography variant="body1" gutterBottom>
-                                    Начало соревнований: <b>{entrie.startDate}</b>
+                                    Начало соревнований: <b>{entry.startDate}</b>
                                 </Typography>
                                 <Typography variant="body1" gutterBottom>
-                                    Окончание соревнований: <b>{entrie.endDate}</b>
+                                    Окончание соревнований: <b>{entry.endDate}</b>
                                 </Typography>
                                 <Typography variant="body1" gutterBottom>
-                                    Последний день принятия заявок: <b>{entrie.endDate}</b>
+                                    Последний день принятия заявок: <b>{entry.endDate}</b>
                                 </Typography>
                             </div>
                             <div>
@@ -62,7 +77,7 @@ export default function EntriePage() {
                                     }}
                                 >
                                     <Typography variant="body1" gutterBottom>
-                                        Телефон представителя команды: <b>{entrie.telephone}</b>
+                                        Телефон представителя команды: <b>{entry.telephone}</b>
                                     </Typography>
                                 </div>
                             </div>
@@ -77,11 +92,11 @@ export default function EntriePage() {
                         }}
                     >
                         <Typography variant="body1" gutterBottom>
-                            Представитель команды: <b>{entrie.traner}</b>
+                            Представитель команды: <b>{entry.traner}</b>
                         </Typography>
                     </div>
                     <div style={{ display: 'flex' }}>
-                        {Object.keys(discepline).map(keyName => {
+                        {sportsmenList?.map(sportsman => {
                             return (
                                 <div
                                     style={{
@@ -99,16 +114,13 @@ export default function EntriePage() {
                                                     variant="h5"
                                                     component="h2"
                                                 >
-                                                    <b>{keyName}</b>
+                                                    <b>{sportsman.name}</b>
                                                     <hr />
                                                 </Typography>
-                                                {discepline[keyName].map(el => {
-                                                    return (
-                                                        <Typography variant="body2" gutterBottom>
-                                                            {el}
-                                                        </Typography>
-                                                    );
-                                                })}
+
+                                                <Typography variant="body2" gutterBottom>
+                                                    {sportsman.discipline}
+                                                </Typography>
                                             </CardContent>
                                         </CardActionArea>
                                     </Card>

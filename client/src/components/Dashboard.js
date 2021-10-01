@@ -225,8 +225,8 @@ function Dashboard() {
                             <PrivateRoute path="/createTrainer/:id?" component={CreateTraner} />
                             <PrivateRoute path="/traner/:id" component={TranerPage} />
                             <PrivateRoute exact path="/myEntries" component={MyEntries} />
-                            <PrivateRoute exact path="/createEntries" component={CreateEntries} />
-                            <PrivateRoute exact path="/entrie" component={EntriePage} />
+                            <PrivateRoute path="/createEntries/:id?" component={CreateEntries} />
+                            <PrivateRoute path="/entrie/:id" component={EntriePage} />
                             <PrivateRoute exact path="/adminSchools" component={AdminSchools} />
                             <PrivateRoute exact path="/adminTraners" component={AdminTraners} />
                             <PrivateRoute

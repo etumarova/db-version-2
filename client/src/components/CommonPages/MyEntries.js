@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { useHistory } from 'react-router';
 import { useQuery } from 'react-query';
 import { fetchEntriesBySchoolId } from 'services/entry';
+import { fetchCompetitions } from 'services/competition';
 
 const columns = [
     { field: 'id', headerName: 'ID', width: 80 },
@@ -25,13 +26,15 @@ export default function MyEntries() {
     const { data: entryData } = useQuery(['entries', user?.sub], () =>
         fetchEntriesBySchoolId(user?.sub)
     );
-    const { entries, competitions } = entryData || {};
+    const { entries } = entryData || {};
 
-    // const competitionKeysToInclude = ['startDate', 'endDate', 'name', 'deadLine', 'discepline']
+    const { data: competitionData } = useQuery('competitions', fetchCompetitions);
+    const { competitions } = competitionData || {};
+
     const entriesData = entries?.map(entry => {
-        const competition = competitions.find(comp => comp._id === entry.idCompetition) || {};
+        const competition = competitions?.find(comp => comp._id === entry.idCompetition) || {};
 
-        return { ...entry, ...competition };
+        return { id: entry._id, ...entry, ...competition };
     });
 
     return (
@@ -46,8 +49,6 @@ export default function MyEntries() {
             <Typography variant="h3" component="h4" gutterBottom>
                 Мои заявки
             </Typography>
-
-            {/* {competitions && entries && !newData && row()} */}
 
             {entriesData && (
                 <div style={{ height: 500, width: '100%' }}>
