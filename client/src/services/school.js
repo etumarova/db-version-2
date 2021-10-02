@@ -4,7 +4,7 @@ export const fetchSchoolByUserId = userId =>
     fetch(`/school/?userId=${userId}`).then(res => res.json());
 
 export const saveSchool = data =>
-    fetch('/saveSchool', {
+    fetch('/schools/save', {
         method: 'post',
         headers: {
             Accept: 'application/json, text/plain, */*',
@@ -14,7 +14,7 @@ export const saveSchool = data =>
     });
 
 export const editSchool = data =>
-    fetch('/editSchool', {
+    fetch('/schools/edit', {
         method: 'post',
         headers: {
             Accept: 'application/json, text/plain, */*',

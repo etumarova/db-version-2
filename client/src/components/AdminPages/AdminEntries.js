@@ -151,14 +151,14 @@ export default function AdminEntries() {
         competitions.forEach(el => {
             if (el._id == id) {
                 const obj = el;
-                const data = entries.filter(elem => elem.idCompetition == id);
+                const data = entries.filter(elem => elem.competitionId == id);
                 data.forEach(element => {
-                    const idSchool = schools.filter(elem => {
-                        if (element.idSchool == elem.idUser) {
+                    const schoolId = schools.filter(elem => {
+                        if (element.schoolId == elem.userId) {
                             return elem.name;
                         }
                     });
-                    element['school'] = idSchool[0].name;
+                    element['school'] = schoolId[0].name;
                     element['nameCompetition'] = obj.name;
                     element['startDate'] = obj.startDate;
                     element['endDate'] = obj.endDate;
@@ -176,7 +176,7 @@ export default function AdminEntries() {
             Object.keys(entry).forEach(keyName => {
                 entry[keyName].forEach(el => {
                     const id = sportsmen.filter(
-                        elem => elem.name == el && elem.idSchool == obj.idSchool
+                        elem => elem.name == el && elem.schoolId == obj.schoolId
                     );
                     if (id.length != 0) {
                         const inner = {

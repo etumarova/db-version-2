@@ -48,7 +48,7 @@ export default function CreateTrainer() {
     });
     const { trainer } = trainerData || {};
 
-    const schoolId = trainer?.idSchool || userSub;
+    const schoolId = trainer?.schoolId || userSub;
 
     const saveTrainerMutation = useMutation(saveTrainer, {
         onSuccess: () => {
@@ -97,7 +97,7 @@ export default function CreateTrainer() {
     const saveData = e => {
         e.preventDefault();
         const data = {
-            idSchool: schoolId,
+            schoolId,
             photo,
             name,
             birthday,
@@ -111,7 +111,7 @@ export default function CreateTrainer() {
         e.preventDefault();
         const data = {
             _id: trainer._id,
-            idSchool: schoolId,
+            schoolId,
             photo,
             name,
             birthday,

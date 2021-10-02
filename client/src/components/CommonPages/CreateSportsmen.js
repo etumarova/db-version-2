@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { useDropzone } from 'react-dropzone';
@@ -14,6 +14,9 @@ import { useMutation, useQuery } from 'react-query';
 import { fetchSportsmanById, saveSportsman, editSportsman } from 'services/sportsmen';
 import { useHistory, useParams } from 'react-router-dom';
 import { queryClient } from 'features/queryClient';
+import { useAuth0 } from '@auth0/auth0-react';
+import { UserContext } from 'context/UserContext';
+import { fetchTrainersBySchoolId } from 'services/trainer';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -42,22 +45,32 @@ export default function CreateSportsmen() {
     const [photo, setPhoto] = useState(null);
     const [name, setName] = useState(null);
     const [birthday, setBirthday] = useState(null);
-    const [adress, setAdress] = useState(null);
+    const [address, setAddress] = useState(null);
     const [telephone, setTelephone] = useState(null);
     const [fTraner, setFTraner] = useState(null);
     const [nowTraner, setNowTraner] = useState(null);
     const [school, setSchool] = useState(null);
     const [result, setResult] = useState({});
     const [listResults, setListResults] = useState([]);
-    const [traners, setTraners] = useState(null);
+    const [nowTrainer, setNowTrainer] = useState(null);
     const [rowTable, setRowTabel] = useState([]);
     const classes = useStyles();
+
+    const { userSub } = useContext(UserContext);
 
     const shouldFetch = !!id;
     const { data: sportsmanData } = useQuery(['sportsmen', id], () => fetchSportsmanById(id), {
         enabled: shouldFetch,
     });
     const { sportsman } = sportsmanData || {};
+    const { data: trainerData } = useQuery(
+        ['trainers', ''],
+        () => fetchTrainersBySchoolId(sportsman.schoolId),
+        {
+            enabled: !!sportsman.schoolId,
+        }
+    );
+    const { trainers } = trainerData || {};
     const saveSportsmanMutation = useMutation(saveSportsman, {
         onSuccess: () => {
             queryClient.invalidateQueries('sportsmen');
@@ -76,52 +89,18 @@ export default function CreateSportsmen() {
     useEffect(() => {
         if (sportsman) {
             // setSportsmen(data);
-            setPhoto(sportsman.photo]);
+            setPhoto(sportsman.photo);
             setListResults(JSON.parse(sportsman.listResults));
             setName(sportsman.name);
             setBirthday(sportsman.birthday);
-            setAdress(sportsman.adress);
+            setAddress(sportsman.address);
             setTelephone(sportsman.telephone);
             setFTraner(sportsman.fTraner);
             setNowTraner(sportsman.nowTraner);
             setSchool(sportsman.school);
+            setNowTrainer(sportsman.nowTrainer);
         }
     }, [sportsman]);
-
-    // const { data } = useQuery(['sportsmen', user?.sub], () => fetchSportsmenBySchoolId(user?.sub));
-    // const { sportsmen } = data || {};
-
-    // useEffect(() => {
-    //     // setSportsmanData();
-    // }, [sportsmen])
-
-    // useEffect(() => {
-    //     socket.emit('getAdminTraners');
-    //     socket.on('adminTraners', data => {
-    //         data.forEach(el => (el['id'] = el['_id']));
-    //         setTraners(data);
-    //     });
-    //     try {
-    //         const editSportsmen = localStorage.getItem('sportsmen');
-    //         if (editSportsmen) {
-    //             const data = JSON.parse(editSportsmen);
-    //             setSportsmen(data);
-    //             setFoto(data.foto);
-    //             setListResults(JSON.parse(data.listResults));
-    //             setName(data.name);
-    //             setBirthday(data.birthday);
-    //             setAdress(data.adress);
-    //             setTelephone(data.telephone);
-    //             setFTraner(data.fTraner);
-    //             setNowTraner(data.nowTraner);
-    //             setSchool(data.school);
-    //             localStorage.clear();
-    //             row(JSON.parse(data.listResults));
-    //         }
-    //     } catch (e) {
-    //         console.log(e);
-    //     }
-    // }, []);
 
     const onDrop = async acceptedFiles => {
         const url = `https://api.cloudinary.com/v1_1/dgeev9d6l/image/upload`;
@@ -145,14 +124,14 @@ export default function CreateSportsmen() {
     const saveData = e => {
         e.preventDefault();
         const data = {
-            idSchool: localStorage.getItem('user'),
+            schoolId: userSub,
             photo: photo,
             name: name,
             birthday: birthday,
             fTraner: fTraner,
             nowTraner: nowTraner,
             school: school,
-            adress: adress,
+            address,
             telephone: telephone,
             listResults: JSON.stringify(listResults),
         };
@@ -163,15 +142,15 @@ export default function CreateSportsmen() {
         e.preventDefault();
         const data = {
             _id: sportsman._id,
-            idSchool: localStorage.getItem('user'),
-            photo: photo,
-            name: name,
-            birthday: birthday,
-            fTraner: fTraner,
-            nowTraner: nowTraner,
-            school: school,
-            adress: adress,
-            telephone: telephone,
+            schoolId: sportsman.schoolId, // I should not have to specify parameters i don't want to update
+            photo,
+            name,
+            birthday,
+            fTraner,
+            nowTraner,
+            school,
+            address,
+            telephone,
             listResults: JSON.stringify(listResults),
         };
         editSportsmanMutation.mutate(data);
@@ -213,16 +192,24 @@ export default function CreateSportsmen() {
     };
 
     return (
-        <div className={classes.root}>
-            <div {...getRootProps()} className={`dropzone ${isDragActive ? 'active' : null}`}>
-                <input {...getInputProps()} />
-                {isDragActive ? <p>Вот прямо сюда!</p> : <p>Бросьте фото спортсмена сюда</p>}
+        <div className={classes.root} style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex' }}>
+                <div {...getRootProps()} className={`dropzone ${isDragActive ? 'active' : null}`}>
+                    <input {...getInputProps()} />
+                    {isDragActive ? <p>Вот прямо сюда!</p> : <p>Бросьте фото спортсмена сюда</p>}
+                </div>
+                <div>
+                    {photo && (
+                        <Image
+                            style={{ maxHeight: '8rem' }}
+                            cloud_name="dgeev9d6l"
+                            publicId={photo}
+                            crop="scale"
+                        />
+                    )}
+                </div>
             </div>
-            <div>
-                {photo != '' && (
-                    <Image cloud_name="dgeev9d6l" publicId={photo} width="50" crop="scale" />
-                )}
-            </div>
+
             <div>
                 <TextField
                     id="standard-full-width"
@@ -262,9 +249,9 @@ export default function CreateSportsmen() {
                     id="margin-none"
                     style={{ margin: 8 }}
                     placeholder="Введите адрес прописки"
-                    value={adress}
+                    value={address}
                     fullWidth
-                    onChange={e => setAdress(e.target.value)}
+                    onChange={e => setAddress(e.target.value)}
                     margin="normal"
                     InputLabelProps={{
                         shrink: true,
@@ -286,9 +273,9 @@ export default function CreateSportsmen() {
                     <InputLabel>Личный тренер</InputLabel>
                     <Select value={nowTraner} onChange={e => setNowTraner(e.target.value)}>
                         <MenuItem value="">None</MenuItem>
-                        {traners &&
-                            traners.map(el => {
-                                return <MenuItem value={el.name}>{el.name}</MenuItem>;
+                        {trainers &&
+                            trainers.map(trainer => {
+                                return <MenuItem value={trainer.name}>{trainer.name}</MenuItem>;
                             })}
                     </Select>
                 </FormControl>
@@ -302,6 +289,8 @@ export default function CreateSportsmen() {
                     onChange={e => setSchool(e.target.value)}
                 />
             </div>
+
+            <hr />
             <div>
                 <div>
                     <TextField

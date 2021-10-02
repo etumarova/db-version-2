@@ -93,7 +93,7 @@ app.get('/school', (req, res) => {
         .catch(e => console.log(e));
 });
 
-app.post('/saveSchool', (req, res) => {
+app.post('/schools/save', (req, res) => {
     const {
         userId,
         photo,
@@ -109,7 +109,7 @@ app.post('/saveSchool', (req, res) => {
     SchoolModel.find({ userId })
         .then(data => {
             if (data.length == 0) {
-                schools.create({
+                SchoolModel.create({
                     userId,
                     photo,
                     name,
@@ -128,7 +128,7 @@ app.post('/saveSchool', (req, res) => {
         });
 });
 
-app.post('/editSchool', (req, res) => {
+app.post('/schools/edit', (req, res) => {
     const {
         _id,
         userId,

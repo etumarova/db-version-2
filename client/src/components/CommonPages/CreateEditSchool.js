@@ -75,7 +75,7 @@ export default function CreateEditSchool() {
     const [description, setDescription] = useState('');
     const [region, setRegion] = useState('');
     const [city, setCity] = useState('');
-    const [adress, setAdress] = useState('');
+    const [address, setAddress] = useState('');
     const [telephone, setTelephone] = useState('');
 
     // const [school, setSchool] = useState({});
@@ -105,7 +105,7 @@ export default function CreateEditSchool() {
         setDirector(data.director);
         setDescription(data.description);
         setCity(data.city);
-        setAdress(data.adress);
+        setAddress(data.address);
         setTelephone(data.telephone);
     };
 
@@ -135,14 +135,14 @@ export default function CreateEditSchool() {
     const saveData = e => {
         e.preventDefault();
         const data = {
-            idUser: userId,
+            userId,
             photo,
             name,
             director,
             description,
             region,
             city,
-            adress,
+            address,
             telephone,
         };
 
@@ -153,14 +153,14 @@ export default function CreateEditSchool() {
         e.preventDefault();
         const data = {
             _id: school._id,
-            idUser: userId,
+            userId,
             photo,
             name,
             director,
             description,
             region,
             city,
-            adress,
+            address,
             telephone,
         };
 
@@ -269,9 +269,9 @@ export default function CreateEditSchool() {
                     label="Адрес"
                     id="outlined-margin-dense"
                     className={classes.textField}
-                    value={adress}
+                    value={address}
                     variant="outlined"
-                    onChange={e => setAdress(e.target.value)}
+                    onChange={e => setAddress(e.target.value)}
                 />
             </div>
 

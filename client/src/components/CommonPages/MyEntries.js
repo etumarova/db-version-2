@@ -32,7 +32,7 @@ export default function MyEntries() {
     const { competitions } = competitionData || {};
 
     const entriesData = entries?.map(entry => {
-        const competition = competitions?.find(comp => comp._id === entry.idCompetition) || {};
+        const competition = competitions?.find(comp => comp._id === entry.competitionId) || {};
 
         return { id: entry._id, ...entry, ...competition };
     });

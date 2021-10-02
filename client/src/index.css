@@ -21,7 +21,7 @@ a {
 }
 
 .dropzone {
-    height: 4rem;
+    height: 8rem;
     padding: 1rem;
     border: 1px dashed salmon;
     display: flex;
@@ -29,6 +29,7 @@ a {
     align-items: center;
     font-size: 1rem;
     cursor: pointer;
+    max-width: 350px;
 }
 
 .csv-link {

@@ -73,7 +73,7 @@ export default function AdminSchools() {
                         pageSize={15}
                         className="table-style"
                         onRowClick={e => {
-                            history.push(`/mySchool/${e.row.idUser}`);
+                            history.push(`/mySchool/${e.row.userId}`);
                         }}
                     />
                 </div>

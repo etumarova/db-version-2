@@ -92,7 +92,7 @@ export default function MySchool() {
                                     <div className="col-sm-3  text-secondary">Адрес</div>
                                     <div className="col-sm-9">
                                         <h6 className="mb-0">
-                                            {school.city + ', ' + school.adress}
+                                            {school.city + ', ' + school.address}
                                         </h6>
                                     </div>
                                 </div>

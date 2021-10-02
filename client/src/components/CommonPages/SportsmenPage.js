@@ -118,7 +118,7 @@ export default function SportsmenPage() {
                                             <h6 className="mb-0">Адрес прописки</h6>
                                         </div>
                                         <div className="col-sm-9 text-secondary">
-                                            {sportsman.adress}
+                                            {sportsman.address}
                                         </div>
                                     </div>
                                 </div>

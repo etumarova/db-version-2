@@ -108,7 +108,7 @@ export default function CreateEntries() {
 
     useEffect(() => {
         if (entry) {
-            setSelectedCompetition(entry.idCompetition);
+            setSelectedCompetition(entry.competitionId);
             setSelectTraner(entry.traner);
             if (entry.sportsmenList) setSelectedSportsmen(JSON.parse(entry.sportsmenList));
         }
@@ -164,8 +164,8 @@ export default function CreateEntries() {
         if (selectDiscepline && selectSportsmen && selectTraner && selectedCompetition) {
             const today = new Date();
             const data = {
-                idCompetition: selectedCompetition,
-                idSchool: localStorage.getItem('user'),
+                competitionId: selectedCompetition,
+                schoolId: userSub,
                 traner: selectTraner,
                 telephone: telephone[0].telephone,
                 dateSend: today.toUTCString(),
@@ -184,8 +184,8 @@ export default function CreateEntries() {
         const today = new Date();
         const data = {
             _id: entry._id,
-            idCompetition: selectedCompetition,
-            idSchool: userSub,
+            competitionId: selectedCompetition,
+            schoolId: userSub,
             traner: selectTraner,
             telephone: telephone[0].telephone,
             dateSend: today.toUTCString(),
