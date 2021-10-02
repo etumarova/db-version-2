@@ -37,41 +37,24 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function CreateEntries() {
+    const history = useHistory();
+    const { id } = useParams();
     const classes = useStyles();
-    // const [competitions, setCompetitions] = useState(null);
-    // const [traners, setTraners] = useState(null);
     const [selectedSportsmen, setSelectedSportsmen] = useState([]);
 
     const [selectedCompetition, setSelectedCompetition] = useState(null);
-    const [selectTraner, setSelectTraner] = useState(null);
+    const [selectTrainer, setSelectTrainer] = useState(null);
     const [selectSportsmen, setSelectSportsmen] = useState({});
     const [discipline, setDiscipline] = useState([]);
     const [selectDiscepline, setSelectDiscepline] = useState(null);
     const [choiseSportsmen, setChoiseSportsmen] = useState(null);
-    const [entrie, setEntrie] = useState({});
     const [self, setSelf] = useState(false);
-    // const [headersTabel, setHeadersTabel] = useState([]);
     const [rowTabel, setRowTabel] = useState([]);
-    const today = Date.now();
-    const { user } = useAuth0();
-
     const { userSub } = useContext(UserContext);
-
-    const { data: sportsmenData } = useQuery(['sportsmen', userSub], () =>
-        fetchSportsmenBySchoolId(userSub)
-    );
-    const { sportsmen } = sportsmenData || {};
 
     const { data: competitionsData } = useQuery('competitions', fetchCompetitions);
     const { competitions } = competitionsData || {};
 
-    const { data: trainersData } = useQuery(['trainers', userSub], () =>
-        fetchTrainersBySchoolId(userSub)
-    );
-    const { trainers } = trainersData || {};
-
-    const history = useHistory();
-    const { id } = useParams();
     const shouldFetchEntry = !!id;
     const { data: entryData } = useQuery(['entries', id], () => fetchEntryById(id), {
         enabled: shouldFetchEntry,
@@ -92,6 +75,21 @@ export default function CreateEntries() {
         onError: error => console.log(error),
     });
 
+    const schoolId = id ? entry?.schoolId : userSub;
+    const { data: sportsmenData } = useQuery(
+        ['sportsmen', schoolId],
+        () => fetchSportsmenBySchoolId(schoolId),
+        { enabled: !!schoolId }
+    );
+    const { sportsmen } = sportsmenData || {};
+
+    const { data: trainersData } = useQuery(
+        ['trainers', schoolId],
+        () => fetchTrainersBySchoolId(schoolId),
+        { enabled: !!schoolId }
+    );
+    const { trainers } = trainersData || {};
+
     const headersTabel = useMemo(() => {
         const arr = [{ field: 'id', headerName: 'ID', width: 80 }];
         discipline.forEach(el => {
@@ -109,7 +107,7 @@ export default function CreateEntries() {
     useEffect(() => {
         if (entry) {
             setSelectedCompetition(entry.competitionId);
-            setSelectTraner(entry.traner);
+            setSelectTrainer(entry.traner);
             if (entry.sportsmenList) setSelectedSportsmen(JSON.parse(entry.sportsmenList));
         }
     }, [entry]);
@@ -156,18 +154,18 @@ export default function CreateEntries() {
         };
 
         if (competition?.discipline) getDisceplines();
-    }, [selectedCompetition, selectSportsmen, competitions, selectTraner]);
+    }, [selectedCompetition, selectSportsmen, competitions, selectTrainer]);
 
     const sendData = e => {
         e.preventDefault();
-        const telephone = trainers.filter(el => el.name == selectTraner);
-        if (selectDiscepline && selectSportsmen && selectTraner && selectedCompetition) {
+        const telephone = trainers.find(el => el.name === selectTrainer)?.telephone || '-';
+        if (selectDiscepline && selectSportsmen && selectTrainer && selectedCompetition) {
             const today = new Date();
             const data = {
                 competitionId: selectedCompetition,
                 schoolId: userSub,
-                traner: selectTraner,
-                telephone: telephone[0].telephone,
+                trainer: selectTrainer,
+                telephone: telephone,
                 dateSend: today.toUTCString(),
                 sportsmenList: JSON.stringify(selectedSportsmen),
             };
@@ -180,19 +178,18 @@ export default function CreateEntries() {
 
     const editData = e => {
         e.preventDefault();
-        const telephone = trainers.filter(el => el.name == selectTraner);
+        const telephone = trainers.find(el => el.name === selectTrainer)?.telephone;
         const today = new Date();
         const data = {
             _id: entry._id,
             competitionId: selectedCompetition,
-            schoolId: userSub,
-            traner: selectTraner,
-            telephone: telephone[0].telephone,
+            schoolId: entry.schoolId,
+            trainer: selectTrainer,
+            telephone: telephone || entry.telephone,
             dateSend: today.toUTCString(),
-            sportsmensList: JSON.stringify(selectedSportsmen),
+            sportsmenList: JSON.stringify(selectedSportsmen),
         };
         editEntryMutation.mutate(data);
-        // socket.emit('editEntries', data);
     };
 
     const deleteCeill = e => {
@@ -254,9 +251,9 @@ export default function CreateEntries() {
                     <FormControl className={classes.formControl}>
                         <InputLabel>Руководитель организации</InputLabel>
                         <Select
-                            value={selectTraner}
+                            value={selectTrainer}
                             onChange={e => {
-                                setSelectTraner(e.target.value);
+                                setSelectTrainer(e.target.value);
                                 // makeDiscepline(selectCompetition);
                             }}
                         >
@@ -269,106 +266,111 @@ export default function CreateEntries() {
                 </div>
             )}
             <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'start' }}>
-                {selectTraner && (
-                    <div
-                        style={{
-                            display: 'flex',
-                            flexFlow: 'column',
-                            alignItems: 'center',
-                            margin: '10px',
-                        }}
-                    >
-                        <Typography variant="h6" component="h7" gutterBottom>
-                            Выберите дисциплину
-                        </Typography>
-                        <FormControl className={classes.formControl}>
-                            <InputLabel>Дисциплина</InputLabel>
-                            <Select
-                                value={selectDiscepline}
-                                onChange={e => setSelectDiscepline(e.target.value)}
-                            >
-                                <MenuItem value="">None</MenuItem>
-                                {discipline.map(el => {
-                                    return <MenuItem value={el}>{el}</MenuItem>;
-                                })}
-                            </Select>
-                        </FormControl>
-                    </div>
-                )}
-                {selectTraner && (
-                    <div
-                        style={{
-                            display: 'flex',
-                            flexFlow: 'column',
-                            alignItems: 'center',
-                            margin: '10px',
-                        }}
-                    >
-                        <Typography variant="h6" component="h7" gutterBottom>
-                            Выберите спортсмена
-                        </Typography>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
+                {selectTrainer && (
+                    <>
+                        <div
+                            style={{
+                                display: 'flex',
+                                flexFlow: 'column',
+                                alignItems: 'center',
+                                margin: '10px',
+                            }}
+                        >
+                            <Typography variant="h6" component="h7" gutterBottom>
+                                Выберите дисциплину
+                            </Typography>
                             <FormControl className={classes.formControl}>
-                                <InputLabel>Выберите спортсмена</InputLabel>
+                                <InputLabel>Дисциплина</InputLabel>
                                 <Select
-                                    value={choiseSportsmen}
-                                    onChange={e => setChoiseSportsmen(e.target.value)}
+                                    value={selectDiscepline}
+                                    onChange={e => setSelectDiscepline(e.target.value)}
                                 >
                                     <MenuItem value="">None</MenuItem>
-                                    {sportsmen?.map(sportsman => {
-                                        return (
-                                            <MenuItem value={sportsman._id}>
-                                                {sportsman.name}
-                                            </MenuItem>
-                                        );
+                                    {discipline.map(el => {
+                                        return <MenuItem value={el}>{el}</MenuItem>;
                                     })}
                                 </Select>
                             </FormControl>
-
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={self}
-                                        onChange={e => setSelf(e.target.checked)}
-                                        name="checkedB"
-                                        color="primary"
-                                    />
-                                }
-                                label="Лично"
-                            />
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={e => {
-                                    e.preventDefault();
-                                    if (selectDiscepline && choiseSportsmen) {
-                                        setSelectedSportsmen(selectedSportsmen => {
-                                            const restOfSportsmen = [
-                                                ...selectedSportsmen.filter(
-                                                    sportsman => sportsman._id !== choiseSportsmen
-                                                ),
-                                            ];
-
-                                            return [
-                                                ...restOfSportsmen,
-                                                {
-                                                    id: choiseSportsmen,
-                                                    discipline: selectDiscepline,
-                                                    name:
-                                                        sportsmen.find(
-                                                            sportsman =>
-                                                                sportsman._id === choiseSportsmen
-                                                        )?.name || '',
-                                                },
-                                            ];
-                                        });
-                                    }
-                                }}
-                            >
-                                Добавить
-                            </Button>
                         </div>
-                    </div>
+
+                        <div
+                            style={{
+                                display: 'flex',
+                                flexFlow: 'column',
+                                alignItems: 'center',
+                                margin: '10px',
+                            }}
+                        >
+                            <Typography variant="h6" component="h7" gutterBottom>
+                                Выберите спортсмена
+                            </Typography>
+                            <div
+                                style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}
+                            >
+                                <FormControl className={classes.formControl}>
+                                    <InputLabel>Выберите спортсмена</InputLabel>
+                                    <Select
+                                        value={choiseSportsmen}
+                                        onChange={e => setChoiseSportsmen(e.target.value)}
+                                    >
+                                        <MenuItem value="">None</MenuItem>
+                                        {sportsmen?.map(sportsman => {
+                                            return (
+                                                <MenuItem value={sportsman._id}>
+                                                    {sportsman.name}
+                                                </MenuItem>
+                                            );
+                                        })}
+                                    </Select>
+                                </FormControl>
+
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={self}
+                                            onChange={e => setSelf(e.target.checked)}
+                                            name="checkedB"
+                                            color="primary"
+                                        />
+                                    }
+                                    label="Лично"
+                                />
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={e => {
+                                        e.preventDefault();
+                                        if (selectDiscepline && choiseSportsmen) {
+                                            setSelectedSportsmen(selectedSportsmen => {
+                                                const restOfSportsmen = [
+                                                    ...selectedSportsmen.filter(
+                                                        sportsman =>
+                                                            sportsman._id !== choiseSportsmen
+                                                    ),
+                                                ];
+
+                                                return [
+                                                    ...restOfSportsmen,
+                                                    {
+                                                        id: choiseSportsmen,
+                                                        discipline: selectDiscepline,
+                                                        name:
+                                                            sportsmen.find(
+                                                                sportsman =>
+                                                                    sportsman._id ===
+                                                                    choiseSportsmen
+                                                            )?.name || '',
+                                                    },
+                                                ];
+                                            });
+                                        }
+                                    }}
+                                >
+                                    Добавить
+                                </Button>
+                            </div>
+                        </div>
+                    </>
                 )}
             </div>
 

@@ -58,7 +58,7 @@ export default function MyEntries() {
                         pageSize={15}
                         className="table-style"
                         onRowClick={e => {
-                            history.push(`/entrie/${e.row.id}`);
+                            history.push(`/entry/${e.row.id}`);
                         }}
                     />
                 </div>

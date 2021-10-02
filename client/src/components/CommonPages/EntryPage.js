@@ -9,7 +9,7 @@ import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import { fetchEntryById } from 'services/entry';
 
-export default function EntriePage() {
+export default function EntryPage() {
     const { id } = useParams();
     const { data: entryData } = useQuery(['entries', id], () => fetchEntryById(id));
     const { entry } = entryData || {};

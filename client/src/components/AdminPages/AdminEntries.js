@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Typography from '@material-ui/core/Typography';
 import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
@@ -18,8 +18,9 @@ import PrintComponent from 'components/PrintComponent';
 import { useQuery } from 'react-query';
 import { fetchCompetitions } from 'services/competition';
 import { fetchSchools } from 'services/school';
-import { fetchEntries } from 'services/entry';
+import { fetchEntries, fetchEntriesByCompetitionId } from 'services/entry';
 import { fetchSportsmen } from 'services/sportsmen';
+import { useHistory } from 'react-router';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -57,7 +58,7 @@ const useStyles = makeStyles(theme => ({
 
 const columns = [
     { field: 'id', headerName: 'ID', width: 80 },
-    { field: 'nameCompetition', headerName: 'Название мероприятия', width: 370 },
+    { field: 'competitionName', headerName: 'Название мероприятия', width: 370 },
     { field: 'school', headerName: 'Школа', width: 350 },
     { field: 'deadLine', headerName: 'Прием заявок до', width: 180 },
     { field: 'dateSend', headerName: 'Дата получения', width: 220 },
@@ -78,100 +79,65 @@ const headersSport = [
 const headersClass = [{ label: 'Класс лодки', key: 'classBoat' }];
 
 export default function AdminEntries() {
-    // const [competitions, setCompetitions] = useState(null);
-    const [select, setSelect] = useState(null);
-    // const [entries, setEntries] = useState(null);
-    const [choiseEntries, setChoiseEntries] = useState(null);
-    // const [schools, setSchools] = useState(null);
+    const history = useHistory();
+    const [selectedCompetition, setSelectedCompetition] = useState(null);
     const [newDataCSV, setNewDataCSV] = useState(null);
     const [sportCSV, setSportCSV] = useState(null);
     const [boatClass, setBoatClass] = useState(null);
-    // const [sportsmen, setSportsmen] = useState(null);
     const [akkr, setAkkr] = useState(null);
     const componentRef = useRef();
     const classes = useStyles();
-    const { user } = useAuth0();
 
     const { data: sportsmenData } = useQuery('sportsmen', fetchSportsmen);
     const { sportsmen } = sportsmenData || {};
-    const formattedSportsmen = sportsmen?.map(sportsman => ({ ...sportsman, id: sportsman._id }));
-
-    const { data: entriesData } = useQuery('entries', fetchEntries);
-    const { entries } = entriesData || {};
-    // const formattedSportsmen = sportsmen?.map(sportsman => ({ ...sportsman, id: sportsman._id }));
 
     const { data: schoolsData } = useQuery('schools', fetchSchools);
     const { schools } = schoolsData || {};
-    const formattedSchools = schools?.map(school => ({ ...school, id: school._id }));
 
     const { data: competitionsData } = useQuery('competitions', fetchCompetitions);
     const { competitions } = competitionsData || {};
-    const formattedCompetitions = competitions?.map(competitions => ({
-        ...competitions,
-        id: competitions._id,
-    }));
-    //  wtf is that
-    useEffect(() => {
-        if (choiseEntries) {
-            dataCSV();
-            sportsmenCSV();
-            classBoat();
-            akkreditation();
-        }
-    }, [choiseEntries]);
 
+    const { data: entriesData } = useQuery(
+        ['entries', selectedCompetition],
+        () => fetchEntriesByCompetitionId(selectedCompetition),
+        {
+            enabled: !!selectedCompetition,
+        }
+    );
+    const { entries } = entriesData || {};
+    const formattedEntries = useMemo(
+        () => entries?.map(entry => ({ ...entry, id: entry._id } || [])),
+        [entries]
+    );
+
+    const tableRows = useMemo(() => {
+        const competition = competitions?.find(comp => comp._id === selectedCompetition) || {};
+        return (
+            formattedEntries?.map(entry => ({
+                id: entry._id,
+                competitionName: competition.name,
+                school: schools?.find(school => school.userId === entry.schoolId)?.name || '-',
+                deadLine: competition.deadLine,
+                dateSend: entry.dateSend,
+            })) || []
+        );
+    }, [formattedEntries, competitions, schools]);
+
+    // const formattedSportsmen = sportsmen?.map(sportsman => ({ ...sportsman, id: sportsman._id }));
+
+    //  wtf is that
     // useEffect(() => {
-    //     // shouldn't be this many requests
-    //     socket.emit('getCompetition');
-    //     socket.on('competition', data => {
-    //         setCompetitions(data);
-    //     });
-    //     socket.emit('getAdminEntries');
-    //     socket.on('adminEntries', data => {
-    //         data.forEach(el => (el['id'] = el['_id']));
-    //         setEntries(data);
-    //     });
-    //     socket.emit('getAdminSchools');
-    //     socket.on('adminSchools', data => {
-    //         setSchools(data);
-    //     });
-    //     socket.emit('getAdminSportsmens');
-    //     socket.on('adminSportsmens', data => {
-    //         setSportsmens(data);
-    //     });
-    //     if (choiseEntries) {
+    //     if (selectedCompetition && formattedEntries.length) {
     //         dataCSV();
     //         sportsmenCSV();
     //         classBoat();
     //         akkreditation();
     //     }
-    // }, []);
-
-    const findEntries = id => {
-        competitions.forEach(el => {
-            if (el._id == id) {
-                const obj = el;
-                const data = entries.filter(elem => elem.competitionId == id);
-                data.forEach(element => {
-                    const schoolId = schools.filter(elem => {
-                        if (element.schoolId == elem.userId) {
-                            return elem.name;
-                        }
-                    });
-                    element['school'] = schoolId[0].name;
-                    element['nameCompetition'] = obj.name;
-                    element['startDate'] = obj.startDate;
-                    element['endDate'] = obj.endDate;
-                    element['deadLine'] = obj.deadLine;
-                });
-                setChoiseEntries(data);
-            }
-        });
-    };
+    // }, [selectedCompetition]);
 
     const dataCSV = () => {
         const arr = [];
-        choiseEntries.forEach(obj => {
+        formattedEntries.forEach(obj => {
             const entry = JSON.parse(obj.sportsmenList);
             Object.keys(entry).forEach(keyName => {
                 entry[keyName].forEach(el => {
@@ -196,7 +162,7 @@ export default function AdminEntries() {
     const sportsmenCSV = () => {
         const arr = [];
 
-        choiseEntries.forEach(obj => {
+        formattedEntries.forEach(obj => {
             const entry = JSON.parse(obj.sportsmenList);
             const uniq = [...new Set(Object.values(entry).flat())];
             uniq.forEach(el => {
@@ -212,7 +178,7 @@ export default function AdminEntries() {
 
     const classBoat = () => {
         const arr = [];
-        const comp = competitions.filter(el => el._id == select);
+        const comp = competitions.filter(el => el._id === selectedCompetition);
         const obj = JSON.parse(comp[0].discipline);
         obj.forEach(el => {
             const inner = {
@@ -224,7 +190,7 @@ export default function AdminEntries() {
     };
 
     const akkreditation = () => {
-        const comp = competitions.filter(el => el._id == select);
+        const comp = competitions.filter(el => el._id === selectedCompetition);
         const newData = sportCSV;
         newData.forEach(el => (el['comp'] = comp[0].name));
         const sportsmen = newData.map(el => {
@@ -275,10 +241,10 @@ export default function AdminEntries() {
                 <FormControl className={classes.formControl}>
                     <InputLabel>Выберите мероприятие</InputLabel>
                     <Select
-                        value={select}
+                        value={selectedCompetition}
                         onChange={e => {
-                            setSelect(e.target.value);
-                            findEntries(e.target.value);
+                            setSelectedCompetition(e.target.value);
+                            // findEntries(e.target.value);
                         }}
                     >
                         <MenuItem value="">None</MenuItem>
@@ -346,20 +312,20 @@ export default function AdminEntries() {
                 </div>
             )}
 
-            {choiseEntries && (
+            {tableRows && (
                 <div style={{ height: 500, width: '100%' }}>
-                    {!newDataCSV && dataCSV()}
+                    {/* {!newDataCSV && dataCSV()}
                     {!newDataCSV && sportsmenCSV()}
                     {!newDataCSV && classBoat()}
-                    {sportCSV && !akkr && akkreditation()}
+                    {sportCSV && !akkr && akkreditation()} */}
+
                     <DataGrid
-                        rows={choiseEntries}
+                        rows={tableRows}
                         columns={columns}
                         pageSize={15}
                         className="table-style"
                         onRowClick={e => {
-                            window.location.assign('/entrie');
-                            localStorage.setItem('entrie', JSON.stringify(e.row));
+                            history.push(`/entry/${e.row.id}`);
                         }}
                     />
                 </div>

@@ -174,7 +174,7 @@ app.post('/schools/edit', (req, res) => {
 
 app.get('/entries', async (req, res) => {
     try {
-        const query = buildMongoQuery(['schoolId'], req.query);
+        const query = buildMongoQuery(['schoolId', 'competitionId'], req.query);
 
         const entries = await EntryModel.find(query);
         res.json({ entries });

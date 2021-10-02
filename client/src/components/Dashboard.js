@@ -27,7 +27,7 @@ import CreateCompetition from 'components/CommonPages/CreateCompetition';
 import CompetitionPage from 'components/CommonPages/CompetitionPage';
 import CreateEntries from 'components/CommonPages/CreateEntries';
 import MyEntries from 'components/CommonPages/MyEntries';
-import EntriePage from 'components/CommonPages/EntriePage';
+import EntryPage from 'components/CommonPages/EntryPage';
 
 import AdminSchools from 'components/AdminPages/AdminSchools';
 import AdminTrainers from 'components/AdminPages/AdminTrainers';
@@ -227,7 +227,7 @@ function Dashboard() {
                             <PrivateRoute path="/traner/:id" component={TranerPage} />
                             <PrivateRoute exact path="/myEntries" component={MyEntries} />
                             <PrivateRoute path="/createEntries/:id?" component={CreateEntries} />
-                            <PrivateRoute path="/entrie/:id" component={EntriePage} />
+                            <PrivateRoute path="/entry/:id" component={EntryPage} />
                             <PrivateRoute exact path="/adminSchools" component={AdminSchools} />
                             <PrivateRoute exact path="/adminTraners" component={AdminTrainers} />
                             <PrivateRoute exact path="/adminSportsmen" component={AdminSportsmen} />
