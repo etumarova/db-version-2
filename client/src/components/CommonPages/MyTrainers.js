@@ -17,7 +17,7 @@ const columns = [
     { field: 'telephone', headerName: 'Телефон', width: 140 },
 ];
 
-export default function MyTraners() {
+export default function MyTrainers() {
     const history = useHistory();
 
     const { userSub } = useContext(UserContext);

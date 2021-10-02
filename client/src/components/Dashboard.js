@@ -17,11 +17,11 @@ import { useAuth0 } from '@auth0/auth0-react';
 import Calendary from 'components/CommonPages/Calendary';
 import MySchool from 'components/CommonPages/MySchool';
 import CreateEditSchool from 'components/CommonPages/CreateEditSchool';
-import MySportsmens from 'components/CommonPages/MySportsmens';
+import MySportsmen from 'components/CommonPages/MySportsmen';
 import CreateSportsmen from 'components/CommonPages/CreateSportsmen';
 import SportsmenPage from 'components/CommonPages/SportsmenPage';
-import MyTraners from 'components/CommonPages/MyTraners';
-import CreateTraner from 'components/CommonPages/CreateTraner';
+import MyTrainers from 'components/CommonPages/MyTrainers';
+import CreateTrainer from 'components/CommonPages/CreateTrainer';
 import TranerPage from 'components/CommonPages/TranerPage';
 import CreateCompetition from 'components/CommonPages/CreateCompetition';
 import CompetitionPage from 'components/CommonPages/CompetitionPage';
@@ -30,8 +30,8 @@ import MyEntries from 'components/CommonPages/MyEntries';
 import EntriePage from 'components/CommonPages/EntriePage';
 
 import AdminSchools from 'components/AdminPages/AdminSchools';
-import AdminTraners from 'components/AdminPages/AdminTraners';
-import AdminSportsmens from 'components/AdminPages/AdminSportsmens';
+import AdminTrainers from 'components/AdminPages/AdminTrainers';
+import AdminSportsmen from 'components/AdminPages/AdminSportsmen';
 import AdminEntries from 'components/AdminPages/AdminEntries';
 import AdminPage from 'components/AdminPages/AdminPage';
 import ImportResult from 'components/AdminPages/ImportResults';
@@ -44,7 +44,7 @@ import { UserRole } from 'srcConstants';
 const adminPanelItems = [
     { text: 'Школы', path: '/adminSchools' },
     { text: 'Тренера', path: '/adminTraners' },
-    { text: 'Спортсмены', path: '/adminSportsmens' },
+    { text: 'Спортсмены', path: '/adminSportsmen' },
     { text: 'Календарь соревнований', path: '/calendary' },
     { text: 'Заявки', path: '/adminEntries' },
     { text: 'Админка', path: '/adminPage' },
@@ -52,7 +52,7 @@ const adminPanelItems = [
 ];
 const userPanelItems = [
     { text: 'Моя Школа', path: '/mySchool' },
-    { text: 'Мои Спортсмены', path: '/mySportsmens' },
+    { text: 'Мои Спортсмены', path: '/mySportsmen' },
     { text: 'Тренерский состав', path: '/myTraners' },
     { text: 'Календарь соревнований', path: '/calendary' },
     { text: 'Сформировать заявку', path: '/myEntries' },
@@ -87,7 +87,8 @@ function Dashboard() {
     const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
-        const fetchAdmin = async () => {
+        const checkUserRole = async () => {
+            console.log(user);
             const res = await fetch(`/checkUserRole/`, {
                 method: 'post',
                 headers: {
@@ -102,7 +103,7 @@ function Dashboard() {
             if (isAdmin) setIsAdmin(true);
         };
 
-        if (isAuthenticated) fetchAdmin();
+        if (isAuthenticated) checkUserRole();
     }, [isAuthenticated, user]);
 
     const shouldRenderDrawer = isAuthenticated;
@@ -115,7 +116,7 @@ function Dashboard() {
             isAuthenticated,
             isAdmin,
         }),
-        [isAdmin, user?.sub]
+        [isAdmin, user?.sub, isAuthenticated]
     );
 
     return (
@@ -215,25 +216,21 @@ function Dashboard() {
                                 path="/createEditSchool/:id"
                                 component={CreateEditSchool}
                             />
-                            <PrivateRoute exact path="/mySportsmens" component={MySportsmens} />
+                            <PrivateRoute exact path="/mySportsmen" component={MySportsmen} />
                             <PrivateRoute
                                 path="/createSportsmen/:id?"
                                 component={CreateSportsmen}
                             />
                             <PrivateRoute path="/sportsmen/:id" component={SportsmenPage} />
-                            <PrivateRoute exact path="/myTraners" component={MyTraners} />
-                            <PrivateRoute path="/createTrainer/:id?" component={CreateTraner} />
+                            <PrivateRoute exact path="/myTraners" component={MyTrainers} />
+                            <PrivateRoute path="/createTrainer/:id?" component={CreateTrainer} />
                             <PrivateRoute path="/traner/:id" component={TranerPage} />
                             <PrivateRoute exact path="/myEntries" component={MyEntries} />
                             <PrivateRoute path="/createEntries/:id?" component={CreateEntries} />
                             <PrivateRoute path="/entrie/:id" component={EntriePage} />
                             <PrivateRoute exact path="/adminSchools" component={AdminSchools} />
-                            <PrivateRoute exact path="/adminTraners" component={AdminTraners} />
-                            <PrivateRoute
-                                exact
-                                path="/adminSportsmens"
-                                component={AdminSportsmens}
-                            />
+                            <PrivateRoute exact path="/adminTraners" component={AdminTrainers} />
+                            <PrivateRoute exact path="/adminSportsmen" component={AdminSportsmen} />
                             <PrivateRoute exact path="/adminEntries" component={AdminEntries} />
                             <PrivateRoute exact path="/adminPage" component={AdminPage} />
                             <PrivateRoute exact path="/adminImportFile" component={ImportResult} />

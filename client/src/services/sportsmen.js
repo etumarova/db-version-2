@@ -1,7 +1,7 @@
 export const fetchSportsmen = () => fetch('/sportsmen').then(res => res.json());
 
 export const fetchSportsmenBySchoolId = schoolId =>
-    fetch(`/sportsmen/?idSchool=${schoolId}`).then(res => res.json());
+    fetch(`/sportsmen/?schoolId=${schoolId}`).then(res => res.json());
 
 export const fetchSportsmanById = id => fetch(`/sportsmen/${id}`).then(res => res.json());
 

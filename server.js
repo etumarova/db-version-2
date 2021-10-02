@@ -9,12 +9,12 @@ const socket = require('socket.io');
 const PORT = process.env.PORT || 3001;
 const axios = require('axios').default;
 
-const competitions = require('./config/competitionSchema');
-const schools = require('./config/schoolSchema');
-const sportsmens = require('./config/sportsmenSchema');
-const traners = require('./config/tranerSchema');
-const entries = require('./config/entriesSchema');
-const users = require('./config/userSchema');
+const CompetitionModel = require('./config/competition.model');
+const SchoolModel = require('./config/school.model');
+const SportsmanModel = require('./config/sportsman.model');
+const TrainerModel = require('./config/trainer.model');
+const EntryModel = require('./config/entry.model');
+const UserModel = require('./config/user.model');
 
 app.use(express.json());
 
@@ -25,16 +25,16 @@ if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging')
     });
 }
 
-const server = app.listen(PORT, () => {
-    console.log('listening on *:3001');
-});
-
 mongoose
     .connect(process.env.MONGODB_URI, { useUnifiedTopology: true, useNewUrlParser: true })
     .then(() => console.log('MongoDb connected'))
     .catch(e => console.log(e));
 
 mongoose.set('useCreateIndex', true);
+
+app.listen(PORT, () => {
+    console.log('listening on *:3001');
+});
 
 const buildMongoQuery = (possibleQueryParams, reqQuery) => {
     const queryEntries = possibleQueryParams
@@ -55,11 +55,9 @@ const buildMongoQuery = (possibleQueryParams, reqQuery) => {
 // USER
 
 app.get('/users', (req, res) => {
-    // fetch additional info from auth0
-    users
-        .find()
+    UserModel.find()
         .then(users => res.json({ users }))
-        .catch(e => res.status(500).json(error.toString()));
+        .catch(error => res.status(500).json(error.toString()));
 });
 
 app.post('/checkUserRole', async (req, res) => {
@@ -67,11 +65,11 @@ app.post('/checkUserRole', async (req, res) => {
         const userData = req.body;
         const userId = userData.sub;
 
-        const user = await users.findOne({ userId });
-        const isUserAdmin = user && user.isAdmin;
+        const existingUser = await UserModel.findOne({ userId });
+        const isUserAdmin = existingUser && existingUser.isAdmin;
 
-        if (!user) {
-            await users.create({ userId, name: `${userData.firstName} ${userData.lastName}` });
+        if (!existingUser) {
+            await UserModel.create({ userId, name: userData.name });
         }
 
         res.json({ isAdmin: isUserAdmin });
@@ -82,8 +80,7 @@ app.post('/checkUserRole', async (req, res) => {
 
 // SCHOOLS
 app.get('/schools', (req, res) => {
-    schools
-        .find()
+    SchoolModel.find()
         .then(schools => res.json({ schools }))
         .catch(e => e.sen);
 });
@@ -91,29 +88,37 @@ app.get('/schools', (req, res) => {
 app.get('/school', (req, res) => {
     const { userId } = req.query;
 
-    schools
-        .findOne({ idUser: userId })
+    SchoolModel.findOne({ userId })
         .then(school => res.json({ school }))
         .catch(e => console.log(e));
 });
 
 app.post('/saveSchool', (req, res) => {
-    const { idUser, foto, name, director, description, region, city, adress, telephone } = req.body;
+    const {
+        userId,
+        photo,
+        name,
+        director,
+        description,
+        region,
+        city,
+        address,
+        telephone,
+    } = req.body;
 
-    schools
-        .find({ idUser: idUser })
+    SchoolModel.find({ userId })
         .then(data => {
             if (data.length == 0) {
                 schools.create({
-                    idUser: idUser,
-                    foto: foto,
-                    name: name,
-                    director: director,
-                    description: description,
-                    region: region,
-                    city: city,
-                    adress: adress,
-                    telephone: telephone,
+                    userId,
+                    photo,
+                    name,
+                    director,
+                    description,
+                    region,
+                    city,
+                    address,
+                    telephone,
                 });
             }
         })
@@ -126,32 +131,32 @@ app.post('/saveSchool', (req, res) => {
 app.post('/editSchool', (req, res) => {
     const {
         _id,
-        idUser,
-        foto,
+        userId,
+        photo,
         name,
         director,
         description,
         region,
         city,
-        adress,
+        address,
         telephone,
     } = req.body;
 
-    schools.updateOne(
+    SchoolModel.updateOne(
         {
             _id: _id,
         },
         {
             $set: {
-                idUser: idUser,
-                foto: foto,
-                name: name,
-                director: director,
-                description: description,
-                region: region,
-                city: city,
-                adress: adress,
-                telephone: telephone,
+                userId,
+                photo,
+                name,
+                director,
+                description,
+                region,
+                city,
+                address,
+                telephone,
             },
         },
         (err, result) => {
@@ -167,14 +172,12 @@ app.post('/editSchool', (req, res) => {
 
 // ENTRIES / COMPETITIONS
 
-app.get('entries', (req, res) => {});
-
 app.get('/entries', async (req, res) => {
     try {
-        const query = buildMongoQuery(['idSchool'], req.query);
+        const query = buildMongoQuery(['schoolId'], req.query);
 
-        const entryResult = await entries.find(query);
-        res.json({ entries: entryResult });
+        const entries = await EntryModel.find(query);
+        res.json({ entries });
     } catch (error) {
         res.status(500).json(error.toString());
     }
@@ -183,7 +186,7 @@ app.get('/entries', async (req, res) => {
 app.get('/entries/:id', async (req, res) => {
     try {
         const id = req.params.id;
-        const entry = await entries.findById(id);
+        const entry = await EntryModel.findById(id);
         res.json({ entry });
     } catch (error) {
         res.status(500).json(error.toString());
@@ -191,36 +194,35 @@ app.get('/entries/:id', async (req, res) => {
 });
 
 app.post('/entries/save', (req, res) => {
-    const { idCompetition, idSchool, traner, telephone, dateSend, sportsmensList } = req.body;
+    const { competitionId, schoolId, trainer, telephone, dateSend, sportsmenList } = req.body;
 
-    entries
-        .create({
-            idCompetition,
-            idSchool,
-            traner,
-            telephone,
-            dateSend,
-            sportsmensList,
-        })
+    EntryModel.create({
+        competitionId,
+        schoolId,
+        trainer,
+        telephone,
+        dateSend,
+        sportsmenList,
+    })
         .then(() => res.sendStatus(200))
         .catch(err => res.status(500).json(err.toString()));
 });
 
 app.post('/entries/edit', (req, res) => {
-    const { _id, idCompetition, idSchool, traner, telephone, dateSend, sportsmensList } = req.body;
+    const { _id, competitionId, schoolId, trainer, telephone, dateSend, sportsmenList } = req.body;
 
-    entries.updateOne(
+    EntryModel.updateOne(
         {
             _id: _id,
         },
         {
             $set: {
-                idCompetition,
-                idSchool,
-                traner,
+                competitionId,
+                schoolId,
+                trainer,
                 telephone,
                 dateSend,
-                sportsmensList,
+                sportsmenList,
             },
         },
         (err, result) => {
@@ -234,8 +236,7 @@ app.post('/entries/edit', (req, res) => {
 });
 
 app.get('/competitions', (req, res) => {
-    competitions
-        .find()
+    CompetitionModel.find()
         .then(competitions => res.json({ competitions }))
         .catch(e => res.status(500).json(e.toString()));
 });
@@ -243,8 +244,7 @@ app.get('/competitions', (req, res) => {
 app.get('/competitions/:id', (req, res) => {
     const { id } = req.params;
 
-    competitions
-        .findById(id)
+    CompetitionModel.findById(id)
         .then(competition => res.json({ competition }))
         .catch(e => res.status(500).json(e.toString()));
 });
@@ -261,23 +261,22 @@ app.post('/competitions/save', (req, res) => {
         telephone,
         place,
         description,
-        discepline,
+        discipline,
     } = req.body;
 
-    competitions
-        .create({
-            logo: logo,
-            name: name,
-            startDate: startDate,
-            endDate: endDate,
-            deadLine: deadLine,
-            mainJudge: mainJudge,
-            secretary: secretary,
-            telephone: telephone,
-            place: place,
-            description: description,
-            discepline: discepline,
-        })
+    CompetitionModel.create({
+        logo,
+        name,
+        startDate,
+        endDate,
+        deadLine,
+        mainJudge,
+        secretary,
+        telephone,
+        place,
+        description,
+        discipline,
+    })
         .then(() => res.sendStatus(200))
         .catch(err => res.status(500).json(err.toString()));
 });
@@ -295,26 +294,26 @@ app.post('/competitions/edit', (req, res) => {
         telephone,
         place,
         description,
-        discepline,
+        discipline,
     } = req.body;
 
-    competitions.updateOne(
+    CompetitionModel.updateOne(
         {
             _id: _id,
         },
         {
             $set: {
-                logo: logo,
-                name: name,
-                startDate: startDate,
-                endDate: endDate,
-                deadLine: deadLine,
-                mainJudge: mainJudge,
-                secretary: secretary,
-                telephone: telephone,
-                place: place,
-                description: description,
-                discepline: discepline,
+                logo,
+                name,
+                startDate,
+                endDate,
+                deadLine,
+                mainJudge,
+                secretary,
+                telephone,
+                place,
+                description,
+                discipline,
             },
         },
         (err, result) => {
@@ -330,48 +329,45 @@ app.post('/competitions/edit', (req, res) => {
 // SPORTSMEN
 
 app.get('/sportsmen', (req, res) => {
-    const query = buildMongoQuery(['idSchool', 'nowTrainer'], req.query);
-    sportsmens
-        .find(query)
+    const query = buildMongoQuery(['schoolId', 'nowTrainer'], req.query);
+    SportsmanModel.find(query)
         .then(sportsmen => res.json({ sportsmen }))
         .catch(e => res.status(500).json(e.toString()));
 });
 
 app.get('/sportsmen/:id', (req, res) => {
     const { id } = req.params;
-    sportsmens
-        .findById(id)
+    SportsmanModel.findById(id)
         .then(sportsman => res.json({ sportsman }))
         .catch(e => res.status(500).json(e.toString()));
 });
 
 app.post('/saveSportsman', (req, res) => {
     const {
-        idSchool,
-        foto,
+        schoolId,
+        photo,
         name,
         birthday,
         fTraner,
         nowTraner,
         school,
-        adress,
+        address,
         telephone,
         listResults,
     } = req.body;
 
-    sportsmens
-        .create({
-            idSchool: idSchool,
-            foto: foto,
-            name: name,
-            birthday: birthday,
-            fTraner: fTraner,
-            nowTraner: nowTraner,
-            school: school,
-            adress: adress,
-            telephone: telephone,
-            listResults: listResults,
-        })
+    SportsmanModel.create({
+        schoolId,
+        photo,
+        name,
+        birthday,
+        fTraner,
+        nowTraner,
+        school,
+        address,
+        telephone,
+        listResults,
+    })
         .then(() => res.sendStatus(200))
         .catch(err => res.status(500).json(err.toString()));
 });
@@ -379,34 +375,34 @@ app.post('/saveSportsman', (req, res) => {
 app.post('/editSportsman', (req, res) => {
     const {
         _id,
-        idSchool,
-        foto,
+        schoolId,
+        photo,
         name,
         birthday,
         fTraner,
         nowTraner,
         school,
-        adress,
+        address,
         telephone,
         listResults,
     } = req.body;
 
-    sportsmens.updateOne(
+    SportsmanModel.updateOne(
         {
             _id: _id,
         },
         {
             $set: {
-                idSchool: idSchool,
-                foto: foto,
-                name: name,
-                birthday: birthday,
-                fTraner: fTraner,
-                nowTraner: nowTraner,
-                school: school,
-                adress: adress,
-                telephone: telephone,
-                listResults: listResults,
+                schoolId,
+                photo,
+                name,
+                birthday,
+                fTraner,
+                nowTraner,
+                school,
+                address,
+                telephone,
+                listResults,
             },
         },
         (err, result) => {
@@ -423,52 +419,49 @@ app.post('/editSportsman', (req, res) => {
 // TRAINERS
 
 app.get('/trainers', (req, res) => {
-    const query = buildMongoQuery(['idSchool'], req.query);
+    const query = buildMongoQuery(['schoolId'], req.query);
 
-    traners
-        .find(query)
+    TrainerModel.find(query)
         .then(trainers => res.json({ trainers }))
         .catch(e => res.status(500).json(e.toString()));
 });
 
 app.get('/trainers/:id', (req, res) => {
     const { id } = req.params;
-    traners
-        .findById(id)
+    TrainerModel.findById(id)
         .then(trainer => res.json({ trainer }))
         .catch(e => res.status(500).json(e.toString()));
 });
 
 app.post('/saveTrainer', (req, res) => {
-    const { idSchool, foto, name, birthday, school, telephone } = req.body;
+    const { schoolId, photo, name, birthday, school, telephone } = req.body;
 
-    traners
-        .create({
-            idSchool,
-            foto,
-            name,
-            birthday,
-            school,
-            telephone,
-        })
+    TrainerModel.create({
+        schoolId,
+        photo,
+        name,
+        birthday,
+        school,
+        telephone,
+    })
         .then(() => res.sendStatus(200))
         .catch(err => res.status(500).json(err.toString()));
 });
 
 app.post('/editTrainer', (req, res) => {
-    const { _id, idSchool, foto, name, birthday, school, telephone } = req.body;
-    traners.updateOne(
+    const { _id, schoolId, photo, name, birthday, school, telephone } = req.body;
+    TrainerModel.updateOne(
         {
             _id: _id,
         },
         {
             $set: {
-                idSchool: idSchool,
-                foto: foto,
-                name: name,
-                birthday: birthday,
-                school: school,
-                telephone: telephone,
+                schoolId,
+                photo,
+                name,
+                birthday,
+                school,
+                telephone,
             },
         },
         (err, result) => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Image } from 'cloudinary-react';
-import TableSportsmens from 'components/TableSportsmens';
+import TableSportsmen from 'components/TableSportsmen';
 import Button from '@material-ui/core/Button';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
@@ -28,7 +28,7 @@ export default function TranerPage() {
                                     <div className="d-flex flex-column align-items-center text-center">
                                         <Image
                                             cloud_name="dgeev9d6l"
-                                            publicId={trainer.foto}
+                                            publicId={trainer.photo}
                                             width="250"
                                         />
                                         <Link to={`/createTrainer/${id}`}>
@@ -86,7 +86,7 @@ export default function TranerPage() {
                         </div>
                         {sportsmen && (
                             <div className="col" style={{ height: 500 }}>
-                                <TableSportsmens sportsmens={sportsmen} />
+                                <TableSportsmen sportsmen={sportsmen} />
                             </div>
                         )}
                     </div>

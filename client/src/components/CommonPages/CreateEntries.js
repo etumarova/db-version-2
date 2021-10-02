@@ -44,8 +44,8 @@ export default function CreateEntries() {
 
     const [selectedCompetition, setSelectedCompetition] = useState(null);
     const [selectTraner, setSelectTraner] = useState(null);
-    const [selectSportsmens, setSelectSportsmens] = useState({});
-    const [discepline, setDiscepline] = useState([]);
+    const [selectSportsmen, setSelectSportsmen] = useState({});
+    const [discipline, setDiscipline] = useState([]);
     const [selectDiscepline, setSelectDiscepline] = useState(null);
     const [choiseSportsmen, setChoiseSportsmen] = useState(null);
     const [entrie, setEntrie] = useState({});
@@ -94,7 +94,7 @@ export default function CreateEntries() {
 
     const headersTabel = useMemo(() => {
         const arr = [{ field: 'id', headerName: 'ID', width: 80 }];
-        discepline.forEach(el => {
+        discipline.forEach(el => {
             arr.push({
                 field: el,
                 headerName: el,
@@ -104,13 +104,13 @@ export default function CreateEntries() {
 
         return arr;
         // setHeadersTabel(arr);
-    }, [discepline]);
+    }, [discipline]);
 
     useEffect(() => {
         if (entry) {
             setSelectedCompetition(entry.idCompetition);
             setSelectTraner(entry.traner);
-            if (entry.sportsmensList) setSelectedSportsmen(JSON.parse(entry.sportsmensList));
+            if (entry.sportsmenList) setSelectedSportsmen(JSON.parse(entry.sportsmenList));
         }
     }, [entry]);
 
@@ -125,7 +125,7 @@ export default function CreateEntries() {
         for (let i = 0; i < selectedSportsmen.length; i++) {
             const sportsman = selectedSportsmen[i];
             const obj = { id: i + 1 };
-            discepline.forEach(el => (obj[el] = ''));
+            discipline.forEach(el => (obj[el] = ''));
 
             obj[sportsman.discipline] = sportsman.name;
 
@@ -142,26 +142,26 @@ export default function CreateEntries() {
     useEffect(() => {
         const competition = competitions?.find(comp => comp._id === selectedCompetition);
         const getDisceplines = () => {
-            const disciplines = JSON.parse(competition.discepline);
-            setDiscepline(disciplines);
+            const disciplines = JSON.parse(competition.discipline);
+            setDiscipline(disciplines);
 
-            if (Array.isArray(selectSportsmens)) {
-                const newSportsmen = [...selectSportsmens];
+            if (Array.isArray(selectSportsmen)) {
+                const newSportsmen = [...selectSportsmen];
 
                 disciplines.forEach(e => {
                     newSportsmen[e] = [];
                 });
-                setSelectSportsmens(newSportsmen);
+                setSelectSportsmen(newSportsmen);
             }
         };
 
-        if (competition?.discepline) getDisceplines();
-    }, [selectedCompetition, selectSportsmens, competitions, selectTraner]);
+        if (competition?.discipline) getDisceplines();
+    }, [selectedCompetition, selectSportsmen, competitions, selectTraner]);
 
     const sendData = e => {
         e.preventDefault();
         const telephone = trainers.filter(el => el.name == selectTraner);
-        if (selectDiscepline && selectSportsmens && selectTraner && selectedCompetition) {
+        if (selectDiscepline && selectSportsmen && selectTraner && selectedCompetition) {
             const today = new Date();
             const data = {
                 idCompetition: selectedCompetition,
@@ -169,7 +169,7 @@ export default function CreateEntries() {
                 traner: selectTraner,
                 telephone: telephone[0].telephone,
                 dateSend: today.toUTCString(),
-                sportsmensList: JSON.stringify(selectedSportsmen),
+                sportsmenList: JSON.stringify(selectedSportsmen),
             };
             // socket.emit('addEntries', data);
             saveEntryMutation.mutate(data);
@@ -288,7 +288,7 @@ export default function CreateEntries() {
                                 onChange={e => setSelectDiscepline(e.target.value)}
                             >
                                 <MenuItem value="">None</MenuItem>
-                                {discepline.map(el => {
+                                {discipline.map(el => {
                                     return <MenuItem value={el}>{el}</MenuItem>;
                                 })}
                             </Select>

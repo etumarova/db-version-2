@@ -2,7 +2,7 @@ export const fetchEntries = () => fetch('/entries').then(res => res.json());
 export const fetchEntryById = id => fetch(`/entries/${id}`).then(res => res.json());
 
 export const fetchEntriesBySchoolId = schoolId =>
-    fetch(`/entries/?idSchool=${schoolId}`).then(res => res.json());
+    fetch(`/entries/?schoolId=${schoolId}`).then(res => res.json());
 
 export const saveEntry = data =>
     fetch('/entries/save', {

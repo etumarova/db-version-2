@@ -86,7 +86,7 @@ export default function AdminEntries() {
     const [newDataCSV, setNewDataCSV] = useState(null);
     const [sportCSV, setSportCSV] = useState(null);
     const [boatClass, setBoatClass] = useState(null);
-    const [sportsmens, setSportsmens] = useState(null);
+    // const [sportsmen, setSportsmen] = useState(null);
     const [akkr, setAkkr] = useState(null);
     const componentRef = useRef();
     const classes = useStyles();
@@ -172,10 +172,10 @@ export default function AdminEntries() {
     const dataCSV = () => {
         const arr = [];
         choiseEntries.forEach(obj => {
-            const entry = JSON.parse(obj.sportsmensList);
+            const entry = JSON.parse(obj.sportsmenList);
             Object.keys(entry).forEach(keyName => {
                 entry[keyName].forEach(el => {
-                    const id = sportsmens.filter(
+                    const id = sportsmen.filter(
                         elem => elem.name == el && elem.idSchool == obj.idSchool
                     );
                     if (id.length != 0) {
@@ -197,7 +197,7 @@ export default function AdminEntries() {
         const arr = [];
 
         choiseEntries.forEach(obj => {
-            const entry = JSON.parse(obj.sportsmensList);
+            const entry = JSON.parse(obj.sportsmenList);
             const uniq = [...new Set(Object.values(entry).flat())];
             uniq.forEach(el => {
                 const inner = {
@@ -213,7 +213,7 @@ export default function AdminEntries() {
     const classBoat = () => {
         const arr = [];
         const comp = competitions.filter(el => el._id == select);
-        const obj = JSON.parse(comp[0].discepline);
+        const obj = JSON.parse(comp[0].discipline);
         obj.forEach(el => {
             const inner = {
                 classBoat: el,
@@ -229,11 +229,11 @@ export default function AdminEntries() {
         newData.forEach(el => (el['comp'] = comp[0].name));
         const sportsmen = newData.map(el => {
             let arr;
-            sportsmens.forEach(elem => {
+            sportsmen.forEach(elem => {
                 if (elem.name == el.sportsmen) {
                     arr = {
                         sportsmen: el.sportsmen,
-                        foto: elem.foto,
+                        photo: elem.photo,
                         comp: el.comp,
                         school: el.school,
                     };

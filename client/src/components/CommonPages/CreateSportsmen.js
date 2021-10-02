@@ -39,7 +39,7 @@ export default function CreateSportsmen() {
     const { id } = useParams();
 
     const history = useHistory();
-    const [foto, setFoto] = useState(null);
+    const [photo, setPhoto] = useState(null);
     const [name, setName] = useState(null);
     const [birthday, setBirthday] = useState(null);
     const [adress, setAdress] = useState(null);
@@ -76,7 +76,7 @@ export default function CreateSportsmen() {
     useEffect(() => {
         if (sportsman) {
             // setSportsmen(data);
-            setFoto(sportsman.foto);
+            setPhoto(sportsman.photo]);
             setListResults(JSON.parse(sportsman.listResults));
             setName(sportsman.name);
             setBirthday(sportsman.birthday);
@@ -133,7 +133,7 @@ export default function CreateSportsmen() {
             body: formData,
         });
         const data = await response.json();
-        setFoto(data.public_id);
+        setPhoto(data.public_id);
     };
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -146,7 +146,7 @@ export default function CreateSportsmen() {
         e.preventDefault();
         const data = {
             idSchool: localStorage.getItem('user'),
-            foto: foto,
+            photo: photo,
             name: name,
             birthday: birthday,
             fTraner: fTraner,
@@ -164,7 +164,7 @@ export default function CreateSportsmen() {
         const data = {
             _id: sportsman._id,
             idSchool: localStorage.getItem('user'),
-            foto: foto,
+            photo: photo,
             name: name,
             birthday: birthday,
             fTraner: fTraner,
@@ -202,7 +202,7 @@ export default function CreateSportsmen() {
     const deleteCeill = rowData => {
         // eslint-disable-next-line no-restricted-globals
         const answer = confirm(
-            `Удалить результат: ${rowData.competition}, Класс -${rowData.discepline}, Место - ${rowData.place} ?`
+            `Удалить результат: ${rowData.competition}, Класс -${rowData.discipline}, Место - ${rowData.place} ?`
         );
         if (answer) {
             const newList = listResults;
@@ -219,8 +219,8 @@ export default function CreateSportsmen() {
                 {isDragActive ? <p>Вот прямо сюда!</p> : <p>Бросьте фото спортсмена сюда</p>}
             </div>
             <div>
-                {foto != '' && (
-                    <Image cloud_name="dgeev9d6l" publicId={foto} width="50" crop="scale" />
+                {photo != '' && (
+                    <Image cloud_name="dgeev9d6l" publicId={photo} width="50" crop="scale" />
                 )}
             </div>
             <div>

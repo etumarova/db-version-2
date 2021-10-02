@@ -11,13 +11,13 @@ const columns = [
     { field: 'telephone', headerName: 'Телефон', width: 140 },
 ];
 
-export default function TableSportsmens(props) {
+export default function TableSportsmen(props) {
     const history = useHistory();
-    const { sportsmens } = props;
+    const { sportsmen } = props;
     return (
         <div style={{ height: 500, width: '100%' }}>
             <DataGrid
-                rows={sportsmens}
+                rows={sportsmen}
                 columns={columns}
                 pageSize={15}
                 className="table-style"

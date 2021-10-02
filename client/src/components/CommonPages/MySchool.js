@@ -54,7 +54,7 @@ export default function MySchool() {
                                 <div className="d-flex flex-column align-items-center text-center">
                                     <Image
                                         cloud_name="dgeev9d6l"
-                                        publicId={school.foto}
+                                        publicId={school.photo}
                                         width="250"
                                     />
                                 </div>

@@ -40,7 +40,7 @@ export default function SportsmenPage() {
                                     <div className="d-flex flex-column align-items-center text-center">
                                         <Image
                                             cloud_name="dgeev9d6l"
-                                            publicId={sportsman.foto}
+                                            publicId={sportsman.photo}
                                             width="250"
                                         />
 

@@ -16,7 +16,7 @@ export default function CompetitionPage() {
 
     const { isAdmin } = useContext(UserContext);
 
-    const discepline = competition?.discepline ? JSON.parse(competition.discepline) : [];
+    const discipline = competition?.discipline ? JSON.parse(competition.discipline) : [];
 
     return (
         <div>
@@ -113,7 +113,7 @@ export default function CompetitionPage() {
                         </Typography>
                     </div>
 
-                    {discepline.map(el => {
+                    {discipline.map(el => {
                         return (
                             <div style={{ marginLeft: '10px' }}>
                                 <Typography variant="body1" gutterBottom key={el}>

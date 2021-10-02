@@ -52,7 +52,7 @@ export default function CreateCompetition() {
     const [telephone, setTelephone] = useState(null);
     const [place, setPlace] = useState(null);
     const [description, setDescription] = useState(null);
-    const [discepline, setDiscepline] = useState([]);
+    const [discipline, setDiscipline] = useState([]);
     const [term, setTerm] = useState(null);
     const classes = useStyles();
 
@@ -89,7 +89,7 @@ export default function CreateCompetition() {
             setSecretary(competition.secretary);
             setPlace(competition.place);
             setDescription(competition.description);
-            setDiscepline(JSON.parse(competition.discepline));
+            setDiscipline(JSON.parse(competition.discipline));
         }
     }, [competition]);
 
@@ -125,7 +125,7 @@ export default function CreateCompetition() {
             telephone: telephone,
             place: place,
             description: description,
-            discepline: JSON.stringify(discepline),
+            discipline: JSON.stringify(discipline),
         };
         saveCompetitionMutation.mutate(data);
 
@@ -146,21 +146,21 @@ export default function CreateCompetition() {
             telephone: telephone,
             place: place,
             description: description,
-            discepline: JSON.stringify(discepline),
+            discipline: JSON.stringify(discipline),
         };
         editCompetitionMutation.mutate(data);
     };
 
     const handleSubmit = e => {
         e.preventDefault();
-        setDiscepline([...discepline, term]);
+        setDiscipline([...discipline, term]);
         setTerm(null);
     };
 
     const handleDelete = index => {
-        const newArr = [...discepline];
+        const newArr = [...discipline];
         newArr.splice(index, 1);
-        setDiscepline(newArr);
+        setDiscipline(newArr);
     };
 
     return (
@@ -279,7 +279,7 @@ export default function CreateCompetition() {
             <div>
                 <div>
                     <div>
-                        {discepline.map((todo, index) => {
+                        {discipline.map((todo, index) => {
                             return (
                                 <div style={{ margin: '0' }}>
                                     {todo}

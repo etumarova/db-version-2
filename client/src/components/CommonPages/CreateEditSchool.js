@@ -71,7 +71,7 @@ export default function CreateEditSchool() {
 
     const [name, setName] = useState('');
     const [director, setDirector] = useState('');
-    const [foto, setFoto] = useState(null);
+    const [photo, setPhoto] = useState(null);
     const [description, setDescription] = useState('');
     const [region, setRegion] = useState('');
     const [city, setCity] = useState('');
@@ -100,7 +100,7 @@ export default function CreateEditSchool() {
 
     const setSchoolData = data => {
         setRegion(data.region);
-        setFoto(data.foto);
+        setPhoto(data.photo);
         setName(data.name);
         setDirector(data.director);
         setDescription(data.description);
@@ -123,7 +123,7 @@ export default function CreateEditSchool() {
             body: formData,
         });
         const data = await response.json();
-        setFoto(data.public_id);
+        setPhoto(data.public_id);
     };
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -136,7 +136,7 @@ export default function CreateEditSchool() {
         e.preventDefault();
         const data = {
             idUser: userId,
-            foto,
+            photo,
             name,
             director,
             description,
@@ -154,7 +154,7 @@ export default function CreateEditSchool() {
         const data = {
             _id: school._id,
             idUser: userId,
-            foto,
+            photo,
             name,
             director,
             description,
@@ -174,11 +174,11 @@ export default function CreateEditSchool() {
             </Typography>
 
             <div className={classes.row}>
-                {foto && (
+                {photo && (
                     <Image
                         className={classes.image}
                         cloud_name="dgeev9d6l"
-                        publicId={foto}
+                        publicId={photo}
                         width="350"
                         crop="scale"
                     />

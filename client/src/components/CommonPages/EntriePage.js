@@ -14,7 +14,7 @@ export default function EntriePage() {
     const { data: entryData } = useQuery(['entries', id], () => fetchEntryById(id));
     const { entry } = entryData || {};
 
-    const sportsmenList = entry?.sportsmensList ? JSON.parse(entry?.sportsmensList) : [];
+    const sportsmenList = entry?.sportsmenList ? JSON.parse(entry?.sportsmenList) : [];
     const today = Date.now();
     return (
         <div>

@@ -31,11 +31,11 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-export default function CreateTraner() {
+export default function CreateTrainer() {
     const { userSub } = useContext(UserContext);
     const { id } = useParams();
     const history = useHistory();
-    const [foto, setFoto] = useState(null);
+    const [photo, setPhoto] = useState(null);
     const [name, setName] = useState(null);
     const [birthday, setBirthday] = useState(null);
     const [telephone, setTelephone] = useState(null);
@@ -67,7 +67,7 @@ export default function CreateTraner() {
 
     useEffect(() => {
         if (trainer) {
-            setFoto(trainer.foto);
+            setPhoto(trainer.photo);
             setName(trainer.name);
             setBirthday(trainer.birthday);
             setTelephone(trainer.telephone);
@@ -85,7 +85,7 @@ export default function CreateTraner() {
             body: formData,
         });
         const data = await response.json();
-        setFoto(data.public_id);
+        setPhoto(data.public_id);
     };
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -98,7 +98,7 @@ export default function CreateTraner() {
         e.preventDefault();
         const data = {
             idSchool: schoolId,
-            foto,
+            photo,
             name,
             birthday,
             school,
@@ -112,7 +112,7 @@ export default function CreateTraner() {
         const data = {
             _id: trainer._id,
             idSchool: schoolId,
-            foto,
+            photo,
             name,
             birthday,
             school,
@@ -128,8 +128,8 @@ export default function CreateTraner() {
                 {isDragActive ? <p>Вот прямо сюда!</p> : <p>Бросьте фото тренера сюда</p>}
             </div>
             <div>
-                {foto != '' && (
-                    <Image cloud_name="dgeev9d6l" publicId={foto} width="50" crop="scale" />
+                {photo != '' && (
+                    <Image cloud_name="dgeev9d6l" publicId={photo} width="50" crop="scale" />
                 )}
             </div>
             <div>

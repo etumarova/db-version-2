@@ -1,37 +1,40 @@
 const mongoose = require('mongoose');
-const SportsmenSchema = new mongoose.Schema({
-    idSchool: {
+const SchoolSchema = new mongoose.Schema({
+    userId: {
         type: String,
         require: true,
     },
-    foto: {
+    photo: {
         type: String,
+        require: true,
     },
     name: {
         type: String,
         require: true,
     },
-    birthday: {
+    director: {
         type: String,
+        require: true,
     },
-    fTraner: {
+    description: {
         type: String,
+        require: true,
     },
-    nowTraner: {
+    region: {
         type: String,
+        require: true,
     },
-    school: {
+    city: {
         type: String,
+        require: true,
     },
-    adress: {
+    address: {
         type: String,
+        require: true,
     },
     telephone: {
         type: String,
-    },
-    listResults: {
-        type: String,
+        require: true,
     },
 });
-// SportsmenSchema.index({ '$**': 'text' });
-module.exports = mongoose.model('sportsmen', SportsmenSchema);
+module.exports = mongoose.model('school', SchoolSchema);

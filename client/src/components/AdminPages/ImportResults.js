@@ -16,7 +16,7 @@ const headers = [
 export default function ImportResult() {
     const [competition, setCompetition] = useState(null);
     const [results, setResults] = useState(null);
-    const [sportsmens, setSportsmens] = useState(null);
+    // const [sportsmen, setSportsmen] = useState(null);
 
     const { data: sportsmenData } = useQuery('sportsmen', fetchSportsmen);
     const { sportsmen } = sportsmenData || {};

@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 const TranerSchema = new mongoose.Schema({
-    idSchool: {
+    schoolId: {
         type: String,
         require: true,
     },
-    foto: {
+    photo: {
         type: String,
     },
     name: {
