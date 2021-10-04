@@ -8,7 +8,6 @@ import { fetchTrainerById, saveTrainer, editTrainer } from 'services/trainer';
 import { useHistory, useParams } from 'react-router-dom';
 import { queryClient } from 'features/queryClient';
 import { useMutation, useQuery } from 'react-query';
-import { useAuth0 } from '@auth0/auth0-react';
 import { UserContext } from 'context/UserContext';
 
 const useStyles = makeStyles(theme => ({

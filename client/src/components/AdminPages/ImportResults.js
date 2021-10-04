@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import { DataGrid } from '@material-ui/data-grid';
@@ -16,19 +16,10 @@ const headers = [
 export default function ImportResult() {
     const [competition, setCompetition] = useState(null);
     const [results, setResults] = useState(null);
-    // const [sportsmen, setSportsmen] = useState(null);
 
     const { data: sportsmenData } = useQuery('sportsmen', fetchSportsmen);
     const { sportsmen } = sportsmenData || {};
     const formattedSportsmen = sportsmen?.map(sportsman => ({ ...sportsman, id: sportsman._id }));
-
-    // useEffect(() => {
-    //     socket.emit('getAdminSportsmens');
-    //     socket.on('adminSportsmens', data => {
-    //         data.forEach(el => (el['id'] = el['_id']));
-    //         setSportsmens(data);
-    //     });
-    // }, []);
 
     const dataGet = input => {
         const file = input.target.files[0];

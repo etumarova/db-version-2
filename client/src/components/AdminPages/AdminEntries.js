@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import Typography from '@material-ui/core/Typography';
 import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
@@ -12,13 +12,12 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
 import { CSVLink } from 'react-csv';
-import { useAuth0 } from '@auth0/auth0-react';
 import ReactToPrint from 'react-to-print';
 import PrintComponent from 'components/PrintComponent';
 import { useQuery } from 'react-query';
 import { fetchCompetitions } from 'services/competition';
 import { fetchSchools } from 'services/school';
-import { fetchEntries, fetchEntriesByCompetitionId } from 'services/entry';
+import { fetchEntriesByCompetitionId } from 'services/entry';
 import { fetchSportsmen } from 'services/sportsmen';
 import { useHistory } from 'react-router';
 

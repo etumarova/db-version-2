@@ -1,6 +1,5 @@
 import { Typography } from '@material-ui/core';
 import React, { useState, useEffect, useContext, useMemo } from 'react';
-import io from 'socket.io-client';
 import { makeStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -10,7 +9,6 @@ import Button from '@material-ui/core/Button';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import { DataGrid } from '@material-ui/data-grid';
-import { useAuth0 } from '@auth0/auth0-react';
 import { fetchCompetitions } from 'services/competition';
 import { useQuery, useMutation } from 'react-query';
 import { UserContext } from 'context/UserContext';

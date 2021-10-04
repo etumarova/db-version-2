@@ -5,7 +5,6 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const path = require('path');
 const cors = require('cors');
-const socket = require('socket.io');
 const PORT = process.env.PORT || 3001;
 const axios = require('axios').default;
 

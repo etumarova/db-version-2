@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import { Image } from 'cloudinary-react';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import { useAuth0 } from '@auth0/auth0-react';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { fetchSchoolByUserId } from 'services/school';

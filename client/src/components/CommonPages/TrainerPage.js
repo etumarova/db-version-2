@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Image } from 'cloudinary-react';
 import TableSportsmen from 'components/TableSportsmen';
 import Button from '@material-ui/core/Button';
