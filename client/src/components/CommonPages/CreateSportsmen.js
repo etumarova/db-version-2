@@ -14,7 +14,6 @@ import { useMutation, useQuery } from 'react-query';
 import { fetchSportsmanById, saveSportsman, editSportsman } from 'services/sportsmen';
 import { useHistory, useParams } from 'react-router-dom';
 import { queryClient } from 'features/queryClient';
-import { useAuth0 } from '@auth0/auth0-react';
 import { UserContext } from 'context/UserContext';
 import { fetchTrainersBySchoolId } from 'services/trainer';
 
@@ -38,6 +37,13 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
+const headers = [
+    { field: 'id', headerName: 'ID', width: 80 },
+    { field: 'competition', headerName: 'Наименование соревнования', width: 400 },
+    { field: 'discipline', headerName: 'Дисциплина', width: 150 },
+    { field: 'place', headerName: 'Место', width: 150 },
+];
+
 export default function CreateSportsmen() {
     const { id } = useParams();
 
@@ -47,27 +53,27 @@ export default function CreateSportsmen() {
     const [birthday, setBirthday] = useState(null);
     const [address, setAddress] = useState(null);
     const [telephone, setTelephone] = useState(null);
-    const [fTraner, setFTraner] = useState(null);
-    const [nowTraner, setNowTraner] = useState(null);
+    const [fTrainer, setFTrainer] = useState(null);
     const [school, setSchool] = useState(null);
-    const [result, setResult] = useState({});
+    const [result, setResult] = useState({ competition: '', discipline: '', place: '' });
     const [listResults, setListResults] = useState([]);
     const [nowTrainer, setNowTrainer] = useState(null);
-    const [rowTable, setRowTabel] = useState([]);
+    const [resultRows, setResultRows] = useState([]);
     const classes = useStyles();
 
-    const { userSub } = useContext(UserContext);
+    const { userSub, isAdmin } = useContext(UserContext);
 
     const shouldFetch = !!id;
     const { data: sportsmanData } = useQuery(['sportsmen', id], () => fetchSportsmanById(id), {
         enabled: shouldFetch,
     });
     const { sportsman } = sportsmanData || {};
+    const schoolId = !isAdmin && (sportsman?.schoolId || userSub);
     const { data: trainerData } = useQuery(
-        ['trainers', ''],
-        () => fetchTrainersBySchoolId(sportsman.schoolId),
+        ['trainers', sportsman?.schoolId],
+        () => fetchTrainersBySchoolId(schoolId),
         {
-            enabled: !!sportsman.schoolId,
+            enabled: !!schoolId,
         }
     );
     const { trainers } = trainerData || {};
@@ -88,17 +94,15 @@ export default function CreateSportsmen() {
 
     useEffect(() => {
         if (sportsman) {
-            // setSportsmen(data);
             setPhoto(sportsman.photo);
             setListResults(JSON.parse(sportsman.listResults));
             setName(sportsman.name);
             setBirthday(sportsman.birthday);
             setAddress(sportsman.address);
             setTelephone(sportsman.telephone);
-            setFTraner(sportsman.fTraner);
-            setNowTraner(sportsman.nowTraner);
+            setFTrainer(sportsman.fTrainer);
+            setNowTrainer(sportsman.nowTrainer?._id || sportsman.nowTrainer);
             setSchool(sportsman.school);
-            setNowTrainer(sportsman.nowTrainer);
         }
     }, [sportsman]);
 
@@ -125,12 +129,12 @@ export default function CreateSportsmen() {
         e.preventDefault();
         const data = {
             schoolId: userSub,
-            photo: photo,
-            name: name,
-            birthday: birthday,
-            fTraner: fTraner,
-            nowTraner: nowTraner,
-            school: school,
+            photo,
+            name,
+            birthday,
+            fTrainer,
+            nowTrainer,
+            school,
             address,
             telephone: telephone,
             listResults: JSON.stringify(listResults),
@@ -146,8 +150,8 @@ export default function CreateSportsmen() {
             photo,
             name,
             birthday,
-            fTraner,
-            nowTraner,
+            fTrainer,
+            nowTrainer,
             school,
             address,
             telephone,
@@ -160,22 +164,9 @@ export default function CreateSportsmen() {
         e.preventDefault();
         if (result?.competition?.length !== 0) {
             setListResults([...listResults, result]);
-            setResult({});
-            row([...listResults, result]);
+            setResult({ competition: '', discipline: '', place: '' });
+            // buildTableRows([...listResults, result]);
         }
-    };
-
-    const headers = [
-        { field: 'id', headerName: 'ID', width: 80 },
-        { field: 'competition', headerName: 'Наименование соревнования', width: 400 },
-        { field: 'discipline', headerName: 'Класс лодки', width: 150 },
-        { field: 'place', headerName: 'Место', width: 150 },
-    ];
-
-    const row = (list = listResults) => {
-        const arr = list;
-        arr.forEach((el, idx) => (el['id'] = idx + 1));
-        setRowTabel(arr);
     };
 
     const deleteCeill = rowData => {
@@ -184,12 +175,16 @@ export default function CreateSportsmen() {
             `Удалить результат: ${rowData.competition}, Класс -${rowData.discipline}, Место - ${rowData.place} ?`
         );
         if (answer) {
-            const newList = listResults;
-            newList.splice(rowData.id - 1, 1);
+            const newList = listResults.filter(result => result.id !== rowData.id);
             setListResults(newList);
-            row(newList);
         }
     };
+
+    useEffect(() => {
+        const arr = listResults;
+        arr.forEach((el, idx) => (el['id'] = idx + 1));
+        setResultRows(arr);
+    }, [listResults]);
 
     return (
         <div className={classes.root} style={{ display: 'flex', flexDirection: 'column' }}>
@@ -221,7 +216,7 @@ export default function CreateSportsmen() {
                     onChange={e => setName(e.target.value)}
                     margin="normal"
                     InputLabelProps={{
-                        shrink: true,
+                        shrink: !!name,
                     }}
                 />
                 <TextField
@@ -243,6 +238,9 @@ export default function CreateSportsmen() {
                     placeholder="Введите номер телефона"
                     variant="outlined"
                     onChange={e => setTelephone(e.target.value)}
+                    InputLabelProps={{
+                        shrink: !!telephone,
+                    }}
                 />
                 <TextField
                     label="Адрес прописки"
@@ -254,7 +252,7 @@ export default function CreateSportsmen() {
                     onChange={e => setAddress(e.target.value)}
                     margin="normal"
                     InputLabelProps={{
-                        shrink: true,
+                        shrink: !!address,
                     }}
                 />
             </div>
@@ -264,19 +262,22 @@ export default function CreateSportsmen() {
                     id="outlined-margin-none"
                     className={classes.textField}
                     placeholder="Введите ФИО первого тренера"
-                    value={fTraner}
+                    value={fTrainer}
                     variant="outlined"
-                    onChange={e => setFTraner(e.target.value)}
+                    onChange={e => setFTrainer(e.target.value)}
+                    InputLabelProps={{
+                        shrink: !!fTrainer,
+                    }}
                 />
 
                 <FormControl className={classes.formControl}>
-                    <InputLabel>Личный тренер</InputLabel>
-                    <Select value={nowTraner} onChange={e => setNowTraner(e.target.value)}>
+                    <InputLabel shrink={true}>Личный тренер</InputLabel>
+                    <Select value={nowTrainer} onChange={e => setNowTrainer(e.target.value)}>
                         <MenuItem value="">None</MenuItem>
                         {trainers &&
-                            trainers.map(trainer => {
-                                return <MenuItem value={trainer.name}>{trainer.name}</MenuItem>;
-                            })}
+                            trainers.map(trainer => (
+                                <MenuItem value={trainer._id}>{trainer.name}</MenuItem>
+                            ))}
                     </Select>
                 </FormControl>
 
@@ -287,6 +288,9 @@ export default function CreateSportsmen() {
                     placeholder="Введите спортивный клуб"
                     variant="outlined"
                     onChange={e => setSchool(e.target.value)}
+                    InputLabelProps={{
+                        shrink: !!school,
+                    }}
                 />
             </div>
 
@@ -307,6 +311,7 @@ export default function CreateSportsmen() {
                         inputProps={{
                             name: 'competition',
                         }}
+                        value={result.competition}
                     />
                     <TextField
                         label="Дисциплина"
@@ -322,6 +327,7 @@ export default function CreateSportsmen() {
                         inputProps={{
                             name: 'discipline',
                         }}
+                        value={result.discipline}
                     />
                     <TextField
                         label="Место"
@@ -337,6 +343,7 @@ export default function CreateSportsmen() {
                         inputProps={{
                             name: 'place',
                         }}
+                        value={result.place}
                     />
                     <Button variant="contained" color="primary" onClick={addResult}>
                         Добавить результат
@@ -349,7 +356,7 @@ export default function CreateSportsmen() {
 
                 <div style={{ height: 450, width: '100%' }}>
                     <DataGrid
-                        rows={rowTable}
+                        rows={resultRows}
                         columns={headers}
                         pageSize={15}
                         className="table-style"

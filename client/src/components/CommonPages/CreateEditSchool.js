@@ -32,6 +32,10 @@ const useStyles = makeStyles(theme => ({
         width: '25ch',
     },
 
+    selectedLabel: {
+        backgroundColor: 'var(--bg-color)',
+    },
+
     regionSelectLabel: {
         padding: '0 5px',
         backgroundColor: 'var(--bg-color)',
@@ -225,7 +229,7 @@ export default function CreateEditSchool() {
                     onChange={e => setDescription(e.target.value)}
                     margin="normal"
                     InputLabelProps={{
-                        shrink: true,
+                        shrink: !!description,
                     }}
                     variant="outlined"
                 />

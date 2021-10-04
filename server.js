@@ -69,10 +69,10 @@ app.post('/checkUserRole', async (req, res) => {
         const isUserAdmin = existingUser && existingUser.isAdmin;
 
         if (!existingUser) {
-            await UserModel.create({ userId, name: userData.name });
+            await UserModel.create({ userId, name: userData.name, email: userData.email });
         }
 
-        res.json({ isAdmin: isUserAdmin });
+        res.json({ isAdmin: isUserAdmin, existingUser });
     } catch (error) {
         res.status(500).json({ message: `Something went wrong while registering: ${error}` });
     }
@@ -331,6 +331,7 @@ app.post('/competitions/edit', (req, res) => {
 app.get('/sportsmen', (req, res) => {
     const query = buildMongoQuery(['schoolId', 'nowTrainer'], req.query);
     SportsmanModel.find(query)
+        .populate('nowTrainer', 'name')
         .then(sportsmen => res.json({ sportsmen }))
         .catch(e => res.status(500).json(e.toString()));
 });
@@ -338,6 +339,7 @@ app.get('/sportsmen', (req, res) => {
 app.get('/sportsmen/:id', (req, res) => {
     const { id } = req.params;
     SportsmanModel.findById(id)
+        .populate('nowTrainer', 'name')
         .then(sportsman => res.json({ sportsman }))
         .catch(e => res.status(500).json(e.toString()));
 });
@@ -348,8 +350,8 @@ app.post('/saveSportsman', (req, res) => {
         photo,
         name,
         birthday,
-        fTraner,
-        nowTraner,
+        fTrainer,
+        nowTrainer,
         school,
         address,
         telephone,
@@ -361,8 +363,8 @@ app.post('/saveSportsman', (req, res) => {
         photo,
         name,
         birthday,
-        fTraner,
-        nowTraner,
+        fTrainer,
+        nowTrainer,
         school,
         address,
         telephone,
@@ -379,8 +381,8 @@ app.post('/editSportsman', (req, res) => {
         photo,
         name,
         birthday,
-        fTraner,
-        nowTraner,
+        fTrainer,
+        nowTrainer,
         school,
         address,
         telephone,
@@ -397,8 +399,8 @@ app.post('/editSportsman', (req, res) => {
                 photo,
                 name,
                 birthday,
-                fTraner,
-                nowTraner,
+                fTrainer,
+                nowTrainer,
                 school,
                 address,
                 telephone,

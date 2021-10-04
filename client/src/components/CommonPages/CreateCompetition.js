@@ -173,17 +173,6 @@ export default function CreateCompetition() {
                 <Image cloud_name="dgeev9d6l" publicId={logo} width="50" crop="scale" />
             </div>
 
-            <div style={{ float: 'right' }}>
-                {competition ? (
-                    <Button variant="contained" color="primary" onClick={editData}>
-                        Редактировать
-                    </Button>
-                ) : (
-                    <Button variant="contained" color="primary" onClick={saveData}>
-                        Сохранить
-                    </Button>
-                )}
-            </div>
             <div>
                 <TextField
                     label="Наименование мероприятия"
@@ -276,45 +265,53 @@ export default function CreateCompetition() {
                 }}
             />
 
-            <div>
-                <div>
-                    <div>
-                        {discipline.map((todo, index) => {
-                            return (
-                                <div style={{ margin: '0' }}>
-                                    {todo}
-                                    <IconButton
-                                        aria-label="delete"
-                                        className={classes.margin}
-                                        name={index}
-                                        onClick={e => {
-                                            handleDelete(e.target.name);
-                                        }}
-                                    >
-                                        <DeleteIcon fontSize="small" />
-                                    </IconButton>
-                                </div>
-                            );
-                        })}
-                        <form>
-                            <TextField
-                                id="standard-basic"
-                                placeholder="Введите класс лодки"
-                                value={term}
-                                onChange={e => setTerm(e.target.value)}
-                            />
-                            <Button
-                                variant="contained"
-                                size="small"
-                                color="primary"
+            <div style={{ width: '100%', marginBottom: '2em' }}>
+                {discipline.map((todo, index) => {
+                    return (
+                        <div style={{ margin: '0' }}>
+                            {todo}
+                            <IconButton
+                                aria-label="delete"
                                 className={classes.margin}
-                                onClick={handleSubmit}
+                                name={index}
+                                onClick={e => {
+                                    handleDelete(e.target.name);
+                                }}
                             >
-                                Добавить
-                            </Button>
-                        </form>
-                    </div>
-                </div>
+                                <DeleteIcon fontSize="small" />
+                            </IconButton>
+                        </div>
+                    );
+                })}
+                <form style={{ marginTop: '2em' }}>
+                    <TextField
+                        id="standard-basic"
+                        placeholder="Добавить дисциплину"
+                        value={term}
+                        onChange={e => setTerm(e.target.value)}
+                    />
+                    <Button
+                        variant="contained"
+                        size="small"
+                        color="primary"
+                        className={classes.margin}
+                        onClick={handleSubmit}
+                    >
+                        Добавить
+                    </Button>
+                </form>
+            </div>
+
+            <div>
+                {competition ? (
+                    <Button variant="contained" color="primary" onClick={editData}>
+                        Редактировать
+                    </Button>
+                ) : (
+                    <Button variant="contained" color="primary" onClick={saveData}>
+                        Сохранить
+                    </Button>
+                )}
             </div>
         </div>
     );

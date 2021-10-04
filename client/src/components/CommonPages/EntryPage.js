@@ -8,11 +8,27 @@ import { useQuery } from 'react-query';
 import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import { fetchEntryById } from 'services/entry';
+import { fetchCompetitionById } from 'services/competition';
+import { fetchTrainerById } from 'services/trainer';
 
 export default function EntryPage() {
     const { id } = useParams();
     const { data: entryData } = useQuery(['entries', id], () => fetchEntryById(id));
     const { entry } = entryData || {};
+
+    const { data: competitionData } = useQuery(
+        ['competition', entry?.competitionId],
+        () => fetchCompetitionById(entry?.competitionId),
+        { enabled: !!entry?.competitionId }
+    );
+    const { competition } = competitionData || {};
+
+    const { data: trainerData } = useQuery(
+        ['trainer', entry?.trainer],
+        () => fetchTrainerById(entry?.trainer),
+        { enabled: !!entry?.trainer }
+    );
+    const { trainer } = trainerData || {};
 
     const sportsmenList = entry?.sportsmenList ? JSON.parse(entry?.sportsmenList) : [];
     const today = Date.now();
@@ -53,16 +69,16 @@ export default function EntryPage() {
                         >
                             <div>
                                 <Typography variant="h3" component="h4" gutterBottom>
-                                    {entry.name}
+                                    {competition.name}
                                 </Typography>
                                 <Typography variant="body1" gutterBottom>
-                                    Начало соревнований: <b>{entry.startDate}</b>
+                                    Начало соревнований: <b>{competition.startDate}</b>
                                 </Typography>
                                 <Typography variant="body1" gutterBottom>
-                                    Окончание соревнований: <b>{entry.endDate}</b>
+                                    Окончание соревнований: <b>{competition.endDate}</b>
                                 </Typography>
                                 <Typography variant="body1" gutterBottom>
-                                    Последний день принятия заявок: <b>{entry.endDate}</b>
+                                    Последний день принятия заявок: <b>{competition.endDate}</b>
                                 </Typography>
                             </div>
                             <div>
@@ -77,7 +93,8 @@ export default function EntryPage() {
                                     }}
                                 >
                                     <Typography variant="body1" gutterBottom>
-                                        Телефон представителя команды: <b>{entry.telephone}</b>
+                                        Телефон представителя команды:{' '}
+                                        <b>{competition.telephone}</b>
                                     </Typography>
                                 </div>
                             </div>
@@ -92,7 +109,7 @@ export default function EntryPage() {
                         }}
                     >
                         <Typography variant="body1" gutterBottom>
-                            Представитель команды: <b>{entry.traner}</b>
+                            Представитель команды: <b>{trainer?.name || '-'}</b>
                         </Typography>
                     </div>
                     <div style={{ display: 'flex' }}>

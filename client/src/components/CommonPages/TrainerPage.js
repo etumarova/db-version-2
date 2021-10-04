@@ -7,7 +7,7 @@ import { useQuery } from 'react-query';
 import { fetchTrainerById } from 'services/trainer';
 import { fetchSportsmenByTrainerId } from 'services/sportsmen';
 
-export default function TranerPage() {
+export default function TrainerPage() {
     const { id } = useParams();
     const { data: trainerData } = useQuery(['trainers', id], () => fetchTrainerById(id));
     const { trainer } = trainerData || {};

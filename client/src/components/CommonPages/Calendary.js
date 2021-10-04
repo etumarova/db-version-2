@@ -55,7 +55,7 @@ const Calendary = () => {
     }, [competitions]);
 
     return (
-        <div>
+        <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             {isAdmin && (
                 <div style={{ float: 'right' }}>
                     <Link to="createCompetition">
@@ -68,18 +68,21 @@ const Calendary = () => {
             <Typography variant="h3" component="h4" gutterBottom>
                 Календарь соревнований
             </Typography>
-            <FullCalendar
-                plugins={[interactionPlugin, dayGridPlugin]}
-                initialView="dayGridMonth"
-                events={calendarEvents}
-                className="table-style"
-                locale={ruLocale}
-                eventClick={e => {
-                    const id = e.event._def.extendedProps.id;
+            <div style={{ flex: 1 }}>
+                <FullCalendar
+                    height={'100%'}
+                    plugins={[interactionPlugin, dayGridPlugin]}
+                    initialView="dayGridMonth"
+                    events={calendarEvents}
+                    className="table-style"
+                    locale={ruLocale}
+                    eventClick={e => {
+                        const id = e.event._def.extendedProps.id;
 
-                    history.push(`/competition/${id}`);
-                }}
-            />
+                        history.push(`/competition/${id}`);
+                    }}
+                />
+            </div>
         </div>
     );
 };

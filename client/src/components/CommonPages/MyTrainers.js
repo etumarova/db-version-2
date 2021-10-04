@@ -50,7 +50,7 @@ export default function MyTrainers() {
                         className="table-style"
                         onRowClick={e => {
                             const trainerId = e.row.id;
-                            history.push(`/traner/${trainerId}`);
+                            history.push(`/trainer/${trainerId}`);
                         }}
                     />
                 </div>

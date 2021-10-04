@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const TranerSchema = new mongoose.Schema({
+const TrainerSchema = new mongoose.Schema({
     schoolId: {
         type: String,
         require: true,
@@ -21,4 +21,5 @@ const TranerSchema = new mongoose.Schema({
         type: String,
     },
 });
-module.exports = mongoose.model('traner', TranerSchema);
+
+module.exports = mongoose.model('trainer', TrainerSchema);

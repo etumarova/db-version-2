@@ -73,7 +73,7 @@ export default function AdminTrainers() {
                         pageSize={15}
                         className="table-style"
                         onRowClick={e => {
-                            history.push(`/traner/${e.row.id}`);
+                            history.push(`/trainer/${e.row.id}`);
                         }}
                     />
                 </div>

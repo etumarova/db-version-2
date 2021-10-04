@@ -107,7 +107,7 @@ export default function CreateEntries() {
     useEffect(() => {
         if (entry) {
             setSelectedCompetition(entry.competitionId);
-            setSelectTrainer(entry.traner);
+            setSelectTrainer(entry.trainer);
             if (entry.sportsmenList) setSelectedSportsmen(JSON.parse(entry.sportsmenList));
         }
     }, [entry]);
@@ -204,7 +204,9 @@ export default function CreateEntries() {
         }
     };
 
-    const validCompetitions = competitions?.filter(comp => new Date(comp.deadLine) < new Date());
+    const validCompetitions = competitions?.filter(
+        comp => !comp.deadLine || new Date(comp.deadLine) > new Date()
+    );
 
     return (
         <div>
@@ -258,8 +260,8 @@ export default function CreateEntries() {
                             }}
                         >
                             <MenuItem value="">None</MenuItem>
-                            {trainers?.map(el => {
-                                return <MenuItem value={el.name}>{el.name}</MenuItem>;
+                            {trainers?.map(trainer => {
+                                return <MenuItem value={trainer._id}>{trainer.name}</MenuItem>;
                             })}
                         </Select>
                     </FormControl>

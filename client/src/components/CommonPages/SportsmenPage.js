@@ -9,7 +9,7 @@ import { fetchSportsmanById } from 'services/sportsmen';
 const columns = [
     { field: 'id', headerName: 'ID', width: 30 },
     { field: 'competition', headerName: 'Спортивное мероприятие', width: 300 },
-    { field: 'discipline', headerName: 'Класс лодки', width: 150 },
+    { field: 'discipline', headerName: 'Дисциплина', width: 150 },
     { field: 'place', headerName: 'Место', width: 150 },
 ];
 
@@ -91,7 +91,7 @@ export default function SportsmenPage() {
                                             <h6 className="mb-0">Личный тренер</h6>
                                         </div>
                                         <div className="col-sm-9 text-secondary">
-                                            {sportsman.nowTraner}
+                                            {sportsman.nowTrainer?.name}
                                         </div>
                                     </div>
                                     <hr />
@@ -100,7 +100,7 @@ export default function SportsmenPage() {
                                             <h6 className="mb-0">Первый тренер</h6>
                                         </div>
                                         <div className="col-sm-9 text-secondary">
-                                            {sportsman.fTraner}
+                                            {sportsman.fTrainer}
                                         </div>
                                     </div>
                                     <hr />

@@ -22,7 +22,7 @@ import CreateSportsmen from 'components/CommonPages/CreateSportsmen';
 import SportsmenPage from 'components/CommonPages/SportsmenPage';
 import MyTrainers from 'components/CommonPages/MyTrainers';
 import CreateTrainer from 'components/CommonPages/CreateTrainer';
-import TranerPage from 'components/CommonPages/TranerPage';
+import TrainerPage from 'components/CommonPages/TrainerPage';
 import CreateCompetition from 'components/CommonPages/CreateCompetition';
 import CompetitionPage from 'components/CommonPages/CompetitionPage';
 import CreateEntries from 'components/CommonPages/CreateEntries';
@@ -40,10 +40,12 @@ import PrivateRoute from 'components/PrivateRoute';
 
 import { UserContext } from 'context/UserContext';
 import { UserRole } from 'srcConstants';
+import { ruRU } from '@material-ui/data-grid';
+import { createTheme, ThemeProvider } from '@material-ui/core';
 
 const adminPanelItems = [
     { text: 'Школы', path: '/adminSchools' },
-    { text: 'Тренера', path: '/adminTraners' },
+    { text: 'Тренера', path: '/adminTrainers' },
     { text: 'Спортсмены', path: '/adminSportsmen' },
     { text: 'Календарь соревнований', path: '/calendary' },
     { text: 'Заявки', path: '/adminEntries' },
@@ -53,7 +55,7 @@ const adminPanelItems = [
 const userPanelItems = [
     { text: 'Моя Школа', path: '/mySchool' },
     { text: 'Мои Спортсмены', path: '/mySportsmen' },
-    { text: 'Тренерский состав', path: '/myTraners' },
+    { text: 'Тренерский состав', path: '/myTrainers' },
     { text: 'Календарь соревнований', path: '/calendary' },
     { text: 'Сформировать заявку', path: '/myEntries' },
 ];
@@ -62,6 +64,7 @@ const drawerWidth = 240;
 const useStyles = makeStyles(theme => ({
     root: {
         display: 'flex',
+        minHeight: '100vh',
     },
     appBar: {
         zIndex: theme.zIndex.drawer + 1,
@@ -79,8 +82,12 @@ const useStyles = makeStyles(theme => ({
     content: {
         flexGrow: 1,
         padding: theme.spacing(3),
+        display: 'flex',
+        flexDirection: 'column',
     },
 }));
+
+const theme = createTheme({}, ruRU);
 function Dashboard() {
     const classes = useStyles();
     const { loginWithRedirect, isAuthenticated, logout, user } = useAuth0();
@@ -120,125 +127,152 @@ function Dashboard() {
     );
 
     return (
-        <UserContext.Provider value={userContextValues}>
-            <Router>
-                <div className={classes.root}>
-                    <CssBaseline />
-                    <AppBar position="fixed" className={classes.appBar}>
-                        <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <Typography variant="h6" noWrap>
-                                Belarus Canoe DB
-                            </Typography>
-                            <div style={{ display: 'flex' }}>
-                                {!isAuthenticated && (
-                                    <Button variant="contained" onClick={() => loginWithRedirect()}>
-                                        Войти или Зарегистрироваться
-                                    </Button>
-                                )}
-
-                                {isAuthenticated && (
-                                    <>
-                                        <div
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                marginRight: '2em',
-                                            }}
-                                        >
-                                            <img
-                                                src={user.picture}
-                                                alt={user.name}
-                                                style={{ width: '45px', marginRight: '1em' }}
-                                            />
-                                            <p style={{ margin: 0 }}>{user.name}</p>
-                                        </div>
-
+        <ThemeProvider theme={theme}>
+            <UserContext.Provider value={userContextValues}>
+                <Router>
+                    <div className={classes.root}>
+                        <CssBaseline />
+                        <AppBar position="fixed" className={classes.appBar}>
+                            <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <Typography variant="h6" noWrap>
+                                    Belarus Wrestling DB
+                                </Typography>
+                                <div style={{ display: 'flex' }}>
+                                    {!isAuthenticated && (
                                         <Button
                                             variant="contained"
-                                            onClick={() => {
-                                                logout({ returnTo: window.location.origin });
-                                                localStorage.clear();
-                                            }}
+                                            onClick={() => loginWithRedirect()}
                                         >
-                                            Выйти
+                                            Войти или Зарегистрироваться
                                         </Button>
-                                    </>
+                                    )}
+
+                                    {isAuthenticated && (
+                                        <>
+                                            <div
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    marginRight: '2em',
+                                                }}
+                                            >
+                                                <img
+                                                    src={user.picture}
+                                                    alt={user.name}
+                                                    style={{ width: '45px', marginRight: '1em' }}
+                                                />
+                                                <p style={{ margin: 0 }}>{user.name}</p>
+                                            </div>
+
+                                            <Button
+                                                variant="contained"
+                                                onClick={() => {
+                                                    logout({ returnTo: window.location.origin });
+                                                    localStorage.clear();
+                                                }}
+                                            >
+                                                Выйти
+                                            </Button>
+                                        </>
+                                    )}
+                                </div>
+                            </Toolbar>
+                        </AppBar>
+
+                        <Drawer
+                            className={classes.drawer}
+                            variant="permanent"
+                            classes={{
+                                paper: classes.drawerPaper,
+                            }}
+                        >
+                            <Toolbar />
+                            <div className={classes.drawerContainer}>
+                                {isAuthenticated && localStorage.setItem('user', user.sub)}
+
+                                {shouldRenderDrawer && (
+                                    <List>
+                                        {drawerItems.map(({ text, path }, index) => (
+                                            <Link to={path} key={path}>
+                                                <ListItem button key={text}>
+                                                    <ListItemIcon>
+                                                        {index % 2 === 0 ? (
+                                                            <InboxIcon />
+                                                        ) : (
+                                                            <MailIcon />
+                                                        )}
+                                                    </ListItemIcon>
+                                                    {text}
+                                                </ListItem>
+                                            </Link>
+                                        ))}
+                                    </List>
                                 )}
                             </div>
-                        </Toolbar>
-                    </AppBar>
+                        </Drawer>
 
-                    <Drawer
-                        className={classes.drawer}
-                        variant="permanent"
-                        classes={{
-                            paper: classes.drawerPaper,
-                        }}
-                    >
-                        <Toolbar />
-                        <div className={classes.drawerContainer}>
-                            {isAuthenticated && localStorage.setItem('user', user.sub)}
+                        <main className={classes.content}>
+                            <Toolbar />
 
-                            {shouldRenderDrawer && (
-                                <List>
-                                    {drawerItems.map(({ text, path }, index) => (
-                                        <Link to={path} key={path}>
-                                            <ListItem button key={text}>
-                                                <ListItemIcon>
-                                                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                                                </ListItemIcon>
-                                                {text}
-                                            </ListItem>
-                                        </Link>
-                                    ))}
-                                </List>
-                            )}
-                        </div>
-                    </Drawer>
-
-                    <main className={classes.content}>
-                        <Toolbar />
-
-                        <Switch>
-                            <PrivateRoute
-                                exact
-                                path="/calendary"
-                                isAdmin={isAdmin}
-                                component={Calendary}
-                            />
-                            <PrivateRoute path="/competition/:id" component={CompetitionPage} />
-                            <PrivateRoute
-                                path="/createCompetition/:id?"
-                                component={CreateCompetition}
-                            />
-                            <PrivateRoute path="/mySchool/:id?" component={MySchool} />
-                            <PrivateRoute
-                                path="/createEditSchool/:id"
-                                component={CreateEditSchool}
-                            />
-                            <PrivateRoute exact path="/mySportsmen" component={MySportsmen} />
-                            <PrivateRoute
-                                path="/createSportsmen/:id?"
-                                component={CreateSportsmen}
-                            />
-                            <PrivateRoute path="/sportsmen/:id" component={SportsmenPage} />
-                            <PrivateRoute exact path="/myTraners" component={MyTrainers} />
-                            <PrivateRoute path="/createTrainer/:id?" component={CreateTrainer} />
-                            <PrivateRoute path="/traner/:id" component={TranerPage} />
-                            <PrivateRoute exact path="/myEntries" component={MyEntries} />
-                            <PrivateRoute path="/createEntries/:id?" component={CreateEntries} />
-                            <PrivateRoute path="/entry/:id" component={EntryPage} />
-                            <PrivateRoute exact path="/adminSchools" component={AdminSchools} />
-                            <PrivateRoute exact path="/adminTraners" component={AdminTrainers} />
-                            <PrivateRoute exact path="/adminSportsmen" component={AdminSportsmen} />
-                            <PrivateRoute exact path="/adminEntries" component={AdminEntries} />
-                            <PrivateRoute exact path="/adminPage" component={AdminPage} />
-                            <PrivateRoute exact path="/adminImportFile" component={ImportResult} />
-                        </Switch>
-                    </main>
-                </div>
-            </Router>
-        </UserContext.Provider>
+                            <Switch>
+                                <PrivateRoute
+                                    exact
+                                    path="/calendary"
+                                    isAdmin={isAdmin}
+                                    component={Calendary}
+                                />
+                                <PrivateRoute path="/competition/:id" component={CompetitionPage} />
+                                <PrivateRoute
+                                    path="/createCompetition/:id?"
+                                    component={CreateCompetition}
+                                />
+                                <PrivateRoute path="/mySchool/:id?" component={MySchool} />
+                                <PrivateRoute
+                                    path="/createEditSchool/:id"
+                                    component={CreateEditSchool}
+                                />
+                                <PrivateRoute exact path="/mySportsmen" component={MySportsmen} />
+                                <PrivateRoute
+                                    path="/createSportsmen/:id?"
+                                    component={CreateSportsmen}
+                                />
+                                <PrivateRoute path="/sportsmen/:id" component={SportsmenPage} />
+                                <PrivateRoute exact path="/myTrainers" component={MyTrainers} />
+                                <PrivateRoute
+                                    path="/createTrainer/:id?"
+                                    component={CreateTrainer}
+                                />
+                                <PrivateRoute path="/trainer/:id" component={TrainerPage} />
+                                <PrivateRoute exact path="/myEntries" component={MyEntries} />
+                                <PrivateRoute
+                                    path="/createEntries/:id?"
+                                    component={CreateEntries}
+                                />
+                                <PrivateRoute path="/entry/:id" component={EntryPage} />
+                                <PrivateRoute exact path="/adminSchools" component={AdminSchools} />
+                                <PrivateRoute
+                                    exact
+                                    path="/adminTrainers"
+                                    component={AdminTrainers}
+                                />
+                                <PrivateRoute
+                                    exact
+                                    path="/adminSportsmen"
+                                    component={AdminSportsmen}
+                                />
+                                <PrivateRoute exact path="/adminEntries" component={AdminEntries} />
+                                <PrivateRoute exact path="/adminPage" component={AdminPage} />
+                                <PrivateRoute
+                                    exact
+                                    path="/adminImportFile"
+                                    component={ImportResult}
+                                />
+                            </Switch>
+                        </main>
+                    </div>
+                </Router>
+            </UserContext.Provider>
+        </ThemeProvider>
     );
 }
 

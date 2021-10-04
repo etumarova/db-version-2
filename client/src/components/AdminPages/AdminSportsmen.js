@@ -35,7 +35,7 @@ const columns = [
     { field: 'id', headerName: 'ID', width: 80 },
     { field: 'name', headerName: 'ФИО тренера', width: 300 },
     { field: 'birthday', headerName: 'Дата рождения', width: 170 },
-    { field: 'nowTraner', headerName: 'Личный тренер', width: 200 },
+    { field: 'nowTrainer', headerName: 'Личный тренер', width: 200 },
     { field: 'school', headerName: 'Школа', width: 200 },
     { field: 'telephone', headerName: 'Телефон', width: 150 },
 ];

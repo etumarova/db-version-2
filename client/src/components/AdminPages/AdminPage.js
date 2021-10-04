@@ -36,7 +36,7 @@ const columns = [
     { field: 'userId', headerName: 'ID', width: 100 },
     { field: 'name', headerName: 'Имя', width: 150 },
     { field: 'isAdmin', headerName: 'Админ', width: 150 },
-    // { field: 'name', headerName: 'Email', width: 170 },
+    { field: 'email', headerName: 'Email', width: 170 },
     // { field: 'created_at', headerName: 'Дата регистрации', width: 230 },
     // { field: 'updated_at', headerName: 'Дата последнего входа', width: 230 },
     // { field: 'last_ip', headerName: 'IP последнего входа', width: 230 },

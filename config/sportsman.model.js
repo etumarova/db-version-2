@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
-const SportsmenSchema = new mongoose.Schema({
+const Schema = mongoose.Schema;
+
+const SportsmanSchema = new mongoose.Schema({
     schoolId: {
         type: String,
         require: true,
@@ -14,11 +16,12 @@ const SportsmenSchema = new mongoose.Schema({
     birthday: {
         type: String,
     },
-    fTraner: {
+    fTrainer: {
         type: String,
     },
-    nowTraner: {
-        type: String,
+    nowTrainer: {
+        type: Schema.Types.ObjectId,
+        ref: 'trainer',
     },
     school: {
         type: String,
@@ -33,5 +36,5 @@ const SportsmenSchema = new mongoose.Schema({
         type: String,
     },
 });
-// SportsmenSchema.index({ '$**': 'text' });
-module.exports = mongoose.model('sportsmen', SportsmenSchema);
+
+module.exports = mongoose.model('sportsman', SportsmanSchema);

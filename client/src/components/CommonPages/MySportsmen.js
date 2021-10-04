@@ -13,7 +13,12 @@ export default function MySportsmen() {
     const { sportsmen } = data || {};
 
     const formattedSportsmen = useMemo(
-        () => sportsmen?.map(sportsman => ({ ...sportsman, id: sportsman._id })) || [],
+        () =>
+            sportsmen?.map(sportsman => ({
+                ...sportsman,
+                nowTrainer: sportsman.nowTrainer?.name || '-',
+                id: sportsman._id,
+            })) || [],
         [sportsmen]
     );
 
