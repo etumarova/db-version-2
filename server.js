@@ -18,24 +18,6 @@ const UserModel = require('./config/user.model');
 
 app.use(express.json());
 
-if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
-    app.use(express.static(path.join(__dirname, 'client/build')));
-    app.get('*', function(req, res) {
-        res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
-    });
-}
-
-mongoose
-    .connect(process.env.MONGODB_URI, { useUnifiedTopology: true, useNewUrlParser: true })
-    .then(() => console.log('MongoDb connected'))
-    .catch(e => console.log(e));
-
-mongoose.set('useCreateIndex', true);
-
-app.listen(PORT, () => {
-    console.log('listening on *:3001');
-});
-
 const buildMongoQuery = (possibleQueryParams, reqQuery) => {
     const queryEntries = possibleQueryParams
         .map(param => [param, reqQuery[param]])
@@ -476,3 +458,26 @@ app.post('/editTrainer', (req, res) => {
         }
     );
 });
+
+if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
+    app.use('/', express.static(path.join(__dirname, 'client/build')));
+    app.get('*', function(req, res) {
+        res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+    });
+}
+
+(async () => {
+    try {
+        await mongoose.connect(process.env.MONGODB_URI, {
+            useUnifiedTopology: true,
+            useNewUrlParser: true,
+        });
+        console.log('MongoDb connected');
+
+        app.listen(PORT, () => {
+            console.log(`listening on *:${PORT}`);
+        });
+    } catch (error) {
+        console.log(error);
+    }
+})();
