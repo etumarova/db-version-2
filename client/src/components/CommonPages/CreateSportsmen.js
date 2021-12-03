@@ -54,6 +54,8 @@ export default function CreateSportsmen() {
     const [address, setAddress] = useState(null);
     const [telephone, setTelephone] = useState(null);
     const [fTrainer, setFTrainer] = useState(null);
+    const [placeStudy, setPlaceStudy] = useState(null);
+    const [enrolmentDate, setEnrolmentDate] = useState(null);
     const [school, setSchool] = useState(null);
     const [result, setResult] = useState({ competition: '', discipline: '', place: '' });
     const [listResults, setListResults] = useState([]);
@@ -101,6 +103,8 @@ export default function CreateSportsmen() {
             setAddress(sportsman.address);
             setTelephone(sportsman.telephone);
             setFTrainer(sportsman.fTrainer);
+            setTelephone(sportsman.enrolmentDate);
+            setFTrainer(sportsman.studyPlace);
             setNowTrainer(sportsman.nowTrainer?._id || sportsman.nowTrainer);
             setSchool(sportsman.school);
         }
@@ -130,6 +134,8 @@ export default function CreateSportsmen() {
         const data = {
             schoolId: userSub,
             photo,
+            enrolmentDate,
+            placeStudy,
             name,
             birthday,
             fTrainer,
@@ -149,6 +155,8 @@ export default function CreateSportsmen() {
             schoolId: sportsman.schoolId, // I should not have to specify parameters i don't want to update
             photo,
             name,
+            enrolmentDate,
+            placeStudy,
             birthday,
             fTrainer,
             nowTrainer,
@@ -280,6 +288,32 @@ export default function CreateSportsmen() {
                             ))}
                     </Select>
                 </FormControl>
+
+                <TextField
+                    label="Зачисление"
+                    id="outlined-margin-none"
+                    className={classes.textField}
+                    placeholder="Введите дату приказа о зачислении"
+                    value={enrolmentDate}
+                    variant="outlined"
+                    onChange={e => setEnrolmentDate(e.target.value)}
+                    InputLabelProps={{
+                        shrink: !!enrolmentDate,
+                    }}
+                />
+
+                <TextField
+                    label="Место проведения занятий"
+                    id="outlined-margin-none"
+                    className={classes.textField}
+                    placeholder="Введите место проведения занятий"
+                    value={placeStudy}
+                    variant="outlined"
+                    onChange={e => setPlaceStudy(e.target.value)}
+                    InputLabelProps={{
+                        shrink: !!placeStudy,
+                    }}
+                />
 
                 <TextField
                     label="Принадлежность"

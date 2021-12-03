@@ -16,6 +16,20 @@ const SchoolSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
+    deputeDirector: {
+        type: String,
+        require: true,
+    },
+    directorPhone: {
+        type: String,
+      },
+      typeSport: {
+        type: String,
+      },
+    email: {
+        type: String,
+        require: true,
+      },
     description: {
         type: String,
         require: true,

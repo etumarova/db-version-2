@@ -13,6 +13,9 @@ const columns = [
     { field: 'name', headerName: 'ФИО', width: 260 },
     { field: 'birthday', headerName: 'Год рождения', width: 150 },
     { field: 'school', headerName: 'Принадлежность', width: 180 },
+    { field: 'education', headerName: 'Образование', width: 180 },
+    { field: 'laborCategory', headerName: 'Трудовая категория', width: 120 },
+    { field: 'studentNumber', headerName: 'Кол-во занимающихся', width: 100 },
     { field: 'telephone', headerName: 'Телефон', width: 140 },
 ];
 

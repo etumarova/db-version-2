@@ -80,6 +80,14 @@ export default function MySchool() {
                                 </div>
                                 <hr />
                                 <div className="row">
+                                    <div className="col-sm-3 text-secondary">Заместитель директора</div>
+
+                                    <div className="col-sm-9">
+                                        <h6 className="mb-0">{school.deputeDirector}</h6>
+                                    </div>
+                                </div>
+                                <hr />
+                                <div className="row">
                                     <div className="col-sm-3 text-secondary">Регион</div>
 
                                     <div className="col-sm-9">
@@ -94,12 +102,34 @@ export default function MySchool() {
                                             {school.city + ', ' + school.address}
                                         </h6>
                                     </div>
+                            
+                                </div>
+                                <hr />
+                                <div className="row">
+                                    <div className="col-sm-3  text-secondary">Телефон директора</div>
+                                    <div className="col-sm-9">
+                                        <h6 className="mb-0">{school.directorPhone}</h6>
+                                    </div>
                                 </div>
                                 <hr />
                                 <div className="row">
                                     <div className="col-sm-3  text-secondary">Телефон</div>
                                     <div className="col-sm-9">
                                         <h6 className="mb-0">{school.telephone}</h6>
+                                    </div>
+                                </div>
+                                <hr />
+                                <div className="row">
+                                    <div className="col-sm-3  text-secondary">Электронная почта</div>
+                                    <div className="col-sm-9">
+                                        <h6 className="mb-0">{school.email}</h6>
+                                    </div>
+                                </div>
+                                <hr />
+                                <div className="row">
+                                    <div className="col-sm-3  text-secondary">Отделения по видам спорта</div>
+                                    <div className="col-sm-9">
+                                        <h6 className="mb-0">{school.typeSport}</h6>
                                     </div>
                                 </div>
                             </div>

@@ -16,6 +16,12 @@ const SportsmanSchema = new mongoose.Schema({
     birthday: {
         type: String,
     },
+    enrolmentDate: {
+        type: String,
+    },
+    placeStudy: {
+        type: String,
+    },
     fTrainer: {
         type: String,
     },

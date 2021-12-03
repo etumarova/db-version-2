@@ -106,6 +106,24 @@ export default function SportsmenPage() {
                                     <hr />
                                     <div className="row">
                                         <div className="col-sm-3">
+                                            <h6 className="mb-0">Дата приказа о зачсилении</h6>
+                                        </div>
+                                        <div className="col-sm-9 text-secondary">
+                                            {sportsman.enrolmentDate}
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div className="row">
+                                        <div className="col-sm-3">
+                                            <h6 className="mb-0">Место проведения занятий</h6>
+                                        </div>
+                                        <div className="col-sm-9 text-secondary">
+                                            {sportsman.studyPlace}
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div className="row">
+                                        <div className="col-sm-3">
                                             <h6 className="mb-0">Телефон</h6>
                                         </div>
                                         <div className="col-sm-9 text-secondary">

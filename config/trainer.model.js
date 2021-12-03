@@ -14,6 +14,15 @@ const TrainerSchema = new mongoose.Schema({
     birthday: {
         type: String,
     },
+    education: {
+        type: String,
+    },
+    laborCategory: {
+        type: String,
+    },
+    studentNumber: {
+        type: String,
+    },
     school: {
         type: String,
     },

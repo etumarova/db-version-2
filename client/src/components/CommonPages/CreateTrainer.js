@@ -37,6 +37,9 @@ export default function CreateTrainer() {
     const [photo, setPhoto] = useState(null);
     const [name, setName] = useState(null);
     const [birthday, setBirthday] = useState(null);
+    const [education, setEducation] = useState(null);
+    const [laborCategory, setLaborCategory] = useState(null);
+    const [studentNumber, setStudentNumber] = useState(null);
     const [telephone, setTelephone] = useState(null);
     const [school, setSchool] = useState(null);
     const classes = useStyles();
@@ -69,6 +72,9 @@ export default function CreateTrainer() {
             setPhoto(trainer.photo);
             setName(trainer.name);
             setBirthday(trainer.birthday);
+            setEducation(trainer.education);
+            setLaborCategory(trainer.laborCategory);
+            setStudentNumber(trainer.studentNumber);
             setTelephone(trainer.telephone);
             setSchool(trainer.school);
         }
@@ -100,6 +106,9 @@ export default function CreateTrainer() {
             photo,
             name,
             birthday,
+            education,
+            laborCategory,
+            studentNumber,
             school,
             telephone,
         };
@@ -114,6 +123,9 @@ export default function CreateTrainer() {
             photo,
             name,
             birthday,
+            education,
+            laborCategory,
+            studentNumber,
             school,
             telephone,
         };
@@ -163,6 +175,33 @@ export default function CreateTrainer() {
                     variant="outlined"
                     value={telephone}
                     onChange={e => setTelephone(e.target.value)}
+                />
+                 <TextField
+                    label="Образование"
+                    id="outlined-margin-normal"
+                    className={classes.textField}
+                    placeholder="Образование"
+                    variant="outlined"
+                    value={education}
+                    onChange={e => setEducation(e.target.value)}
+                />
+                 <TextField
+                    label="Трудовая категория"
+                    id="outlined-margin-normal"
+                    className={classes.textField}
+                    placeholder="Трудовая категория"
+                    variant="outlined"
+                    value={laborCategory}
+                    onChange={e => setLaborCategory(e.target.value)}
+                />
+                <TextField
+                    label="Количество занимающихся"
+                    id="outlined-margin-normal"
+                    className={classes.textField}
+                    placeholder="Количество занимающихся"
+                    variant="outlined"
+                    value={studentNumber}
+                    onChange={e => setStudentNumber(e.target.value)}
                 />
             </div>
             <div>

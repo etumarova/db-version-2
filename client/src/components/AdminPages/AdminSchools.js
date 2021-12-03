@@ -35,9 +35,13 @@ const columns = [
     { field: 'id', headerName: 'ID', width: 80 },
     { field: 'name', headerName: 'Название школы', width: 370 },
     { field: 'director', headerName: 'Директор', width: 270 },
+    { field: 'directorPhone', headerName: 'Телефон директора', width: 220 },
+    { field: 'deputeDirector', headerName: 'Заместитель директора', width: 270 },
     { field: 'region', headerName: 'Регион', width: 180 },
     { field: 'city', headerName: 'Город', width: 170 },
     { field: 'telephone', headerName: 'Телефон', width: 150 },
+    
+    { field: 'email', headerName: 'Электронная почта', width: 250 },
 ];
 
 export default function AdminSchools() {

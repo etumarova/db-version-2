@@ -80,6 +80,9 @@ app.post('/schools/save', (req, res) => {
         photo,
         name,
         director,
+        deputeDirector,
+        directorPhone,
+        email,
         description,
         region,
         city,
@@ -95,6 +98,9 @@ app.post('/schools/save', (req, res) => {
                     photo,
                     name,
                     director,
+                    deputeDirector,
+                    directorPhone,
+                    email,
                     description,
                     region,
                     city,
@@ -116,6 +122,9 @@ app.post('/schools/edit', (req, res) => {
         photo,
         name,
         director,
+        deputeDirector,
+        directorPhone,
+        email,
         description,
         region,
         city,
@@ -133,6 +142,9 @@ app.post('/schools/edit', (req, res) => {
                 photo,
                 name,
                 director,
+                deputeDirector,
+                directorPhone,
+                email,
                 description,
                 region,
                 city,
@@ -242,6 +254,7 @@ app.post('/competitions/save', (req, res) => {
         telephone,
         place,
         description,
+        email,
         discipline,
     } = req.body;
 
@@ -256,6 +269,7 @@ app.post('/competitions/save', (req, res) => {
         telephone,
         place,
         description,
+        email,
         discipline,
     })
         .then(() => res.sendStatus(200))
@@ -275,6 +289,7 @@ app.post('/competitions/edit', (req, res) => {
         telephone,
         place,
         description,
+        email,
         discipline,
     } = req.body;
 
@@ -294,6 +309,7 @@ app.post('/competitions/edit', (req, res) => {
                 telephone,
                 place,
                 description,
+                email,
                 discipline,
             },
         },
@@ -329,6 +345,8 @@ app.post('/saveSportsman', (req, res) => {
     const {
         schoolId,
         photo,
+        enrolmentDate,
+        placeStudy,
         name,
         birthday,
         fTrainer,
@@ -342,6 +360,8 @@ app.post('/saveSportsman', (req, res) => {
     SportsmanModel.create({
         schoolId,
         photo,
+        enrolmentDate,
+        placeStudy,
         name,
         birthday,
         fTrainer,
@@ -361,6 +381,8 @@ app.post('/editSportsman', (req, res) => {
         schoolId,
         photo,
         name,
+        enrolmentDate,
+        placeStudy,
         birthday,
         fTrainer,
         nowTrainer,
@@ -378,6 +400,8 @@ app.post('/editSportsman', (req, res) => {
             $set: {
                 schoolId,
                 photo,
+                enrolmentDate,
+                placeStudy,
                 name,
                 birthday,
                 fTrainer,
@@ -417,13 +441,16 @@ app.get('/trainers/:id', (req, res) => {
 });
 
 app.post('/saveTrainer', (req, res) => {
-    const { schoolId, photo, name, birthday, school, telephone } = req.body;
+    const { schoolId, photo, name, birthday, school, telephone, education, laborCategory, studentNumber } = req.body;
 
     TrainerModel.create({
         schoolId,
         photo,
         name,
         birthday,
+        education,
+        laborCategory,
+        studentNumber,
         school,
         telephone,
     })
@@ -432,7 +459,7 @@ app.post('/saveTrainer', (req, res) => {
 });
 
 app.post('/editTrainer', (req, res) => {
-    const { _id, schoolId, photo, name, birthday, school, telephone } = req.body;
+    const { _id, schoolId, photo, name, birthday, school, telephone, education, laborCategory, studentNumber } = req.body;
     TrainerModel.updateOne(
         {
             _id: _id,
@@ -443,6 +470,9 @@ app.post('/editTrainer', (req, res) => {
                 photo,
                 name,
                 birthday,
+                education,
+                laborCategory,
+                studentNumber,
                 school,
                 telephone,
             },

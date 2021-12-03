@@ -66,10 +66,37 @@ export default function TrainerPage() {
                                     <hr />
                                     <div className="row">
                                         <div className="col-sm-3">
+                                            <h6 className="mb-0">Образование</h6>
+                                        </div>
+                                        <div className="col-sm-9 text-secondary">
+                                            {trainer.education}
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div className="row">
+                                        <div className="col-sm-3">
+                                            <h6 className="mb-0">Трудовая категория</h6>
+                                        </div>
+                                        <div className="col-sm-9 text-secondary">
+                                            {trainer.laborCategory}
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div className="row">
+                                        <div className="col-sm-3">
                                             <h6 className="mb-0">Принадлежность</h6>
                                         </div>
                                         <div className="col-sm-9 text-secondary">
                                             {trainer.school}
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div className="row">
+                                        <div className="col-sm-3">
+                                            <h6 className="mb-0">Количество занимающихся</h6>
+                                        </div>
+                                        <div className="col-sm-9 text-secondary">
+                                            {trainer.studentNumber}
                                         </div>
                                     </div>
                                     <hr />

@@ -75,12 +75,16 @@ export default function CreateEditSchool() {
 
     const [name, setName] = useState('');
     const [director, setDirector] = useState('');
+    const [deputeDirector, setDeputeDirector] = useState('');
     const [photo, setPhoto] = useState(null);
+    const [directorPhone, setDirectorPhone] = useState('');
     const [description, setDescription] = useState('');
+    const [email, setEmail] = useState('');
     const [region, setRegion] = useState('');
     const [city, setCity] = useState('');
     const [address, setAddress] = useState('');
     const [telephone, setTelephone] = useState('');
+    const [typeSport, setTypeSport] = useState('');
 
     // const [school, setSchool] = useState({});
     const { data } = useQuery(['schools', userId], () => fetchSchoolByUserId(userId));
@@ -107,10 +111,14 @@ export default function CreateEditSchool() {
         setPhoto(data.photo);
         setName(data.name);
         setDirector(data.director);
+        setDeputeDirector(data.deputeDirector);
+        setDirectorPhone(data.directorPhone);
+        setEmail(data.email);
         setDescription(data.description);
         setCity(data.city);
         setAddress(data.address);
         setTelephone(data.telephone);
+        setTelephone(data.typeSport);
     };
 
     useEffect(() => {
@@ -143,11 +151,15 @@ export default function CreateEditSchool() {
             photo,
             name,
             director,
+            deputeDirector,
+            directorPhone,
+            email,
             description,
             region,
             city,
             address,
             telephone,
+            typeSport,
         };
 
         saveSchoolMutation.mutate(data);
@@ -161,11 +173,15 @@ export default function CreateEditSchool() {
             photo,
             name,
             director,
+            deputeDirector,
+            directorPhone,
+            email,
             description,
             region,
             city,
             address,
             telephone,
+            typeSport,
         };
 
         editSchoolMutation.mutate(data);
@@ -210,6 +226,16 @@ export default function CreateEditSchool() {
                     style={{ margin: 8 }}
                     value={director}
                     onChange={e => setDirector(e.target.value)}
+                    margin="normal"
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                />
+                <TextField
+                    label="Заместитель директора"
+                    style={{ margin: 8 }}
+                    value={deputeDirector}
+                    onChange={e => setDeputeDirector(e.target.value)}
                     margin="normal"
                     InputLabelProps={{
                         shrink: true,
@@ -280,6 +306,14 @@ export default function CreateEditSchool() {
             </div>
 
             <div className={classes.row}>
+            <TextField
+                    label="Телефон директора"
+                    id="outlined-margin-normal"
+                    className={classes.textField}
+                    value={directorPhone}
+                    variant="outlined"
+                    onChange={e => setDirectorPhone(e.target.value)}
+                />
                 <TextField
                     label="Контактный номер телефона"
                     id="outlined-margin-normal"
@@ -287,6 +321,22 @@ export default function CreateEditSchool() {
                     value={telephone}
                     variant="outlined"
                     onChange={e => setTelephone(e.target.value)}
+                />
+                 <TextField
+                    label="Электронная почта"
+                    id="outlined-margin-normal"
+                    className={classes.textField}
+                    value={email}
+                    variant="outlined"
+                    onChange={e => setEmail(e.target.value)}
+                />
+                 <TextField
+                    label="Отделения по видам спорта"
+                    id="outlined-margin-normal"
+                    className={classes.textField}
+                    value={typeSport}
+                    variant="outlined"
+                    onChange={e => setTypeSport(e.target.value)}
                 />
             </div>
 
