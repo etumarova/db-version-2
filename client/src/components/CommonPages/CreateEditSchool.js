@@ -118,7 +118,7 @@ export default function CreateEditSchool() {
         setCity(data.city);
         setAddress(data.address);
         setTelephone(data.telephone);
-        setTelephone(data.typeSport);
+        setTypeSport(data.typeSport);
     };
 
     useEffect(() => {
@@ -306,7 +306,7 @@ export default function CreateEditSchool() {
             </div>
 
             <div className={classes.row}>
-            <TextField
+                <TextField
                     label="Телефон директора"
                     id="outlined-margin-normal"
                     className={classes.textField}
@@ -322,7 +322,7 @@ export default function CreateEditSchool() {
                     variant="outlined"
                     onChange={e => setTelephone(e.target.value)}
                 />
-                 <TextField
+                <TextField
                     label="Электронная почта"
                     id="outlined-margin-normal"
                     className={classes.textField}
@@ -330,7 +330,7 @@ export default function CreateEditSchool() {
                     variant="outlined"
                     onChange={e => setEmail(e.target.value)}
                 />
-                 <TextField
+                <TextField
                     label="Отделения по видам спорта"
                     id="outlined-margin-normal"
                     className={classes.textField}

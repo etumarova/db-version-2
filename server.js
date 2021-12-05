@@ -83,6 +83,7 @@ app.post('/schools/save', (req, res) => {
         deputeDirector,
         directorPhone,
         email,
+        typeSport,
         description,
         region,
         city,
@@ -101,6 +102,7 @@ app.post('/schools/save', (req, res) => {
                     deputeDirector,
                     directorPhone,
                     email,
+                    typeSport,
                     description,
                     region,
                     city,
@@ -125,6 +127,7 @@ app.post('/schools/edit', (req, res) => {
         deputeDirector,
         directorPhone,
         email,
+        typeSport,
         description,
         region,
         city,
@@ -145,6 +148,7 @@ app.post('/schools/edit', (req, res) => {
                 deputeDirector,
                 directorPhone,
                 email,
+                typeSport,
                 description,
                 region,
                 city,
@@ -441,7 +445,17 @@ app.get('/trainers/:id', (req, res) => {
 });
 
 app.post('/saveTrainer', (req, res) => {
-    const { schoolId, photo, name, birthday, school, telephone, education, laborCategory, studentNumber } = req.body;
+    const {
+        schoolId,
+        photo,
+        name,
+        birthday,
+        school,
+        telephone,
+        education,
+        laborCategory,
+        studentNumber,
+    } = req.body;
 
     TrainerModel.create({
         schoolId,
@@ -459,7 +473,18 @@ app.post('/saveTrainer', (req, res) => {
 });
 
 app.post('/editTrainer', (req, res) => {
-    const { _id, schoolId, photo, name, birthday, school, telephone, education, laborCategory, studentNumber } = req.body;
+    const {
+        _id,
+        schoolId,
+        photo,
+        name,
+        birthday,
+        school,
+        telephone,
+        education,
+        laborCategory,
+        studentNumber,
+    } = req.body;
     TrainerModel.updateOne(
         {
             _id: _id,
