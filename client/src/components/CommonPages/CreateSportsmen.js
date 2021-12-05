@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { useDropzone } from 'react-dropzone';
@@ -16,6 +16,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import { queryClient } from 'features/queryClient';
 import { UserContext } from 'context/UserContext';
 import { fetchTrainersBySchoolId } from 'services/trainer';
+import { fetchSchools } from 'services/school';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -48,19 +49,7 @@ export default function CreateSportsmen() {
     const { id } = useParams();
 
     const history = useHistory();
-    const [photo, setPhoto] = useState(null);
-    const [name, setName] = useState(null);
-    const [birthday, setBirthday] = useState(null);
-    const [address, setAddress] = useState(null);
-    const [telephone, setTelephone] = useState(null);
-    const [fTrainer, setFTrainer] = useState(null);
-    const [placeStudy, setPlaceStudy] = useState(null);
-    const [enrolmentDate, setEnrolmentDate] = useState(null);
-    const [school, setSchool] = useState(null);
-    const [result, setResult] = useState({ competition: '', discipline: '', place: '' });
-    const [listResults, setListResults] = useState([]);
-    const [nowTrainer, setNowTrainer] = useState(null);
-    const [resultRows, setResultRows] = useState([]);
+
     const classes = useStyles();
 
     const { userSub, isAdmin } = useContext(UserContext);
@@ -79,6 +68,8 @@ export default function CreateSportsmen() {
         }
     );
     const { trainers } = trainerData || {};
+    const { data: schoolsData } = useQuery('schools', fetchSchools);
+    const { schools } = schoolsData || {};
     const saveSportsmanMutation = useMutation(saveSportsman, {
         onSuccess: () => {
             queryClient.invalidateQueries('sportsmen');
@@ -94,6 +85,24 @@ export default function CreateSportsmen() {
         onError: error => console.log(error),
     });
 
+    const [photo, setPhoto] = useState(null);
+    const [name, setName] = useState(null);
+    const [birthday, setBirthday] = useState(null);
+    const [address, setAddress] = useState(null);
+    const [telephone, setTelephone] = useState(null);
+    const [fTrainer, setFTrainer] = useState(null);
+    const [placeStudy, setPlaceStudy] = useState(null);
+    const [enrolmentDate, setEnrolmentDate] = useState(null);
+    const [school, setSchool] = useState(null);
+    const [result, setResult] = useState({ competition: '', discipline: '', place: '' });
+    const [listResults, setListResults] = useState([]);
+    const [nowTrainer, setNowTrainer] = useState(null);
+    const [resultRows, setResultRows] = useState([]);
+
+    useEffect(() => {
+        setSchool(schoolId);
+    }, [schoolId]);
+
     useEffect(() => {
         if (sportsman) {
             setPhoto(sportsman.photo);
@@ -103,10 +112,9 @@ export default function CreateSportsmen() {
             setAddress(sportsman.address);
             setTelephone(sportsman.telephone);
             setFTrainer(sportsman.fTrainer);
-            setTelephone(sportsman.enrolmentDate);
-            setFTrainer(sportsman.studyPlace);
+            setEnrolmentDate(sportsman.enrolmentDate);
+            setPlaceStudy(sportsman.studyPlace);
             setNowTrainer(sportsman.nowTrainer?._id || sportsman.nowTrainer);
-            setSchool(sportsman.school);
         }
     }, [sportsman]);
 
@@ -129,10 +137,17 @@ export default function CreateSportsmen() {
         multiple: false,
     });
 
+    const userName = useMemo(() => {
+        return schools?.find(sch => {
+            return sch.userId === school;
+        })?.name;
+    }, [schools, school]);
+
     const saveData = e => {
         e.preventDefault();
         const data = {
-            schoolId: userSub,
+            schoolId: school,
+            school: userName,
             photo,
             enrolmentDate,
             placeStudy,
@@ -140,7 +155,6 @@ export default function CreateSportsmen() {
             birthday,
             fTrainer,
             nowTrainer,
-            school,
             address,
             telephone: telephone,
             listResults: JSON.stringify(listResults),
@@ -152,7 +166,8 @@ export default function CreateSportsmen() {
         e.preventDefault();
         const data = {
             _id: sportsman._id,
-            schoolId: sportsman.schoolId, // I should not have to specify parameters i don't want to update
+            schoolId: school,
+            school: userName,
             photo,
             name,
             enrolmentDate,
@@ -160,7 +175,6 @@ export default function CreateSportsmen() {
             birthday,
             fTrainer,
             nowTrainer,
-            school,
             address,
             telephone,
             listResults: JSON.stringify(listResults),
@@ -314,18 +328,20 @@ export default function CreateSportsmen() {
                         shrink: !!placeStudy,
                     }}
                 />
-
-                <TextField
-                    label="Принадлежность"
-                    className={classes.textField}
-                    value={school}
-                    placeholder="Введите спортивный клуб"
-                    variant="outlined"
-                    onChange={e => setSchool(e.target.value)}
-                    InputLabelProps={{
-                        shrink: !!school,
-                    }}
-                />
+                <FormControl key={school} className={classes.formControl}>
+                    <InputLabel>Выберите школу</InputLabel>
+                    <Select
+                        value={school}
+                        onChange={e => {
+                            setSchool(e.target.value);
+                        }}
+                    >
+                        <MenuItem value="">-</MenuItem>
+                        {schools?.map(el => {
+                            return <MenuItem value={el.userId}>{el.name}</MenuItem>;
+                        })}
+                    </Select>
+                </FormControl>
             </div>
 
             <hr />
