@@ -7,7 +7,7 @@ const columns = [
     { field: 'name', headerName: 'ФИО', width: 260 },
     { field: 'birthday', headerName: 'Год рождения', width: 150 },
     { field: 'nowTrainer', headerName: 'Личный тренер', width: 260 },
-    { field: 'school', headerName: 'Принадлежность', width: 180 },
+    { field: 'school', headerName: 'Ведомственная принадлежность', width: 180 },
     { field: 'telephone', headerName: 'Телефон', width: 140 },
 ];
 

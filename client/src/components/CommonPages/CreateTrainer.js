@@ -206,7 +206,7 @@ export default function CreateTrainer() {
             </div>
             <div>
                 <TextField
-                    label="Принадлежность"
+                    label="Ведомственная принадлежность"
                     className={classes.textField}
                     placeholder="Введите спортивный клуб"
                     variant="outlined"

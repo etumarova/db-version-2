@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useMemo } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { useDropzone } from 'react-dropzone';
@@ -16,7 +16,6 @@ import { useHistory, useParams } from 'react-router-dom';
 import { queryClient } from 'features/queryClient';
 import { UserContext } from 'context/UserContext';
 import { fetchTrainersBySchoolId } from 'services/trainer';
-import { fetchSchools } from 'services/school';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -49,7 +48,27 @@ export default function CreateSportsmen() {
     const { id } = useParams();
 
     const history = useHistory();
-
+    const [photo, setPhoto] = useState(null);
+    const [name, setName] = useState(null);
+    const [birthday, setBirthday] = useState(null);
+    const [address, setAddress] = useState(null);
+    const [telephone, setTelephone] = useState(null);
+    const [nowTrainer, setNowTrainer] = useState(null);
+    const [fTrainer, setFTrainer] = useState(null);
+    const [placeStudy, setPlaceStudy] = useState(null);
+    const [enrolmentDate, setEnrolmentDate] = useState(null);
+    const [school, setSchool] = useState(null);
+    const [result, setResult] = useState({ competition: '', discipline: '', place: '' });
+    const [listResults, setListResults] = useState([]);
+    const [resultRows, setResultRows] = useState([]);
+    const [unenrolmentDate, setUnenrolmentDate] = useState(null);
+    const [causeUnenrolment, setCauseUnenrolment] = useState(null);
+    const [anthropometricData, setAnthropometricData] = useState(null);
+    const [mum, setMum] = useState(null);
+    const [mumPhone, setMumPhone] = useState(null);
+    const [dad, setDad] = useState(null);
+    const [dadPhone, setDadPhone] = useState(null);
+    const [livingAddress, setLivingAddress] = useState(null);
     const classes = useStyles();
 
     const { userSub, isAdmin } = useContext(UserContext);
@@ -68,8 +87,6 @@ export default function CreateSportsmen() {
         }
     );
     const { trainers } = trainerData || {};
-    const { data: schoolsData } = useQuery('schools', fetchSchools);
-    const { schools } = schoolsData || {};
     const saveSportsmanMutation = useMutation(saveSportsman, {
         onSuccess: () => {
             queryClient.invalidateQueries('sportsmen');
@@ -85,24 +102,6 @@ export default function CreateSportsmen() {
         onError: error => console.log(error),
     });
 
-    const [photo, setPhoto] = useState(null);
-    const [name, setName] = useState(null);
-    const [birthday, setBirthday] = useState(null);
-    const [address, setAddress] = useState(null);
-    const [telephone, setTelephone] = useState(null);
-    const [fTrainer, setFTrainer] = useState(null);
-    const [placeStudy, setPlaceStudy] = useState(null);
-    const [enrolmentDate, setEnrolmentDate] = useState(null);
-    const [school, setSchool] = useState(null);
-    const [result, setResult] = useState({ competition: '', discipline: '', place: '' });
-    const [listResults, setListResults] = useState([]);
-    const [nowTrainer, setNowTrainer] = useState(null);
-    const [resultRows, setResultRows] = useState([]);
-
-    useEffect(() => {
-        setSchool(schoolId);
-    }, [schoolId]);
-
     useEffect(() => {
         if (sportsman) {
             setPhoto(sportsman.photo);
@@ -113,8 +112,16 @@ export default function CreateSportsmen() {
             setTelephone(sportsman.telephone);
             setFTrainer(sportsman.fTrainer);
             setEnrolmentDate(sportsman.enrolmentDate);
-            setPlaceStudy(sportsman.studyPlace);
+            setUnenrolmentDate(sportsman.unEnrolmentDate);
+            setCauseUnenrolment(sportsman.CauseUnenrolment);
+            setTelephone(sportsman.studyPlace);
             setNowTrainer(sportsman.nowTrainer?._id || sportsman.nowTrainer);
+            setAnthropometricData(sportsman.anthropometricData);
+            setMum(sportsman.mum);
+            setMumPhone(sportsman.mumPhone);
+            setDad(sportsman.dad);
+            setDadPhone(sportsman.dadPhone);
+            setLivingAddress(sportsman.livingAddress);
         }
     }, [sportsman]);
 
@@ -137,17 +144,10 @@ export default function CreateSportsmen() {
         multiple: false,
     });
 
-    const userName = useMemo(() => {
-        return schools?.find(sch => {
-            return sch.userId === school;
-        })?.name;
-    }, [schools, school]);
-
     const saveData = e => {
         e.preventDefault();
         const data = {
-            schoolId: school,
-            school: userName,
+            schoolId: userSub,
             photo,
             enrolmentDate,
             placeStudy,
@@ -155,9 +155,18 @@ export default function CreateSportsmen() {
             birthday,
             fTrainer,
             nowTrainer,
+            school,
             address,
             telephone: telephone,
             listResults: JSON.stringify(listResults),
+            unenrolmentDate,
+            causeUnenrolment,
+            anthropometricData,
+            mum,
+            mumPhone,
+            dad,
+            dadPhone,
+            livingAddress, 
         };
         saveSportsmanMutation.mutate(data);
     };
@@ -166,8 +175,7 @@ export default function CreateSportsmen() {
         e.preventDefault();
         const data = {
             _id: sportsman._id,
-            schoolId: school,
-            school: userName,
+            schoolId: sportsman.schoolId, // I should not have to specify parameters i don't want to update
             photo,
             name,
             enrolmentDate,
@@ -175,9 +183,18 @@ export default function CreateSportsmen() {
             birthday,
             fTrainer,
             nowTrainer,
+            school,
             address,
             telephone,
             listResults: JSON.stringify(listResults),
+            unenrolmentDate,
+            causeUnenrolment,
+            anthropometricData,
+            mum,
+            mumPhone,
+            dad,
+            dadPhone,
+            livingAddress, 
         };
         editSportsmanMutation.mutate(data);
     };
@@ -253,6 +270,18 @@ export default function CreateSportsmen() {
                     }}
                 />
                 <TextField
+                    label="Антропометрические данные"
+                    id="outlined-margin-normal"
+                    className={classes.textField}
+                    value={anthropometricData}
+                    placeholder="Введите антропометрические данные"
+                    variant="outlined"
+                    onChange={e => setAnthropometricData(e.target.value)}
+                    InputLabelProps={{
+                        shrink: !!anthropometricData,
+                    }}
+                />
+                <TextField
                     label="Контактный номер телефона"
                     id="outlined-margin-normal"
                     className={classes.textField}
@@ -264,17 +293,80 @@ export default function CreateSportsmen() {
                         shrink: !!telephone,
                     }}
                 />
+                
                 <TextField
-                    label="Адрес прописки"
+                    label="ФИО матери"
+                    id="outlined-margin-normal"
+                    className={classes.textField}
+                    value={mum}
+                    placeholder="Введите ФИО матери"
+                    variant="outlined"
+                    onChange={e => setMum(e.target.value)}
+                    InputLabelProps={{
+                        shrink: !!mum,
+                    }}
+                />
+                <TextField
+                    label="Контактный номер телефона матери"
+                    id="outlined-margin-normal"
+                    className={classes.textField}
+                    value={mumPhone}
+                    placeholder="Введите номер телефона матери"
+                    variant="outlined"
+                    onChange={e => setMumPhone(e.target.value)}
+                    InputLabelProps={{
+                        shrink: !!mumPhone,
+                    }}
+                />
+                
+                <TextField
+                    label="ФИО отца"
+                    id="outlined-margin-normal"
+                    className={classes.textField}
+                    value={dad}
+                    placeholder="Введите ФИО отца"
+                    variant="outlined"
+                    onChange={e => setDad(e.target.value)}
+                    InputLabelProps={{
+                        shrink: !!dad,
+                    }}
+                />
+                <TextField
+                    label="Контактный номер телефона отца"
+                    id="outlined-margin-normal"
+                    className={classes.textField}
+                    value={dadPhone}
+                    placeholder="Введите номер телефона отца"
+                    variant="outlined"
+                    onChange={e => setDadPhone(e.target.value)}
+                    InputLabelProps={{
+                        shrink: !!dadPhone,
+                    }}
+                />
+                <TextField
+                    label="Адрес регистрации"
                     id="margin-none"
                     style={{ margin: 8 }}
-                    placeholder="Введите адрес прописки"
+                    placeholder="Введите адрес регистрации"
                     value={address}
                     fullWidth
                     onChange={e => setAddress(e.target.value)}
                     margin="normal"
                     InputLabelProps={{
                         shrink: !!address,
+                    }}
+                />
+                 <TextField
+                    label="Адрес проживания"
+                    id="margin-none"
+                    style={{ margin: 8 }}
+                    placeholder="Введите адрес проживания"
+                    value={livingAddress}
+                    fullWidth
+                    onChange={e => setLivingAddress(e.target.value)}
+                    margin="normal"
+                    InputLabelProps={{
+                        shrink: !!livingAddress,
                     }}
                 />
             </div>
@@ -328,20 +420,44 @@ export default function CreateSportsmen() {
                         shrink: !!placeStudy,
                     }}
                 />
-                <FormControl key={school} className={classes.formControl}>
-                    <InputLabel>Выберите школу</InputLabel>
-                    <Select
-                        value={school}
-                        onChange={e => {
-                            setSchool(e.target.value);
-                        }}
-                    >
-                        <MenuItem value="">-</MenuItem>
-                        {schools?.map(el => {
-                            return <MenuItem value={el.userId}>{el.name}</MenuItem>;
-                        })}
-                    </Select>
-                </FormControl>
+
+                <TextField
+                    label="Ведомственная принадлежность"
+                    className={classes.textField}
+                    value={school}
+                    placeholder="Введите спортивный клуб"
+                    variant="outlined"
+                    onChange={e => setSchool(e.target.value)}
+                    InputLabelProps={{
+                        shrink: !!school,
+                    }}
+                />
+
+                <TextField
+                    label="Отчисление"
+                    id="outlined-margin-none"
+                    className={classes.textField}
+                    placeholder="Введите дату приказа об отчислении"
+                    value={unenrolmentDate}
+                    variant="outlined"
+                    onChange={e => setUnenrolmentDate(e.target.value)}
+                    InputLabelProps={{
+                        shrink: !!unenrolmentDate,
+                    }}
+                />
+
+                <TextField
+                    label="Причина отчисления"
+                    id="outlined-margin-none"
+                    className={classes.textField}
+                    placeholder="Введите причину отчисления"
+                    value={causeUnenrolment}
+                    variant="outlined"
+                    onChange={e => setCauseUnenrolment(e.target.value)}
+                    InputLabelProps={{
+                        shrink: !!causeUnenrolment,
+                    }}
+                />
             </div>
 
             <hr />

@@ -76,13 +76,71 @@ export default function SportsmenPage() {
                                             {sportsman.birthday}
                                         </div>
                                     </div>
+                                    
                                     <hr />
                                     <div className="row">
                                         <div className="col-sm-3">
-                                            <h6 className="mb-0">Принадлежность</h6>
+                                            <h6 className="mb-0">Антропометрические данные</h6>
+                                        </div>
+                                        <div className="col-sm-9 text-secondary">
+                                            {sportsman.anthropometricData}
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div className="row">
+                                        <div className="col-sm-3">
+                                            <h6 className="mb-0">Мать</h6>
+                                        </div>
+                                        <div className="col-sm-9 text-secondary">
+                                            {sportsman.mum}
+                                        </div>
+                                    </div>
+                                    
+                                    <hr />
+                                    <div className="row">
+                                        <div className="col-sm-3">
+                                            <h6 className="mb-0">Телефон матери</h6>
+                                        </div>
+                                        <div className="col-sm-9 text-secondary">
+                                            {sportsman.mumPhone}
+                                        </div>
+                                    </div>
+                                    
+                                    <hr />
+                                    <div className="row">
+                                        <div className="col-sm-3">
+                                            <h6 className="mb-0">Отец</h6>
+                                        </div>
+                                        <div className="col-sm-9 text-secondary">
+                                            {sportsman.dad}
+                                        </div>
+                                    </div>
+                                    
+                                    <hr />
+                                    <div className="row">
+                                        <div className="col-sm-3">
+                                            <h6 className="mb-0">Телефон отца</h6>
+                                        </div>
+                                        <div className="col-sm-9 text-secondary">
+                                            {sportsman.dadPhone}
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div className="row">
+                                        <div className="col-sm-3">
+                                            <h6 className="mb-0">Ведомственная принадлежность</h6>
                                         </div>
                                         <div className="col-sm-9 text-secondary">
                                             {sportsman.school}
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div className="row">
+                                        <div className="col-sm-3">
+                                            <h6 className="mb-0">Первый тренер</h6>
+                                        </div>
+                                        <div className="col-sm-9 text-secondary">                                        
+                                            {sportsman.fTrainer}
                                         </div>
                                     </div>
                                     <hr />
@@ -97,16 +155,7 @@ export default function SportsmenPage() {
                                     <hr />
                                     <div className="row">
                                         <div className="col-sm-3">
-                                            <h6 className="mb-0">Первый тренер</h6>
-                                        </div>
-                                        <div className="col-sm-9 text-secondary">
-                                            {sportsman.fTrainer}
-                                        </div>
-                                    </div>
-                                    <hr />
-                                    <div className="row">
-                                        <div className="col-sm-3">
-                                            <h6 className="mb-0">Дата приказа о зачсилении</h6>
+                                            <h6 className="mb-0">Дата приказа о зачислении</h6>
                                         </div>
                                         <div className="col-sm-9 text-secondary">
                                             {sportsman.enrolmentDate}
@@ -133,10 +182,37 @@ export default function SportsmenPage() {
                                     <hr />
                                     <div className="row">
                                         <div className="col-sm-3">
-                                            <h6 className="mb-0">Адрес прописки</h6>
+                                            <h6 className="mb-0">Адрес регистрации</h6>
                                         </div>
                                         <div className="col-sm-9 text-secondary">
                                             {sportsman.address}
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div className="row">
+                                        <div className="col-sm-3">
+                                            <h6 className="mb-0">Адрес проживания</h6>
+                                        </div>
+                                        <div className="col-sm-9 text-secondary">
+                                            {sportsman.livingAddress}
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div className="row">
+                                        <div className="col-sm-3">
+                                            <h6 className="mb-0">Дата приказа отчисления</h6>
+                                        </div>
+                                        <div className="col-sm-9 text-secondary">
+                                            {sportsman.unenrolmentDate}
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div className="row">
+                                        <div className="col-sm-3">
+                                            <h6 className="mb-0">Причина отчисления</h6>
+                                        </div>
+                                        <div className="col-sm-9 text-secondary">
+                                            {sportsman.CauseUnenrolment}
                                         </div>
                                     </div>
                                 </div>

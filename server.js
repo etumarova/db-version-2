@@ -359,6 +359,14 @@ app.post('/saveSportsman', (req, res) => {
         address,
         telephone,
         listResults,
+        unenrolmentDate,
+        causeUnenrolment,
+        anthropometricData,
+        mum,
+        mumPhone,
+        dad,
+        dadPhone,
+        livingAddress, 
     } = req.body;
 
     SportsmanModel.create({
@@ -374,6 +382,14 @@ app.post('/saveSportsman', (req, res) => {
         address,
         telephone,
         listResults,
+        unenrolmentDate,
+        causeUnenrolment,
+        anthropometricData,
+        mum,
+        mumPhone,
+        dad,
+        dadPhone,
+        livingAddress, 
     })
         .then(() => res.sendStatus(200))
         .catch(err => res.status(500).json(err.toString()));
@@ -394,6 +410,14 @@ app.post('/editSportsman', (req, res) => {
         address,
         telephone,
         listResults,
+        unenrolmentDate,
+        causeUnenrolment,
+        anthropometricData,
+        mum,
+        mumPhone,
+        dad,
+        dadPhone,
+        livingAddress, 
     } = req.body;
 
     SportsmanModel.updateOne(
@@ -414,6 +438,14 @@ app.post('/editSportsman', (req, res) => {
                 address,
                 telephone,
                 listResults,
+                unenrolmentDate,
+                causeUnenrolment,
+                anthropometricData,
+                mum,
+                mumPhone,
+                dad,
+                dadPhone,
+                livingAddress, 
             },
         },
         (err, result) => {
