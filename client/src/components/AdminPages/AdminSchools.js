@@ -39,8 +39,7 @@ const columns = [
     { field: 'deputeDirector', headerName: 'Заместитель директора', width: 270 },
     { field: 'region', headerName: 'Регион', width: 180 },
     { field: 'city', headerName: 'Город', width: 170 },
-    { field: 'telephone', headerName: 'Телефон', width: 150 },
-    
+    { field: 'telephone', headerName: 'Телефон', width: 150 },   
     { field: 'email', headerName: 'Электронная почта', width: 250 },
 ];
 
