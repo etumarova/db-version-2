@@ -9,6 +9,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
+import { CircularProgress } from '@material-ui/core';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useHistory, useParams } from 'react-router-dom';
 import { useQuery, useMutation } from 'react-query';
@@ -86,9 +87,12 @@ export default function CreateEditSchool() {
     const [telephone, setTelephone] = useState('');
     const [typeSport, setTypeSport] = useState('');
 
+    const [isImageLoading, setIsImageLoading] = useState(false);
+
     // const [school, setSchool] = useState({});
     const { data } = useQuery(['schools', userId], () => fetchSchoolByUserId(userId));
     const { school } = data || {};
+    console.log("sch", data);
     const saveSchoolMutation = useMutation(saveSchool, {
         onSuccess: () => {
             queryClient.invalidateQueries('schools');
@@ -126,6 +130,7 @@ export default function CreateEditSchool() {
     }, [school]);
 
     const onDrop = async acceptedFiles => {
+        setIsImageLoading(true);
         const url = `https://api.cloudinary.com/v1_1/dgeev9d6l/image/upload`;
         const formData = new FormData();
         formData.append('file', acceptedFiles[0]);
@@ -136,6 +141,7 @@ export default function CreateEditSchool() {
         });
         const data = await response.json();
         setPhoto(data.public_id);
+        setIsImageLoading(false);
     };
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -194,7 +200,7 @@ export default function CreateEditSchool() {
             </Typography>
 
             <div className={classes.row}>
-                {photo && (
+                {isImageLoading? <CircularProgress style={{margin: "100px"}}></CircularProgress> : photo && (
                     <Image
                         className={classes.image}
                         cloud_name="dgeev9d6l"
@@ -203,7 +209,7 @@ export default function CreateEditSchool() {
                         crop="scale"
                     />
                 )}
-
+        
                 <div {...getRootProps()} className={classes.dropzone}>
                     <input {...getInputProps()} />
                     {isDragActive ? <p>Вот прямо сюда!</p> : <p>Бросьте фото учреждения сюда</p>}

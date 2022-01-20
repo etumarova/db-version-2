@@ -44,6 +44,8 @@ export default function CreateTrainer() {
     const [school, setSchool] = useState(null);
     const classes = useStyles();
 
+    const [isImageLoading, setIsImageLoading] = useState(false);
+
     const shouldFetchTrainer = !!id;
     const { data: trainerData } = useQuery(['trainers', id], () => fetchTrainerById(id), {
         enabled: shouldFetchTrainer,
@@ -81,6 +83,7 @@ export default function CreateTrainer() {
     }, [trainer]);
 
     const onDrop = async acceptedFiles => {
+        setIsImageLoading(true);
         const url = `https://api.cloudinary.com/v1_1/dgeev9d6l/image/upload`;
         const formData = new FormData();
         formData.append('file', acceptedFiles[0]);
@@ -91,6 +94,7 @@ export default function CreateTrainer() {
         });
         const data = await response.json();
         setPhoto(data.public_id);
+        setIsImageLoading(false);
     };
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -142,6 +146,8 @@ export default function CreateTrainer() {
                 {photo != '' && (
                     <Image cloud_name="dgeev9d6l" publicId={photo} width="50" crop="scale" />
                 )}
+
+                
             </div>
             <div>
                 <TextField

@@ -167,7 +167,7 @@ export default function SportsmenPage() {
                                             <h6 className="mb-0">Место проведения занятий</h6>
                                         </div>
                                         <div className="col-sm-9 text-secondary">
-                                            {sportsman.studyPlace}
+                                            {sportsman.placeStudy}
                                         </div>
                                     </div>
                                     <hr />
@@ -212,7 +212,7 @@ export default function SportsmenPage() {
                                             <h6 className="mb-0">Причина отчисления</h6>
                                         </div>
                                         <div className="col-sm-9 text-secondary">
-                                            {sportsman.CauseUnenrolment}
+                                            {sportsman.causeUnenrolment}
                                         </div>
                                     </div>
                                 </div>

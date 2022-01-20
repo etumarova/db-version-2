@@ -22,12 +22,12 @@ const SportsmanSchema = new mongoose.Schema({
     placeStudy: {
         type: String,
     },
-    fTrainer: {
-        type: String,
-    },
     nowTrainer: {
         type: Schema.Types.ObjectId,
         ref: 'trainer',
+    },
+    fTrainer: {
+        type: String,
     },
     school: {
         type: String,
@@ -41,6 +41,34 @@ const SportsmanSchema = new mongoose.Schema({
     listResults: {
         type: String,
     },
+    mum: {
+        type: String,
+    },
+    mumPhone: {
+        type: String,
+    },
+    dad: {
+        type: String,
+    },
+    dadPhone: {
+        type: String,
+    },
+    placeStudy: {
+        type: String,
+    },
+    unenrolmentDate: {
+        type: String,
+    },
+    causeUnenrolment: {
+        type: String,
+    },
+    anthropometricData: {
+        type: String,
+    },
+    livingAddress: {
+        type: String,
+    },
+
 });
 
 module.exports = mongoose.model('sportsman', SportsmanSchema);

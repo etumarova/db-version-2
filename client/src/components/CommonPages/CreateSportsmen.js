@@ -73,6 +73,8 @@ export default function CreateSportsmen() {
 
     const { userSub, isAdmin } = useContext(UserContext);
 
+    const [isImageLoading, setIsImageLoading] = useState(false);
+
     const shouldFetch = !!id;
     const { data: sportsmanData } = useQuery(['sportsmen', id], () => fetchSportsmanById(id), {
         enabled: shouldFetch,
@@ -112,9 +114,9 @@ export default function CreateSportsmen() {
             setTelephone(sportsman.telephone);
             setFTrainer(sportsman.fTrainer);
             setEnrolmentDate(sportsman.enrolmentDate);
-            setUnenrolmentDate(sportsman.unEnrolmentDate);
-            setCauseUnenrolment(sportsman.CauseUnenrolment);
-            setTelephone(sportsman.studyPlace);
+            setUnenrolmentDate(sportsman.unenrolmentDate);
+            setCauseUnenrolment(sportsman.causeUnenrolment);
+            setPlaceStudy(sportsman.placeStudy);
             setNowTrainer(sportsman.nowTrainer?._id || sportsman.nowTrainer);
             setAnthropometricData(sportsman.anthropometricData);
             setMum(sportsman.mum);
@@ -122,10 +124,12 @@ export default function CreateSportsmen() {
             setDad(sportsman.dad);
             setDadPhone(sportsman.dadPhone);
             setLivingAddress(sportsman.livingAddress);
+            setSchool(sportsman.school)
         }
     }, [sportsman]);
 
     const onDrop = async acceptedFiles => {
+        setIsImageLoading(true);
         const url = `https://api.cloudinary.com/v1_1/dgeev9d6l/image/upload`;
         const formData = new FormData();
         formData.append('file', acceptedFiles[0]);
@@ -136,6 +140,7 @@ export default function CreateSportsmen() {
         });
         const data = await response.json();
         setPhoto(data.public_id);
+        setIsImageLoading(false);
     };
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -232,6 +237,7 @@ export default function CreateSportsmen() {
                     <input {...getInputProps()} />
                     {isDragActive ? <p>Вот прямо сюда!</p> : <p>Бросьте фото спортсмена сюда</p>}
                 </div>
+                </div>
                 <div>
                     {photo && (
                         <Image
@@ -242,7 +248,7 @@ export default function CreateSportsmen() {
                         />
                     )}
                 </div>
-            </div>
+
 
             <div>
                 <TextField

@@ -207,6 +207,7 @@ export default function CreateCompetition() {
                 <TextField
                     label="Окончание соревнований"
                     type="date"
+                    value={endDate}
                     className={classes.textField}
                     onChange={e => setEndDate(e.target.value)}
                     InputLabelProps={{
@@ -216,6 +217,7 @@ export default function CreateCompetition() {
                 <TextField
                     label="Последний день приема заявок"
                     type="date"
+                    value={deadLine}
                     className={classes.textField}
                     onChange={e => setDeadLine(e.target.value)}
                     InputLabelProps={{
@@ -227,30 +229,43 @@ export default function CreateCompetition() {
                 <TextField
                     label="Главный судья"
                     className={classes.textField}
+                    value={mainJudge}
                     placeholder="Введите ФИО главного судьи"
                     variant="outlined"
                     onChange={e => setMainJudge(e.target.value)}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
                 />
                 <TextField
                     label="Секретарь соревнований"
                     className={classes.textField}
+                    value={secretary}
                     placeholder="Введите ФИО секретаря соревнований"
                     variant="outlined"
                     onChange={e => setSecretary(e.target.value)}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
                 />
                 <TextField
                     label="Контактный номер телефона"
                     id="outlined-margin-normal"
                     className={classes.textField}
+                    value={telephone}
                     placeholder="Введите номер телефона"
                     variant="outlined"
                     onChange={e => setTelephone(e.target.value)}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
                 />
             </div>
             <TextField
                 label="Краткое описание мероприятия"
                 style={{ margin: 8 }}
                 placeholder="Введите описание"
+                value={description}
                 multiline
                 fullWidth
                 rows={5}
@@ -269,10 +284,8 @@ export default function CreateCompetition() {
                             <IconButton
                                 aria-label="delete"
                                 className={classes.margin}
-                                name={index}
-                                onClick={e => {
-                                    handleDelete(e.target.name);
-                                }}
+
+                                onClick={() => {handleDelete(index)}}
                             >
                                 <DeleteIcon fontSize="small" />
                             </IconButton>

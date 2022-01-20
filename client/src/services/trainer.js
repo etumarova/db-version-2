@@ -24,3 +24,13 @@ export const editTrainer = data =>
         },
         body: JSON.stringify(data),
     });
+
+    export const deleteTrainer = data =>
+    fetch('/deleteTrainer', {
+        method: 'post',
+        headers: {
+            Accept: 'application/json, text/plain, */*',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });

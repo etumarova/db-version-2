@@ -8,6 +8,7 @@ import { useParams } from 'react-router';
 import { useQuery } from 'react-query';
 import { fetchCompetitionById } from 'services/competition';
 import { Image } from 'cloudinary-react';
+import { deleteCompetition } from "services/competition";
 
 export default function CompetitionPage() {
     const { id } = useParams();
@@ -21,12 +22,22 @@ export default function CompetitionPage() {
     return (
         <div>
             {isAdmin && (
-                <div style={{ float: 'right' }}>
-                    <Link to={`/createCompetition/${id}`}>
-                        <Button variant="contained" color="primary">
-                            Редактировать
-                        </Button>
-                    </Link>
+                <div>
+                    <div style={{ float: 'right', marginTop: '10px' }}>
+                        <Link to={`/calendary`}>
+                            <Button variant="contained" color="primary" onClick={() => deleteCompetition({_id: id})}>
+                                Удалить
+                            </Button>
+                        </Link>
+                    </div>
+                    <div> </div>
+                    <div style={{ float: 'right', marginTop: '10px' }}>
+                        <Link to={`/createCompetition/${id}`}>
+                            <Button variant="contained" color="primary">
+                                Редактировать
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
             )}
             {competition && (

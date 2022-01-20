@@ -50,7 +50,7 @@ const adminPanelItems = [
     { text: 'Календарь соревнований', path: '/calendary' },
     { text: 'Заявки', path: '/adminEntries' },
     { text: 'Админка', path: '/adminPage' },
-    { text: 'Загрузка результатов', path: '/adminImportFile' },
+    // { text: 'Загрузка результатов', path: '/adminImportFile' },
 ];
 const userPanelItems = [
     { text: 'Моя Школа', path: '/mySchool' },

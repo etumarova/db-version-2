@@ -59,22 +59,30 @@ app.post('/checkUserRole', async (req, res) => {
     }
 });
 
-// SCHOOLS
+// 
 app.get('/schools', (req, res) => {
     SchoolModel.find()
-        .then(schools => res.json({ schools }))
+        .then(school => res.json(school))
         .catch(e => e.sen);
 });
 
 app.get('/school', (req, res) => {
     const { userId } = req.query;
-
     SchoolModel.findOne({ userId })
         .then(school => res.json({ school }))
         .catch(e => console.log(e));
 });
 
-app.post('/schools/save', (req, res) => {
+app.post('/deleteSchool', (req, res) => {
+    const {_id} = req.body;
+
+    SchoolModel.deleteOne({_id: _id})
+        .then(() => res.sendStatus(200))
+        .catch(err => res.status(500).json(err.toString()));
+        window.alert("123");
+});
+
+app.post('//save', (req, res) => {
     const {
         userId,
         photo,
@@ -89,6 +97,10 @@ app.post('/schools/save', (req, res) => {
         city,
         address,
         telephone,
+        inventories_name,
+        inventories_count,
+        inventories_date,
+        inventories_nomination,
     } = req.body;
 
     SchoolModel.find({ userId })
@@ -108,6 +120,10 @@ app.post('/schools/save', (req, res) => {
                     city,
                     address,
                     telephone,
+                    inventories_name,
+                    inventories_count,
+                    inventories_date,
+                    inventories_nomination,
                 });
             }
         })
@@ -117,7 +133,7 @@ app.post('/schools/save', (req, res) => {
         });
 });
 
-app.post('/schools/edit', (req, res) => {
+app.post('//edit', (req, res) => {
     const {
         _id,
         userId,
@@ -134,6 +150,14 @@ app.post('/schools/edit', (req, res) => {
         address,
         telephone,
     } = req.body;
+
+    console.log("sdsdsds")
+
+    inventories = [{inventory:"мяяяч",
+        nomination: "Футбольный такой",
+        amount: 69,
+        dateRelease: "13.06.2001"
+    }];
 
     SchoolModel.updateOne(
         {
@@ -154,6 +178,10 @@ app.post('/schools/edit', (req, res) => {
                 city,
                 address,
                 telephone,
+                inventories_name,
+                inventories_count,
+                inventories_date,
+                inventories_nomination,
             },
         },
         (err, result) => {
@@ -391,6 +419,30 @@ app.post('/saveSportsman', (req, res) => {
         dadPhone,
         livingAddress, 
     })
+        .then(() => res.sendStatus(200))
+        .catch(err => res.status(500).json(err.toString()));
+});
+
+app.post('/deleteSportsman', (req, res) => {
+    const {_id} = req.body;
+
+    SportsmanModel.deleteOne({_id: _id})
+        .then(() => res.sendStatus(200))
+        .catch(err => res.status(500).json(err.toString()));
+});
+
+app.post('/deleteCompetitions', (req, res) => {
+    const {_id} = req.body;
+
+    CompetitionModel.deleteOne({_id: _id})
+        .then(() => res.sendStatus(200))
+        .catch(err => res.status(500).json(err.toString()));
+});
+
+app.post('/deleteTrainer', (req, res) => {
+    const {_id} = req.body;
+
+    TrainerModel.deleteOne({_id: _id})
         .then(() => res.sendStatus(200))
         .catch(err => res.status(500).json(err.toString()));
 });

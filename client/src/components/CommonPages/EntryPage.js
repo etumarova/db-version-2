@@ -21,7 +21,8 @@ export default function EntryPage() {
         () => fetchCompetitionById(entry?.competitionId),
         { enabled: !!entry?.competitionId }
     );
-    const { competition } = competitionData || {};
+
+    const  competition = competitionData?.competition || {};
 
     const { data: trainerData } = useQuery(
         ['trainer', entry?.trainer],

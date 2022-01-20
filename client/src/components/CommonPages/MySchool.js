@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Image } from 'cloudinary-react';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
@@ -6,6 +6,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { fetchSchoolByUserId } from 'services/school';
 import { UserContext } from 'context/UserContext';
+import TableSchoolInventory from '../TableSchoolInventory.js'
 
 export default function MySchool() {
     const { id } = useParams();
@@ -35,6 +36,8 @@ export default function MySchool() {
                         </Button>
                     </Link>
                 </div>
+
+
             )}
 
             {showNoDataWarning && <p>Нет сохраненной школы</p>}
@@ -154,6 +157,7 @@ export default function MySchool() {
                             </div>
                         </div>
                     </div>
+                    <TableSchoolInventory school={[]}></TableSchoolInventory>
                 </div>
             )}
         </div>

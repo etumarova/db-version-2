@@ -21,3 +21,13 @@ export const editCompetition = data =>
         },
         body: JSON.stringify(data),
     });
+
+export const deleteCompetition = data =>
+    fetch('/deleteCompetitions', {
+        method: 'post',
+        headers: {
+            Accept: 'application/json, text/plain, */*',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });

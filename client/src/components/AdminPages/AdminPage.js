@@ -4,10 +4,13 @@ import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import InputBase from '@material-ui/core/InputBase';
+import { Button } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
+import { App } from '../../App';
 import SearchIcon from '@material-ui/icons/Search';
 import { fetchUsers } from 'services/users';
 import { useQuery } from 'react-query';
+import { useEffect } from "react";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -41,13 +44,13 @@ const columns = [
 ];
 
 export default function AdminPage() {
-    // const [users, setUsers] = useState(null);
+    const [users1, setUsers1] = useState(null);
     const [select, setSelect] = useState(null);
     const classes = useStyles();
 
     const { data: usersData } = useQuery('users', fetchUsers);
     const { users } = usersData || {};
-
+    //const socket = new WebSocket("ws://localhost:3000");
     const formattedUsers = users?.map(user => ({
         ...user,
         id: user._id,
@@ -61,7 +64,7 @@ export default function AdminPage() {
     //     });
     //     socket.on('getUsersData', data => {
     //         data.forEach(el => (el['id'] = el.user_id));
-    //         setUsers(data);
+    //         setUsers1(data);
     //     });
     // }, []);
 
@@ -93,11 +96,11 @@ export default function AdminPage() {
                     </IconButton>
                 </Paper>
             </div>
-            {/* <div>
-                <Button variant="contained" color="primary" onClick={deleteUser}>
+             <div>
+                {/*<Button variant="contained" color="primary" onClick={deleteUser}>
                     Удалить пользователя
-                </Button>
-            </div> */}
+                </Button>*/}
+            </div>
             {users && (
                 <div style={{ height: 500, width: '100%' }}>
                     <DataGrid

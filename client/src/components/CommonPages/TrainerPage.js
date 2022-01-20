@@ -12,6 +12,7 @@ export default function TrainerPage() {
     const { data: trainerData } = useQuery(['trainers', id], () => fetchTrainerById(id));
     const { trainer } = trainerData || {};
 
+
     const { data: sportsmenData } = useQuery(['sportsmen', trainer?._id], () =>
         fetchSportsmenByTrainerId(trainer?._id)
     );
