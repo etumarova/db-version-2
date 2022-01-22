@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, {useState, useRef, useMemo, useEffect} from 'react';
 import Typography from '@material-ui/core/Typography';
 import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
@@ -20,7 +20,7 @@ import { fetchSchools } from 'services/school';
 import { fetchEntriesByCompetitionId } from 'services/entry';
 import { fetchSportsmen } from 'services/sportsmen';
 import { useHistory } from 'react-router';
-import {setIndexToObject} from '../../services/utils';
+import {searchByName, setIndexToObject} from '../../services/utils';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -58,7 +58,7 @@ const useStyles = makeStyles(theme => ({
 
 const columns = [
     { field: 'index', headerName: 'ID', width: 80 },
-    { field: 'competitionName', headerName: 'Название мероприятия', width: 370 },
+    { field: 'name', headerName: 'Название мероприятия', width: 370 },
     { field: 'school', headerName: 'Школа', width: 350 },
     { field: 'deadLine', headerName: 'Прием заявок до', width: 180 },
     { field: 'dateSend', headerName: 'Дата получения', width: 220 },
@@ -85,6 +85,8 @@ export default function AdminEntries() {
     const [sportCSV, setSportCSV] = useState(null);
     const [boatClass, setBoatClass] = useState(null);
     const [akkr, setAkkr] = useState(null);
+    const [value, setValue] = useState("");
+    const [formattedEntries, setFormattedEntries] = useState([]);
     const componentRef = useRef();
     const classes = useStyles();
 
@@ -104,7 +106,7 @@ export default function AdminEntries() {
         }
     );
     const { entries } = entriesData || {};
-    const formattedEntries = useMemo(
+    const defaultFormattedEntries = useMemo(
         () => entries?.map(entry => ({ ...entry, id: entry._id} || [])),
         [entries]
     );
@@ -113,10 +115,10 @@ export default function AdminEntries() {
         const competition = competitions?.find(comp => comp._id === selectedCompetition) || {};
 
         return (
-            formattedEntries?.map((entry, index) => {
+            defaultFormattedEntries?.map((entry, index) => {
                 const transformedValue = {
                     id: entry._id,
-                    competitionName: competition.name,
+                    name: competition.name,
                     school: schoolsData?.find(school => school.userId === entry.schoolId)?.name || '-',
                     deadLine: competition.deadLine,
                     dateSend: entry.dateSend,
@@ -124,7 +126,11 @@ export default function AdminEntries() {
                 return setIndexToObject(transformedValue, index)
             }) || []
         );
-    }, [formattedEntries, competitions, schoolsData]);
+    }, [defaultFormattedEntries, competitions, schoolsData]);
+
+    useEffect(() => {
+        setFormattedEntries(tableRows)
+    }, [tableRows])
 
     // const formattedSportsmen = sportsmen?.map(sportsman => ({ ...sportsman, id: sportsman._id }));
 
@@ -220,14 +226,17 @@ export default function AdminEntries() {
                     Заявки
                 </Typography>
 
-                <Paper component="form" className={classes.root}>
+                <Paper className={classes.root}>
                     <InputBase
+                        onChange={(e) => {
+                            setValue(e.target.value)
+                            searchByName(tableRows, e.target.value, setFormattedEntries)
+                        }}
+                        value={value}
                         className={classes.input}
                         inputProps={{ 'aria-label': 'search google maps' }}
                     />
-                    <IconButton type="submit" className={classes.iconButton} aria-label="search">
-                        <SearchIcon />
-                    </IconButton>
+                    <SearchIcon />
                 </Paper>
             </div>
             <div
@@ -315,7 +324,7 @@ export default function AdminEntries() {
                 </div>
             )}
 
-            {tableRows && (
+            {formattedEntries && (
                 <div style={{ height: 500, width: '100%' }}>
                     {/* {!newDataCSV && dataCSV()}
                     {!newDataCSV && sportsmenCSV()}
@@ -323,7 +332,7 @@ export default function AdminEntries() {
                     {sportCSV && !akkr && akkreditation()} */}
 
                     <DataGrid
-                        rows={tableRows}
+                        rows={formattedEntries}
                         columns={columns}
                         pageSize={15}
                         className="table-style"

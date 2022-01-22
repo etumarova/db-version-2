@@ -11,7 +11,7 @@ import { fetchSportsmen } from 'services/sportsmen';
 import { useQuery } from 'react-query';
 import { useHistory } from 'react-router';
 import { deleteSportsman } from 'services/sportsmen';
-import { setIndexToObject } from '../../services/utils';
+import {searchByName, setIndexToObject} from '../../services/utils';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -44,33 +44,25 @@ const columns = [
     { field: 'delete', headerName: '', width: 80 },
 ];
 
-
-
 export default function AdminSportsmen() {
     const history = useHistory();
-
-    const [isLoading, setIsLoading] = React.useState(true);
-    const { data: sportsmenData } = useQuery('sportsmen', fetchSportsmen, {onSuccess : () => setIsLoading(false)});
-   const { sportsmen } = sportsmenData || {};
-   // const sportsmen = sportsmenData?.sportsmen || {};
-    const [formattedSportsmen, setFormattedSportsmen] =
-        React.useState();
-    const [rows, setRows] = React.useState([]);
-
-    React.useEffect(()=> {
-        setFormattedSportsmen(sportsmen?.map((sportsman, index) => {
-            const transformedObject = { ...sportsman, nowTrainer: sportsman.nowTrainer.name, id: sportsman._id, delete: "Удалить"}
-            return setIndexToObject(transformedObject, index)
-        }));
-    }, [isLoading]);
-
-    React.useEffect(()=> {
-        if(formattedSportsmen) setRows(formattedSportsmen)
-    }, [formattedSportsmen]);
-
     const classes = useStyles();
 
-    console.log(formattedSportsmen);
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [value, setValue] = useState("");
+    const { data: sportsmenData } = useQuery('sportsmen', fetchSportsmen, {onSuccess : () => setIsLoading(false)});
+    const { sportsmen } = sportsmenData || {};
+
+    const [formattedSportsmen, setFormattedSportsmen] = useState([]);
+
+    const defaultFormattedSportsmen = sportsmen?.map((sportsman, index) => {
+        const transformedObject = { ...sportsman, nowTrainer: sportsman.nowTrainer.name, id: sportsman._id, delete: "Удалить"}
+        return setIndexToObject(transformedObject, index)
+    }) || [];
+
+    useEffect(() => {
+        setFormattedSportsmen(defaultFormattedSportsmen)
+    }, [isLoading])
 
     return (
         <div>
@@ -79,20 +71,23 @@ export default function AdminSportsmen() {
                     Спортсмены
                 </Typography>
 
-                <Paper component="form" className={classes.root}>
+                <Paper className={classes.root}>
                     <InputBase
+                        onChange={(e) => {
+                            setValue(e.target.value)
+                            searchByName(defaultFormattedSportsmen, e.target.value, setFormattedSportsmen)
+                        }}
+                        value={value}
                         className={classes.input}
                         inputProps={{ 'aria-label': 'search google maps' }}
                     />
-                    <IconButton type="submit" className={classes.iconButton} aria-label="search">
-                        <SearchIcon />
-                    </IconButton>
+                    <SearchIcon />
                 </Paper>
             </div>
             {sportsmen && (
                 <div style={{ height: 500, width: '100%' }}>
                     <DataGrid
-                        rows={rows}
+                        rows={formattedSportsmen}
                         columns={columns}
                         pageSize={15}
                         className="table-style"

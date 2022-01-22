@@ -11,6 +11,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import { fetchUsers } from 'services/users';
 import { useQuery } from 'react-query';
 import { useEffect } from "react";
+import {searchByName, setIndexToObject} from '../../services/utils';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -45,17 +46,24 @@ const columns = [
 
 export default function AdminPage() {
     const [users1, setUsers1] = useState(null);
-    const [select, setSelect] = useState(null);
+    const [select, setSelect] = useState(null)
+    const [isLoading, setIsLoading] = useState(true);
+    const [value, setValue] = useState("");
+    const [formattedUsers, setFormattedUsers] = useState([]);
     const classes = useStyles();
 
-    const { data: usersData } = useQuery('users', fetchUsers);
+    const { data: usersData } = useQuery('users', fetchUsers, {onSuccess : () => setIsLoading(false)});
     const { users } = usersData || {};
     //const socket = new WebSocket("ws://localhost:3000");
-    const formattedUsers = users?.map((user, index) => {
+
+    const defaultFormattedUsers = users?.map((user, index) => {
         const transformedUser = {...user, id: user._id, isAdmin: user.isAdmin ? 'Да' : 'Нет'}
         return setIndexToObject(transformedUser, index)
-    }
-    );
+    }) || [];
+
+    useEffect(() => {
+        setFormattedUsers(defaultFormattedUsers)
+    }, [isLoading])
 
     // useEffect(() => {
     //     socket.emit('getUsers', {
@@ -86,14 +94,17 @@ export default function AdminPage() {
                     Пользователи
                 </Typography>
 
-                <Paper component="form" className={classes.root}>
+                <Paper className={classes.root}>
                     <InputBase
+                        onChange={(e) => {
+                            setValue(e.target.value)
+                            searchByName(defaultFormattedUsers, e.target.value, setFormattedUsers)
+                        }}
+                        value={value}
                         className={classes.input}
                         inputProps={{ 'aria-label': 'search google maps' }}
                     />
-                    <IconButton type="submit" className={classes.iconButton} aria-label="search">
-                        <SearchIcon />
-                    </IconButton>
+                    <SearchIcon />
                 </Paper>
             </div>
              <div>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Typography from '@material-ui/core/Typography';
 import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
@@ -14,7 +14,7 @@ import { deleteSchool } from "services/school";
 import TableSchoolInventory from 'components/TableSchoolInventory';
 import {fetchTrainers} from "../../services/trainer";
 import {Button} from "@material-ui/core";
-import { setIndexToObject } from '../../services/utils';
+import {searchByName, setIndexToObject} from '../../services/utils';
 
 
 
@@ -58,28 +58,16 @@ export default function AdminSchools() {
     const [isLoading, setIsLoading] = React.useState(true);
     const { data: schoolsData } = useQuery('schools', fetchSchools, {onSuccess : () => setIsLoading(false)});
     const [formattedSchools, setFormattedSchools] = React.useState([]);
-    const [rows, setRows] = React.useState([]);
+    const [value, setValue] = useState("");
 
-    React.useEffect(()=> {
-        setFormattedSchools(schoolsData?.map((school, index) => {
-            const transformedObject = { ...school, id: school._id, delete: "Удалить"}
-            return setIndexToObject(transformedObject, index)
-        }));
+    const defaultFormattedSchools = schoolsData?.map((school, index) => {
+        const transformedObject = { ...school, id: school._id, delete: "Удалить"}
+        return setIndexToObject(transformedObject, index)
+    }) || [];
+
+    useEffect(() => {
+        setFormattedSchools(defaultFormattedSchools)
     }, [isLoading])
-
-    React.useEffect(()=> {
-        if(formattedSchools) setRows(formattedSchools)
-    }, [formattedSchools]);
-
-
-    /*const { data: schoolsData, isLoading } = useQuery('schools', fetchSchools);
-    const [schools, setSchools] = React.useState([]);
-
-    React.useEffect(()=>
-        {
-            setSchools(schoolsData?.map(school => ({ ...school, id: school._id, delete: "Удалить" })));
-            console.log(schools);
-        }, [isLoading])*/
 
     return (
         <div>
@@ -88,20 +76,23 @@ export default function AdminSchools() {
                     Спортивные Школы
                 </Typography>
 
-                <Paper component="form" className={classes.root}>
+                <Paper className={classes.root}>
                     <InputBase
+                        onChange={(e) => {
+                            setValue(e.target.value)
+                            searchByName(defaultFormattedSchools, e.target.value, setFormattedSchools)
+                        }}
+                        value={value}
                         className={classes.input}
                         inputProps={{ 'aria-label': 'search google maps' }}
                     />
-                    <IconButton type="submit" className={classes.iconButton} aria-label="search">
-                        <SearchIcon />
-                    </IconButton>
+                    <SearchIcon />
                 </Paper>
             </div>
             {formattedSchools && (
                 <div style={{ height: 500, width: '100%' }}>
                     <DataGrid
-                        rows={rows}
+                        rows={formattedSchools}
                         columns={columns}
                         pageSize={15}
                         className="table-style"
@@ -113,7 +104,7 @@ export default function AdminSchools() {
                                 deleteSchool({_id: e.row.id});
                             } else{
                                 console.log("1114");
-                                history.push(`/mySchool/${e.row.userId}`);
+                                history.push(`/mySchool/${e.row.id}`);
                             }
                         }}
                     />

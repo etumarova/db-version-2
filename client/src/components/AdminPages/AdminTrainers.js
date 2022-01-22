@@ -11,7 +11,7 @@ import { fetchTrainers } from 'services/trainer';
 import { useQuery } from 'react-query';
 import { useHistory } from 'react-router';
 import { deleteTrainer } from 'services/trainer';
-import { setIndexToObject } from '../../services/utils';
+import {searchByName, setIndexToObject} from '../../services/utils';
 
 
 const useStyles = makeStyles(theme => ({
@@ -50,19 +50,19 @@ const columns = [
 export default function AdminTrainers() {
     const history = useHistory();
 
-    const [isLoading, setIsLoading] = React.useState(true);
+    const [isLoading, setIsLoading] = useState(true);
     const { data: trainersData } = useQuery('trainer', fetchTrainers, {onSuccess : () => setIsLoading(false)});
     const [formattedTrainer, setFormattedTrainer] = React.useState([]);
-    const [rows, setRows] = React.useState([]);
-    React.useEffect(()=> {
-        setFormattedTrainer(trainersData?.trainers.map((trainer, index) => {
-            const transformedObject = { ...trainer, id: trainer._id, delete: "Удалить"}
-            return setIndexToObject(transformedObject, index)
-        }));
+    const [value, setValue] = useState("");
+
+    const defaultFormattedTrainer = trainersData?.trainers.map((trainer, index) => {
+        const transformedObject = { ...trainer, id: trainer._id, delete: "Удалить"}
+        return setIndexToObject(transformedObject, index)
+    }) || [];
+
+    useEffect(() => {
+        setFormattedTrainer(defaultFormattedTrainer)
     }, [isLoading])
-    React.useEffect(()=> {
-        if(formattedTrainer) setRows(formattedTrainer)
-    }, [formattedTrainer]);
 
     //const classes = useStyles();
 
@@ -79,14 +79,17 @@ export default function AdminTrainers() {
                     Тренеры
                 </Typography>
 
-                <Paper component="form" className={classes.root}>
+                <Paper className={classes.root}>
                     <InputBase
+                        onChange={(e) => {
+                            setValue(e.target.value)
+                            searchByName(defaultFormattedTrainer, e.target.value, setFormattedTrainer)
+                        }}
+                        value={value}
                         className={classes.input}
                         inputProps={{ 'aria-label': 'search google maps' }}
                     />
-                    <IconButton type="submit" className={classes.iconButton} aria-label="search">
-                        <SearchIcon />
-                    </IconButton>
+                    <SearchIcon />
                 </Paper>
             </div>
             {formattedTrainer && (
@@ -94,7 +97,7 @@ export default function AdminTrainers() {
 
                     <DataGrid
 
-                        rows={rows}
+                        rows={formattedTrainer}
                         columns={columns}
                         pageSize={15}
                         className="table-style"
