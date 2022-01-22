@@ -38,7 +38,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const headers = [
-    { field: 'id', headerName: 'ID', width: 80 },
+    { field: 'id', headerName: 'ID', width: 95 },
     { field: 'competition', headerName: 'Наименование соревнования', width: 400 },
     { field: 'discipline', headerName: 'Дисциплина', width: 150 },
     { field: 'place', headerName: 'Место', width: 150 },

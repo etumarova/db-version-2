@@ -8,15 +8,16 @@ import { useHistory } from 'react-router';
 import { useQuery } from 'react-query';
 import { fetchEntriesBySchoolId } from 'services/entry';
 import { fetchCompetitions } from 'services/competition';
+import {setIndexToObject} from '../../services/utils';
 
 const columns = [
-    { field: 'id', headerName: 'ID', width: 80 },
+    { field: 'index', headerName: 'ID', width: 95},
     { field: 'startDate', headerName: 'Начало', width: 130 },
     { field: 'endDate', headerName: 'Конец', width: 130 },
     { field: 'name', headerName: 'Название мероприятия', width: 380 },
     { field: 'deadLine', headerName: 'Заявки до', width: 130 },
-    { field: 'dateSend', headerName: 'Дата отправки', width: 170 },
-    { field: 'telephone', headerName: 'Телефон Представителя', width: 200 },
+    { field: 'dateSend', headerName: 'Дата отправки', width: 180 },
+    { field: 'telephone', headerName: 'Телефон Представителя', width: 245 },
 ];
 
 export default function MyEntries() {
@@ -31,10 +32,10 @@ export default function MyEntries() {
     const { data: competitionData } = useQuery('competitions', fetchCompetitions);
     const { competitions } = competitionData || {};
 
-    const entriesData = entries?.map(entry => {
+    const entriesData = entries?.map((entry, index) => {
         const competition = competitions?.find(comp => comp._id === entry.competitionId) || {};
-
-        return { id: entry._id, ...entry, ...competition };
+        const transformedEntry = { id: entry._id, ...entry, ...competition };
+        return setIndexToObject(transformedEntry, index);
     });
 
     return (

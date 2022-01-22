@@ -11,6 +11,7 @@ import { fetchSportsmen } from 'services/sportsmen';
 import { useQuery } from 'react-query';
 import { useHistory } from 'react-router';
 import { deleteSportsman } from 'services/sportsmen';
+import { setIndexToObject } from '../../services/utils';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -34,13 +35,13 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const columns = [
-    { field: 'id', headerName: 'ID', width: 95 },
+    { field: 'index', headerName: 'ID', width: 95 },
     { field: 'name', headerName: 'ФИО тренера', width: 300 },
     { field: 'birthday', headerName: 'Дата рождения', width: 170 },
     { field: 'nowTrainer', headerName: 'Личный тренер', width: 200 },
     { field: 'school', headerName: 'Школа', width: 200 },
     { field: 'telephone', headerName: 'Телефон2', width: 150 },
-    {field: 'delete', headerName: " ", width: 80},
+    { field: 'delete', headerName: '', width: 80 },
 ];
 
 
@@ -55,9 +56,14 @@ export default function AdminSportsmen() {
     const [formattedSportsmen, setFormattedSportsmen] =
         React.useState();
     const [rows, setRows] = React.useState([]);
+
     React.useEffect(()=> {
-        setFormattedSportsmen(sportsmen?.map(sportsman => ({ ...sportsman, nowTrainer: sportsman.nowTrainer.name, id: sportsman._id, delete: "Удалить"})));
-    },    [isLoading]);
+        setFormattedSportsmen(sportsmen?.map((sportsman, index) => {
+            const transformedObject = { ...sportsman, nowTrainer: sportsman.nowTrainer.name, id: sportsman._id, delete: "Удалить"}
+            return setIndexToObject(transformedObject, index)
+        }));
+    }, [isLoading]);
+
     React.useEffect(()=> {
         if(formattedSportsmen) setRows(formattedSportsmen)
     }, [formattedSportsmen]);

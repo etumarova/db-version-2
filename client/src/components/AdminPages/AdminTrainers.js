@@ -11,6 +11,8 @@ import { fetchTrainers } from 'services/trainer';
 import { useQuery } from 'react-query';
 import { useHistory } from 'react-router';
 import { deleteTrainer } from 'services/trainer';
+import { setIndexToObject } from '../../services/utils';
+
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -34,7 +36,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const columns = [
-    { field: 'id', headerName: 'ID', width: 95 },
+    { field: 'index', headerName: 'ID', width: 95 },
     { field: 'name', headerName: 'ФИО тренера', width: 370 },
     { field: 'birthday', headerName: 'Дата рождения', width: 270 },
     { field: 'school', headerName: 'Школа', width: 180 },
@@ -53,7 +55,10 @@ export default function AdminTrainers() {
     const [formattedTrainer, setFormattedTrainer] = React.useState([]);
     const [rows, setRows] = React.useState([]);
     React.useEffect(()=> {
-        setFormattedTrainer(trainersData?.trainers.map(trainer => ({ ...trainer, id: trainer._id, delete: "Удалить"})));
+        setFormattedTrainer(trainersData?.trainers.map((trainer, index) => {
+            const transformedObject = { ...trainer, id: trainer._id, delete: "Удалить"}
+            return setIndexToObject(transformedObject, index)
+        }));
     }, [isLoading])
     React.useEffect(()=> {
         if(formattedTrainer) setRows(formattedTrainer)

@@ -89,7 +89,7 @@ export default function CreateEntries() {
     const { trainers } = trainersData || {};
 
     const headersTabel = useMemo(() => {
-        const arr = [{ field: 'id', headerName: 'ID', width: 80 }];
+        const arr = [{ field: 'id', headerName: 'ID', width: 95 }];
         discipline.forEach(el => {
             arr.push({
                 field: el,

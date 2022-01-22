@@ -5,9 +5,10 @@ import Button from '@material-ui/core/Button';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { fetchSportsmanById } from 'services/sportsmen';
+import {setIndexToObject} from '../../services/utils';
 
 const columns = [
-    { field: 'id', headerName: 'ID', width: 30 },
+    { field: 'index', headerName: 'ID', width: 30 },
     { field: 'competition', headerName: 'Спортивное мероприятие', width: 300 },
     { field: 'discipline', headerName: 'Дисциплина', width: 150 },
     { field: 'place', headerName: 'Место', width: 150 },
@@ -23,8 +24,10 @@ export default function SportsmenPage() {
     // result.forEach((el, idx) => (el['id'] = idx + 1));
 
     const serializedResults = sportsman?.listResults;
-    const results = serializedResults
-        ? JSON.parse(serializedResults).map((result, index) => ({ ...result, id: index + 1 }))
+    const results = serializedResults ? JSON.parse(serializedResults).map((result, index) => {
+            const transformedObject = { ...result, id: result.id}
+            return setIndexToObject(transformedObject, index)
+        })
         : [];
 
     console.log(results);

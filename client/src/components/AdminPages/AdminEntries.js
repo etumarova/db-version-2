@@ -20,6 +20,7 @@ import { fetchSchools } from 'services/school';
 import { fetchEntriesByCompetitionId } from 'services/entry';
 import { fetchSportsmen } from 'services/sportsmen';
 import { useHistory } from 'react-router';
+import {setIndexToObject} from '../../services/utils';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -56,7 +57,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const columns = [
-    { field: 'id', headerName: 'ID', width: 80 },
+    { field: 'index', headerName: 'ID', width: 80 },
     { field: 'competitionName', headerName: 'Название мероприятия', width: 370 },
     { field: 'school', headerName: 'Школа', width: 350 },
     { field: 'deadLine', headerName: 'Прием заявок до', width: 180 },
@@ -91,7 +92,6 @@ export default function AdminEntries() {
     const { sportsmen } = sportsmenData || {};
 
     const { data: schoolsData } = useQuery('schools', fetchSchools);
-    const { schools } = schoolsData || {};
 
     const { data: competitionsData } = useQuery('competitions', fetchCompetitions);
     const { competitions } = competitionsData || {};
@@ -105,22 +105,26 @@ export default function AdminEntries() {
     );
     const { entries } = entriesData || {};
     const formattedEntries = useMemo(
-        () => entries?.map(entry => ({ ...entry, id: entry._id } || [])),
+        () => entries?.map(entry => ({ ...entry, id: entry._id} || [])),
         [entries]
     );
 
     const tableRows = useMemo(() => {
         const competition = competitions?.find(comp => comp._id === selectedCompetition) || {};
+
         return (
-            formattedEntries?.map(entry => ({
-                id: entry._id,
-                competitionName: competition.name,
-                school: schools?.find(school => school.userId === entry.schoolId)?.name || '-',
-                deadLine: competition.deadLine,
-                dateSend: entry.dateSend,
-            })) || []
+            formattedEntries?.map((entry, index) => {
+                const transformedValue = {
+                    id: entry._id,
+                    competitionName: competition.name,
+                    school: schoolsData?.find(school => school.userId === entry.schoolId)?.name || '-',
+                    deadLine: competition.deadLine,
+                    dateSend: entry.dateSend,
+                }
+                return setIndexToObject(transformedValue, index)
+            }) || []
         );
-    }, [formattedEntries, competitions, schools]);
+    }, [formattedEntries, competitions, schoolsData]);
 
     // const formattedSportsmen = sportsmen?.map(sportsman => ({ ...sportsman, id: sportsman._id }));
 

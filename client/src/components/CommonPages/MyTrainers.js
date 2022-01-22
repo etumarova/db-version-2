@@ -7,9 +7,10 @@ import { useHistory } from 'react-router';
 import { fetchTrainersBySchoolId } from 'services/trainer';
 import { useQuery } from 'react-query';
 import { UserContext } from 'context/UserContext';
+import {setIndexToObject} from '../../services/utils';
 
 const columns = [
-    { field: 'id', headerName: 'ID', width: 150 },
+    { field: 'index', headerName: 'ID', width: 150 },
     { field: 'name', headerName: 'ФИО', width: 260 },
     { field: 'birthday', headerName: 'Год рождения', width: 150 },
     { field: 'school', headerName: 'Ведомственная принадлежность', width: 180 },
@@ -27,7 +28,7 @@ export default function MyTrainers() {
     const { trainers } = data || {};
 
     const formattedTrainers = useMemo(
-        () => trainers?.map(trainer => ({ ...trainer, id: trainer._id })) || [],
+        () => trainers?.map((trainer, index) => setIndexToObject({ ...trainer, id: trainer._id }, index)) || [],
         [trainers]
     );
 

@@ -114,7 +114,7 @@ export default function TrainerPage() {
                         </div>
                         {sportsmen && (
                             <div className="col" style={{ height: 500 }}>
-                                <TableSportsmen sportsmen={sportsmen} />
+                                <TableSportsmen sportsmen={sportsmen}/>
                             </div>
                         )}
                     </div>

@@ -34,7 +34,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const columns = [
-    { field: 'userId', headerName: 'ID', width: 100 },
+    { field: 'index', headerName: 'ID', width: 95 },
     { field: 'name', headerName: 'Имя', width: 150 },
     { field: 'isAdmin', headerName: 'Админ', width: 150 },
     { field: 'email', headerName: 'Email', width: 170 },
@@ -51,11 +51,11 @@ export default function AdminPage() {
     const { data: usersData } = useQuery('users', fetchUsers);
     const { users } = usersData || {};
     //const socket = new WebSocket("ws://localhost:3000");
-    const formattedUsers = users?.map(user => ({
-        ...user,
-        id: user._id,
-        isAdmin: user.isAdmin ? 'Да' : 'Нет',
-    }));
+    const formattedUsers = users?.map((user, index) => {
+        const transformedUser = {...user, id: user._id, isAdmin: user.isAdmin ? 'Да' : 'Нет'}
+        return setIndexToObject(transformedUser, index)
+    }
+    );
 
     // useEffect(() => {
     //     socket.emit('getUsers', {

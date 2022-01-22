@@ -14,6 +14,8 @@ import { deleteSchool } from "services/school";
 import TableSchoolInventory from 'components/TableSchoolInventory';
 import {fetchTrainers} from "../../services/trainer";
 import {Button} from "@material-ui/core";
+import { setIndexToObject } from '../../services/utils';
+
 
 
 const useStyles = makeStyles(theme => ({
@@ -38,7 +40,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const columns = [
-    { field: 'id', headerName: 'ID', width: 95 },
+    { field: 'index', headerName: 'ID', width: 95 },
     { field: 'name', headerName: 'Название школы', width: 370 },
     { field: 'director', headerName: 'Директор', width: 270 },
     { field: 'directorPhone', headerName: 'Телефон директора', width: 220 },
@@ -47,22 +49,24 @@ const columns = [
     { field: 'city', headerName: 'Город', width: 170 },
     { field: 'telephone', headerName: 'Телефон', width: 150 },
     { field: 'email', headerName: 'Электронная почта', width: 250 },
-    {field: 'delete', headerName: " ", width: 80},
+    { field: 'delete', headerName: '', width: 80 },
 ];
 
 export default function AdminSchools() {
     const history = useHistory();
     const classes = useStyles();
-
-    console.log("ssdasdsad")
-
     const [isLoading, setIsLoading] = React.useState(true);
     const { data: schoolsData } = useQuery('schools', fetchSchools, {onSuccess : () => setIsLoading(false)});
     const [formattedSchools, setFormattedSchools] = React.useState([]);
     const [rows, setRows] = React.useState([]);
+
     React.useEffect(()=> {
-        setFormattedSchools(schoolsData?.map(school => ({ ...school, id: school._id, delete: "Удалить"})));
+        setFormattedSchools(schoolsData?.map((school, index) => {
+            const transformedObject = { ...school, id: school._id, delete: "Удалить"}
+            return setIndexToObject(transformedObject, index)
+        }));
     }, [isLoading])
+
     React.useEffect(()=> {
         if(formattedSchools) setRows(formattedSchools)
     }, [formattedSchools]);
