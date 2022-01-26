@@ -540,6 +540,7 @@ app.post('/saveTrainer', (req, res) => {
         education,
         laborCategory,
         studentNumber,
+        listTransfer,
     } = req.body;
 
     TrainerModel.create({
@@ -552,6 +553,7 @@ app.post('/saveTrainer', (req, res) => {
         studentNumber,
         school,
         telephone,
+        listTransfer,
     })
         .then(() => res.sendStatus(200))
         .catch(err => res.status(500).json(err.toString()));
@@ -569,6 +571,7 @@ app.post('/editTrainer', (req, res) => {
         education,
         laborCategory,
         studentNumber,
+        listTransfer,
     } = req.body;
     TrainerModel.updateOne(
         {
@@ -585,6 +588,7 @@ app.post('/editTrainer', (req, res) => {
                 studentNumber,
                 school,
                 telephone,
+                listTransfer,
             },
         },
         (err, result) => {

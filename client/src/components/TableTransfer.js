@@ -5,16 +5,15 @@ import {setIndexToObject} from '../services/utils';
 
 const columns = [
     { field: 'index', headerName: 'ID', width: 95 },
-    { field: 'inventories_name', headerName: 'Инвентарь', width: 260 },
-    { field: 'inventories_nomination', headerName: 'Наименование', width: 300 },
-    { field: 'inventories_count', headerName: 'Количество', width: 200 },
-    { field: 'inventories_date', headerName: 'Дата выпуска', width: 200 },
+    { field: 'name', headerName: 'ФИО спортсмена', width: 300 },
+    { field: 'school', headerName: 'Наименование организации', width: 265 },
+    { field: 'year', headerName: 'Год передачи', width: 170 },
 ];
 
-export default function TableSchoolInventory({inventories}) {
+export default function TableTransfer({transfer}) {
     const history = useHistory();
-    inventories = JSON.parse(inventories);
-    const transformedInventoriesData = inventories?.map(
+    transfer = JSON.parse(transfer);
+    const transformedTransferData = transfer?.map(
         (element, index) => setIndexToObject({...element, id: index}, index)
     )
 
@@ -22,15 +21,15 @@ export default function TableSchoolInventory({inventories}) {
         <div style={{ height: 500, width: '100%' }}>
             <DataGrid
                 localeText={ruRU.props.MuiDataGrid.localeText}
-                rows={transformedInventoriesData}
+                rows={transformedTransferData}
                 columns={columns}
                 pageSize={15}
                 className="table-style"
                 onRowClick={e => {
-                    //const schoolId = e.row.id;
-                    history.push(`/mySchool/${e.row.id}`);
+                    history.push(`/trainer/${e.row.id}`);
                 }}
             />
         </div>
     );
 }
+

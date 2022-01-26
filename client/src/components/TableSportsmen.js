@@ -16,9 +16,6 @@ const columns = [
 
 export default function TableSportsmen({sportsmen}) {
     const history = useHistory();
-    const { sportsmen } = props;
-
-
     const [formattedSportsmen, setFormattedSportsmen] =
         React.useState(null);
 

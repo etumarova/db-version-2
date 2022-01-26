@@ -9,11 +9,12 @@ import { useHistory, useParams } from 'react-router-dom';
 import { queryClient } from 'features/queryClient';
 import { useMutation, useQuery } from 'react-query';
 import { UserContext } from 'context/UserContext';
+import {DataGrid, ruRU} from '@material-ui/data-grid';
 
 const useStyles = makeStyles(theme => ({
     root: {
         display: 'flex',
-        flexWrap: 'wrap',
+        flexDirection: 'column',
     },
     textField: {
         marginLeft: theme.spacing(1),
@@ -30,6 +31,13 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
+const columns = [
+    { field: 'id', headerName: 'ID', width: 95 },
+    { field: 'name', headerName: 'ФИО спортсмена', width: 300 },
+    { field: 'school', headerName: 'Наименование организации', width: 265 },
+    { field: 'year', headerName: 'Год передачи', width: 170 },
+];
+
 export default function CreateTrainer() {
     const { userSub } = useContext(UserContext);
     const { id } = useParams();
@@ -43,15 +51,17 @@ export default function CreateTrainer() {
     const [telephone, setTelephone] = useState(null);
     const [school, setSchool] = useState(null);
     const classes = useStyles();
-
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [transfer, setTransfer] = useState({ name: '', school: '', year: '' });
+    const [listTransfer, setListTransfer] = useState([]);
     const [isImageLoading, setIsImageLoading] = useState(false);
 
     const shouldFetchTrainer = !!id;
     const { data: trainerData } = useQuery(['trainers', id], () => fetchTrainerById(id), {
         enabled: shouldFetchTrainer,
+        onSuccess : () => setIsLoading(false),
     });
     const { trainer } = trainerData || {};
-
     const schoolId = trainer?.schoolId || userSub;
 
     const saveTrainerMutation = useMutation(saveTrainer, {
@@ -79,6 +89,7 @@ export default function CreateTrainer() {
             setStudentNumber(trainer.studentNumber);
             setTelephone(trainer.telephone);
             setSchool(trainer.school);
+            setListTransfer(JSON.parse(trainer.listTransfer));
         }
     }, [trainer]);
 
@@ -103,6 +114,42 @@ export default function CreateTrainer() {
         multiple: false,
     });
 
+    const [formattedTrainer, setFormattedTrainer] = useState([]);
+    const defaultFormattedTrainer = listTransfer?.map(element => ({ ...element, id: element._id}
+    )) || [];
+
+    useEffect(() => {
+        setFormattedTrainer(defaultFormattedTrainer)
+    }, [isLoading])
+
+    const addTransfer = e => {
+        e.preventDefault();
+        console.log(transfer);
+        if (transfer) {
+            setListTransfer([...listTransfer, transfer]);
+            setTransfer({ name: '', school: '', year: '' });
+        }
+    };
+
+    const deleteCeill = rowData => {
+        // eslint-disable-next-line no-restricted-globals
+        const answer = confirm(
+            `           Удалить инвентарь: ${rowData.name},
+           Наименование - ${rowData.school},
+           Количество - ${rowData.year}.`
+        );
+        if (answer) {
+            const newList = listTransfer.filter(result => result.id !== rowData.id);
+            setListTransfer(newList);
+        }
+    };
+
+    useEffect(() => {
+        const arr = listTransfer;
+        arr.forEach((el, idx) => (el['id'] = idx + 1));
+        setFormattedTrainer(arr);
+    }, [listTransfer]);
+
     const saveData = e => {
         e.preventDefault();
         const data = {
@@ -115,6 +162,7 @@ export default function CreateTrainer() {
             studentNumber,
             school,
             telephone,
+            listTransfer: JSON.stringify(listTransfer),
         };
         saveTrainerMutation.mutate(data);
     };
@@ -132,6 +180,7 @@ export default function CreateTrainer() {
             studentNumber,
             school,
             telephone,
+            listTransfer: JSON.stringify(listTransfer),
         };
         editTrainerMutation.mutate(data);
     };
@@ -219,6 +268,72 @@ export default function CreateTrainer() {
                     value={school}
                     onChange={e => setSchool(e.target.value)}
                 />
+            </div>
+            <div></div>
+            <div>
+                <div>
+                    <TextField
+                        label="ФИО спортсмена"
+                        className={classes.textField}
+                        placeholder="Введите ФИО спортсмена"
+                        variant="outlined"
+                        onChange={e => {
+                            setTransfer({
+                                ...transfer,
+                                [e.target.name]: e.target.value,
+                            });
+                        }}
+                        inputProps={{
+                            name: 'name',
+                        }}
+                        value={transfer.name}
+                    />
+                    <TextField
+                        label="Наименование организации"
+                        className={classes.textField}
+                        placeholder="Введите наименование организации"
+                        variant="outlined"
+                        onChange={e => {
+                            setTransfer({
+                                ...transfer,
+                                [e.target.name]: e.target.value,
+                            });
+                        }}
+                        inputProps={{
+                            name: 'school',
+                        }}
+                        value={transfer.school}
+                    />
+                    <TextField
+                        label="Год передачи"
+                        className={classes.textField}
+                        placeholder="Введите год передачи"
+                        variant="outlined"
+                        onChange={e => {
+                            setTransfer({
+                                ...transfer,
+                                [e.target.name]: e.target.value,
+                            });
+                        }}
+                        inputProps={{
+                            name: 'year',
+                        }}
+                        value={transfer.year}
+                    />
+                    <Button variant="contained" color="primary" onClick={addTransfer}>
+                        Добавить результат
+                    </Button>
+                </div>
+                <div style={{ height: 500, width: '100%' }}>
+                    <DataGrid
+                        localeText={ruRU.props.MuiDataGrid.localeText}
+                        rows={formattedTrainer}
+                        columns={columns}
+                        pageSize={15}
+                        className="table-style"
+                        onRowClick={e => deleteCeill(e.row)}
+                    />
+                </div>
             </div>
             <div>
                 {trainer ? (

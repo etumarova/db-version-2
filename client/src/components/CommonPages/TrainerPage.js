@@ -6,13 +6,12 @@ import { Link, useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { fetchTrainerById } from 'services/trainer';
 import { fetchSportsmenByTrainerId } from 'services/sportsmen';
+import TableTransfer from '../TableTransfer';
 
 export default function TrainerPage() {
     const { id } = useParams();
     const { data: trainerData } = useQuery(['trainers', id], () => fetchTrainerById(id));
     const { trainer } = trainerData || {};
-
-
     const { data: sportsmenData } = useQuery(['sportsmen', trainer?._id], () =>
         fetchSportsmenByTrainerId(trainer?._id)
     );
@@ -118,6 +117,7 @@ export default function TrainerPage() {
                             </div>
                         )}
                     </div>
+                    <TableTransfer transfer={trainer.listTransfer}></TableTransfer>
                 </div>
             )}
         </div>

@@ -29,6 +29,10 @@ const TrainerSchema = new mongoose.Schema({
     telephone: {
         type: String,
     },
+    listTransfer: {
+        type: String,
+        require: false,
+    }
 });
 
 module.exports = mongoose.model('trainer', TrainerSchema);
