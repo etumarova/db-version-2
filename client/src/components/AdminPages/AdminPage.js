@@ -8,7 +8,7 @@ import { Button } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import { App } from '../../App';
 import SearchIcon from '@material-ui/icons/Search';
-import { fetchUsers } from 'services/users';
+import {deleteuser, fetchUsers} from 'services/users';
 import { useQuery } from 'react-query';
 import { useEffect } from "react";
 import {searchByName, setIndexToObject} from '../../services/utils';
@@ -87,6 +87,13 @@ export default function AdminPage() {
     //     }
     // };
 
+    const deleteSelectedUsers = () => {
+        if(select) {
+            console.log(select);
+            deleteuser({_id: select})
+        }
+    }
+
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -108,9 +115,9 @@ export default function AdminPage() {
                 </Paper>
             </div>
              <div>
-                {/*<Button variant="contained" color="primary" onClick={deleteUser}>
+                <Button variant="contained" color="primary" onClick={deleteSelectedUsers}>
                     Удалить пользователя
-                </Button>*/}
+                </Button>
             </div>
             {users && (
                 <div style={{ height: 500, width: '100%' }}>
@@ -119,7 +126,9 @@ export default function AdminPage() {
                         columns={columns}
                         pageSize={15}
                         className="table-style"
-                        onRowSelected={e => setSelect(e.data.user_id)}
+                        onRowClick={e => {
+                            setSelect(e.id)
+                        }}
                         checkboxSelection
                     />
                 </div>

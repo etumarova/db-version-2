@@ -41,6 +41,15 @@ app.get('/users', (req, res) => {
         .catch(error => res.status(500).json(error.toString()));
 });
 
+app.post('/deleteUser', (req, res) => {
+    const {_id} = req.body;
+
+    UserModel.deleteOne({_id: _id})
+        .then(() => res.sendStatus(200))
+        .catch(err => res.status(500).json(err.toString()));
+    window.alert("123");
+});
+
 app.post('/checkUserRole', async (req, res) => {
     try {
         const userData = req.body;
