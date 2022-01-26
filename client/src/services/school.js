@@ -3,8 +3,8 @@ export const fetchSchools = () => fetch('/schools').then(res => res.json());
 export const fetchSchoolByUserId = userId =>
     fetch(`/school/?userId=${userId}`).then(res => res.json());
 
-/*export const fetchSchoolById = id =>
-    fetch(`/school/${id}`).then(res => res.json());*/
+export const fetchSchoolById = id =>
+    fetch(`/schoolById/${id}`).then(res => res.json());
 
 export const saveSchool = data => {
     if(!data.photo) data.photo = "vdsamwwv2pdsgiowvluh";

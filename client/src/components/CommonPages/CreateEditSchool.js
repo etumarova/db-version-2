@@ -13,8 +13,10 @@ import { CircularProgress } from '@material-ui/core';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useHistory, useParams } from 'react-router-dom';
 import { useQuery, useMutation } from 'react-query';
-import { editSchool, saveSchool, fetchSchoolByUserId } from 'services/school';
+import { editSchool, saveSchool, fetchSchoolById } from 'services/school';
 import { queryClient } from 'features/queryClient';
+import { fetchSchoolByUserId } from 'services/school';
+import {DataGrid, ruRU} from '@material-ui/data-grid';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -66,6 +68,14 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
+const columns = [
+    { field: 'id', headerName: 'ID', width: 95 },
+    { field: 'inventories_name', headerName: 'Инвентарь', width: 260 },
+    { field: 'inventories_nomination', headerName: 'Наименование', width: 300 },
+    { field: 'inventories_count', headerName: 'Количество', width: 200 },
+    { field: 'inventories_date', headerName: 'Дата выпуска', width: 200 },
+];
+
 export default function CreateEditSchool() {
     const { id } = useParams();
     const classes = useStyles();
@@ -86,11 +96,15 @@ export default function CreateEditSchool() {
     const [address, setAddress] = useState('');
     const [telephone, setTelephone] = useState('');
     const [typeSport, setTypeSport] = useState('');
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [inventories, setInventories] = useState({ inventories_name: '', inventories_nomination: '', inventories_count: '', inventories_date: '' });
+    const [listInventories, setListInventories] = useState([]);
 
     const [isImageLoading, setIsImageLoading] = useState(false);
 
-    // const [school, setSchool] = useState({});
-    const { data } = useQuery(['schools', userId], () => fetchSchoolByUserId(userId));
+    const { data } = useQuery(['schools', userId], () =>
+        id? fetchSchoolById(id) : fetchSchoolByUserId(userId)
+    );
     const { school } = data || {};
     console.log("sch", data);
     const saveSchoolMutation = useMutation(saveSchool, {
@@ -109,6 +123,42 @@ export default function CreateEditSchool() {
         },
         onError: error => console.log(error),
     });
+    const [formattedSportsmen, setFormattedSportsmen] = useState([]);
+    const defaultFormattedSportsmen = listInventories?.map(element => ({ ...element, id: element._id}
+    )) || [];
+
+    useEffect(() => {
+        setFormattedSportsmen(defaultFormattedSportsmen)
+    }, [isLoading])
+
+    const addInventories = e => {
+        e.preventDefault();
+        console.log(inventories);
+        if (inventories) {
+            setListInventories([...listInventories, inventories]);
+            setInventories({ inventories_name: '', inventories_nomination: '', inventories_count: '', inventories_date: '' });
+        }
+    };
+
+    const deleteCeill = rowData => {
+        // eslint-disable-next-line no-restricted-globals
+        const answer = confirm(
+            `           Удалить инвентарь: ${rowData.inventories_name},
+           Наименование - ${rowData.inventories_nomination},
+           Количество - ${rowData.inventories_count},
+           Дата выпуска - ${rowData.inventories_date}.`
+        );
+        if (answer) {
+            const newList = listInventories.filter(result => result.id !== rowData.id);
+            setListInventories(newList);
+        }
+    };
+
+    useEffect(() => {
+        const arr = listInventories;
+        arr.forEach((el, idx) => (el['id'] = idx + 1));
+        setFormattedSportsmen(arr);
+    }, [listInventories]);
 
     const setSchoolData = data => {
         setRegion(data.region);
@@ -123,6 +173,7 @@ export default function CreateEditSchool() {
         setAddress(data.address);
         setTelephone(data.telephone);
         setTypeSport(data.typeSport);
+        setListInventories(JSON.parse(data.listInventories));
     };
 
     useEffect(() => {
@@ -166,6 +217,7 @@ export default function CreateEditSchool() {
             address,
             telephone,
             typeSport,
+            listInventories: JSON.stringify(listInventories),
         };
 
         saveSchoolMutation.mutate(data);
@@ -188,6 +240,7 @@ export default function CreateEditSchool() {
             address,
             telephone,
             typeSport,
+            listInventories: JSON.stringify(listInventories),
         };
 
         editSchoolMutation.mutate(data);
@@ -344,6 +397,88 @@ export default function CreateEditSchool() {
                     variant="outlined"
                     onChange={e => setTypeSport(e.target.value)}
                 />
+            </div>
+
+            <div>
+                <div>
+                    <TextField
+                        label="Инвентарь"
+                        className={classes.textField}
+                        placeholder="Введите инвентарь"
+                        variant="outlined"
+                        onChange={e => {
+                            setInventories({
+                                ...inventories,
+                                [e.target.name]: e.target.value,
+                            });
+                        }}
+                        inputProps={{
+                            name: 'inventories_name',
+                        }}
+                        value={inventories.inventories_name}
+                    />
+                    <TextField
+                        label="Наименование"
+                        className={classes.textField}
+                        placeholder="Введите наименование"
+                        variant="outlined"
+                        onChange={e => {
+                            setInventories({
+                                ...inventories,
+                                [e.target.name]: e.target.value,
+                            });
+                        }}
+                        inputProps={{
+                            name: 'inventories_nomination',
+                        }}
+                        value={inventories.inventories_nomination}
+                    />
+                    <TextField
+                        label="Количество"
+                        className={classes.textField}
+                        placeholder="Введите количество"
+                        variant="outlined"
+                        onChange={e => {
+                            setInventories({
+                                ...inventories,
+                                [e.target.name]: e.target.value,
+                            });
+                        }}
+                        inputProps={{
+                            name: 'inventories_count',
+                        }}
+                        value={inventories.inventories_count}
+                    />
+                    <TextField
+                        label="Дата выпуска"
+                        className={classes.textField}
+                        placeholder="Введите дату выпуска"
+                        variant="outlined"
+                        onChange={e => {
+                            setInventories({
+                                ...inventories,
+                                [e.target.name]: e.target.value,
+                            });
+                        }}
+                        inputProps={{
+                            name: 'inventories_date',
+                        }}
+                        value={inventories.inventories_date}
+                    />
+                    <Button variant="contained" color="primary" onClick={addInventories}>
+                        Добавить результат
+                    </Button>
+                </div>
+                <div style={{ height: 500, width: '100%' }}>
+                    <DataGrid
+                        localeText={ruRU.props.MuiDataGrid.localeText}
+                        rows={formattedSportsmen}
+                        columns={columns}
+                        pageSize={15}
+                        className="table-style"
+                        onRowClick={e => deleteCeill(e.row)}
+                    />
+                </div>
             </div>
 
             <div className={classes.row}>

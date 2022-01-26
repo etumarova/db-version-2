@@ -82,6 +82,13 @@ app.get('/school', (req, res) => {
         .catch(e => console.log(e));
 });
 
+app.get('/schoolById/:id', (req, res) => {
+    const { id } = req.params;
+    SchoolModel.findById(id)
+        .then(school => res.json({ school }))
+        .catch(e => res.status(500).json(e.toString()));
+});
+
 app.post('/deleteSchool', (req, res) => {
     const {_id} = req.body;
 
@@ -91,7 +98,7 @@ app.post('/deleteSchool', (req, res) => {
         window.alert("123");
 });
 
-app.post('//save', (req, res) => {
+app.post('/schools/save', (req, res) => {
     const {
         userId,
         photo,
@@ -106,10 +113,7 @@ app.post('//save', (req, res) => {
         city,
         address,
         telephone,
-        inventories_name,
-        inventories_count,
-        inventories_date,
-        inventories_nomination,
+        listInventories,
     } = req.body;
 
     SchoolModel.find({ userId })
@@ -129,10 +133,7 @@ app.post('//save', (req, res) => {
                     city,
                     address,
                     telephone,
-                    inventories_name,
-                    inventories_count,
-                    inventories_date,
-                    inventories_nomination,
+                    listInventories,
                 });
             }
         })
@@ -142,7 +143,7 @@ app.post('//save', (req, res) => {
         });
 });
 
-app.post('//edit', (req, res) => {
+app.post('/schools/edit', (req, res) => {
     const {
         _id,
         userId,
@@ -158,15 +159,9 @@ app.post('//edit', (req, res) => {
         city,
         address,
         telephone,
+        listInventories
     } = req.body;
 
-    console.log("sdsdsds")
-
-    inventories = [{inventory:"мяяяч",
-        nomination: "Футбольный такой",
-        amount: 69,
-        dateRelease: "13.06.2001"
-    }];
 
     SchoolModel.updateOne(
         {
@@ -187,10 +182,7 @@ app.post('//edit', (req, res) => {
                 city,
                 address,
                 telephone,
-                inventories_name,
-                inventories_count,
-                inventories_date,
-                inventories_nomination,
+                listInventories,
             },
         },
         (err, result) => {

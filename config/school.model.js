@@ -50,22 +50,9 @@ const SchoolSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
-    inventories_name: {
-        type: [String],
+    listInventories: {
+        type: String,
         require: false,
-    },
-    inventories_count:{
-        type: [Number],
-        require: false,
-    },
-    inventories_date: {
-        type: [String],
-        require: false,
-    },
-    inventories_nomination: {
-        type: [String],
-        require: false,
-    },
-
+    }
 });
 module.exports = mongoose.model('school', SchoolSchema);

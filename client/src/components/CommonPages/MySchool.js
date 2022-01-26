@@ -4,6 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
+import { fetchSchoolById } from 'services/school';
 import { fetchSchoolByUserId } from 'services/school';
 import { UserContext } from 'context/UserContext';
 import TableSchoolInventory from '../TableSchoolInventory.js'
@@ -14,7 +15,7 @@ export default function MySchool() {
 
     const userId = id || userSub;
     const { isSuccess, isError, data } = useQuery(['schools', userId], () =>
-        fetchSchoolByUserId(userId)
+        id? fetchSchoolById(id) : fetchSchoolByUserId(userId)
     );
 
     const { school } = data || {};
@@ -157,7 +158,7 @@ export default function MySchool() {
                             </div>
                         </div>
                     </div>
-                    <TableSchoolInventory school={[]}></TableSchoolInventory>
+                    <TableSchoolInventory inventories={school.listInventories}></TableSchoolInventory>
                 </div>
             )}
         </div>
