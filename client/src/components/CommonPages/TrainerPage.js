@@ -7,6 +7,7 @@ import { useQuery } from 'react-query';
 import { fetchTrainerById } from 'services/trainer';
 import { fetchSportsmenByTrainerId } from 'services/sportsmen';
 import TableTransfer from '../TableTransfer';
+import TableArrestersPreparation from '../TableArrestersPreparation';
 
 export default function TrainerPage() {
     const { id } = useParams();
@@ -118,6 +119,7 @@ export default function TrainerPage() {
                         )}
                     </div>
                     <TableTransfer transfer={trainer.listTransfer}></TableTransfer>
+                    <TableArrestersPreparation arresters={trainer.listArresters}></TableArrestersPreparation>
                 </div>
             )}
         </div>

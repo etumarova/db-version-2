@@ -32,6 +32,10 @@ const TrainerSchema = new mongoose.Schema({
     listTransfer: {
         type: String,
         require: false,
+    },
+    listArresters: {
+        type: String,
+        require: false,
     }
 });
 

@@ -31,11 +31,18 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const columns = [
+const columnsTransfer = [
     { field: 'id', headerName: 'ID', width: 95 },
     { field: 'name', headerName: 'ФИО спортсмена', width: 300 },
     { field: 'school', headerName: 'Наименование организации', width: 265 },
     { field: 'year', headerName: 'Год передачи', width: 170 },
+];
+
+const columnsArresters = [
+    { field: 'id', headerName: 'ID', width: 95 },
+    { field: 'name', headerName: 'ФИО спортсмена', width: 300 },
+    { field: 'sportTitul', headerName: 'Спортивное звание', width: 300 },
+    { field: 'year', headerName: 'Год присвоения', width: 250 },
 ];
 
 export default function CreateTrainer() {
@@ -54,7 +61,11 @@ export default function CreateTrainer() {
     const [isLoading, setIsLoading] = React.useState(true);
     const [transfer, setTransfer] = useState({ name: '', school: '', year: '' });
     const [listTransfer, setListTransfer] = useState([]);
+    const [formattedTransfer, setFormattedTransfer] = useState([]);
+    const [arresters, setArresters] = useState({ name: '', sportTitul: '', year: '' });
+    const [listArresters, setListArresters] = useState([]);
     const [isImageLoading, setIsImageLoading] = useState(false);
+    const [formattedArresters, setFormattedArresters] = useState([]);
 
     const shouldFetchTrainer = !!id;
     const { data: trainerData } = useQuery(['trainers', id], () => fetchTrainerById(id), {
@@ -90,6 +101,7 @@ export default function CreateTrainer() {
             setTelephone(trainer.telephone);
             setSchool(trainer.school);
             setListTransfer(JSON.parse(trainer.listTransfer));
+            setListArresters(JSON.parse(trainer.listArresters));
         }
     }, [trainer]);
 
@@ -114,12 +126,12 @@ export default function CreateTrainer() {
         multiple: false,
     });
 
-    const [formattedTrainer, setFormattedTrainer] = useState([]);
-    const defaultFormattedTrainer = listTransfer?.map(element => ({ ...element, id: element._id}
+
+    const defaultFormattedTransfer = listTransfer?.map(element => ({ ...element, id: element._id}
     )) || [];
 
     useEffect(() => {
-        setFormattedTrainer(defaultFormattedTrainer)
+        setFormattedTransfer(defaultFormattedTransfer)
     }, [isLoading])
 
     const addTransfer = e => {
@@ -131,12 +143,12 @@ export default function CreateTrainer() {
         }
     };
 
-    const deleteCeill = rowData => {
+    const deleteTransferCeill = rowData => {
         // eslint-disable-next-line no-restricted-globals
         const answer = confirm(
-            `           Удалить инвентарь: ${rowData.name},
+            `           Удалить спортсмена: ${rowData.name},
            Наименование - ${rowData.school},
-           Количество - ${rowData.year}.`
+           Год передачи - ${rowData.year}.`
         );
         if (answer) {
             const newList = listTransfer.filter(result => result.id !== rowData.id);
@@ -147,8 +159,43 @@ export default function CreateTrainer() {
     useEffect(() => {
         const arr = listTransfer;
         arr.forEach((el, idx) => (el['id'] = idx + 1));
-        setFormattedTrainer(arr);
+        setFormattedTransfer(arr);
     }, [listTransfer]);
+
+    const defaultFormattedArresters = listArresters?.map(element => ({ ...element, id: element._id}
+    )) || [];
+
+    useEffect(() => {
+        setFormattedArresters(defaultFormattedArresters)
+    }, [isLoading])
+
+    const addArresters = e => {
+        e.preventDefault();
+        console.log(arresters);
+        if (arresters) {
+            setListArresters([...listArresters, arresters]);
+            setArresters({ name: '', sportTitul: '', year: '' });
+        }
+    };
+
+    const deleteArrestersCeill = rowData => {
+        // eslint-disable-next-line no-restricted-globals
+        const answer = confirm(
+            `           Удалить спортсмена: ${rowData.name},
+           Звание - ${rowData.sportTitul},
+           Год присвоения - ${rowData.year}.`
+        );
+        if (answer) {
+            const newList = listArresters.filter(result => result.id !== rowData.id);
+            setListArresters(newList);
+        }
+    };
+
+    useEffect(() => {
+        const arr = listArresters;
+        arr.forEach((el, idx) => (el['id'] = idx + 1));
+        setFormattedArresters(arr);
+    }, [listArresters]);
 
     const saveData = e => {
         e.preventDefault();
@@ -163,6 +210,7 @@ export default function CreateTrainer() {
             school,
             telephone,
             listTransfer: JSON.stringify(listTransfer),
+            listArresters: JSON.stringify(listArresters),
         };
         saveTrainerMutation.mutate(data);
     };
@@ -181,6 +229,7 @@ export default function CreateTrainer() {
             school,
             telephone,
             listTransfer: JSON.stringify(listTransfer),
+            listArresters: JSON.stringify(listArresters),
         };
         editTrainerMutation.mutate(data);
     };
@@ -324,14 +373,81 @@ export default function CreateTrainer() {
                         Добавить результат
                     </Button>
                 </div>
-                <div style={{ height: 500, width: '100%' }}>
+                <div style={{ height: 500, width: '100%', marginBottom: 25, }}>
                     <DataGrid
                         localeText={ruRU.props.MuiDataGrid.localeText}
-                        rows={formattedTrainer}
-                        columns={columns}
+                        rows={formattedTransfer}
+                        columns={columnsTransfer}
+                        rowsPerPageOptions={[5, 10, 15]}
                         pageSize={15}
                         className="table-style"
-                        onRowClick={e => deleteCeill(e.row)}
+                        onRowClick={e => deleteTransferCeill(e.row)}
+                    />
+                </div>
+            </div>
+            <div>
+                <div>
+                    <TextField
+                        label="ФИО спортсмена"
+                        className={classes.textField}
+                        placeholder="Введите ФИО спортсмена"
+                        variant="outlined"
+                        onChange={e => {
+                            setArresters({
+                                ...arresters,
+                                [e.target.name]: e.target.value,
+                            });
+                        }}
+                        inputProps={{
+                            name: 'name',
+                        }}
+                        value={arresters.name}
+                    />
+                    <TextField
+                        label="Спортивное звание"
+                        className={classes.textField}
+                        placeholder="Введите спортивное звание"
+                        variant="outlined"
+                        onChange={e => {
+                            setArresters({
+                                ...arresters,
+                                [e.target.name]: e.target.value,
+                            });
+                        }}
+                        inputProps={{
+                            name: 'sportTitul',
+                        }}
+                        value={arresters.sportTitul}
+                    />
+                    <TextField
+                        label="Год присвоения"
+                        className={classes.textField}
+                        placeholder="Введите год присвоения"
+                        variant="outlined"
+                        onChange={e => {
+                            setArresters({
+                                ...arresters,
+                                [e.target.name]: e.target.value,
+                            });
+                        }}
+                        inputProps={{
+                            name: 'year',
+                        }}
+                        value={arresters.year}
+                    />
+                    <Button variant="contained" color="primary" onClick={addArresters}>
+                        Добавить результат
+                    </Button>
+                </div>
+                <div style={{ height: 500, width: '100%', marginBottom: 5, }}>
+                    <DataGrid
+                        localeText={ruRU.props.MuiDataGrid.localeText}
+                        rows={formattedArresters}
+                        columns={columnsArresters}
+                        pageSize={15}
+                        rowsPerPageOptions={[5, 10, 15]}
+                        className="table-style"
+                        onRowClick={e => deleteArrestersCeill(e.row)}
                     />
                 </div>
             </div>
