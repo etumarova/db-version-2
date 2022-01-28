@@ -7,11 +7,11 @@ import {setIndexToObject} from '../services/utils';
 
 const columns = [
     { field: 'index', headerName: 'ID', width: 95 },
-    { field: 'name', headerName: 'ФИО', width: 260 },
-    { field: 'birthday', headerName: 'Год рождения', width: 150 },
-    { field: 'nowTrainer', headerName: 'Личный тренер', width: 260 },
-    { field: 'school', headerName: 'Ведомственная принадлежность', width: 180 },
-    { field: 'telephone', headerName: 'Телефон', width: 140 },
+    { field: 'name', headerName: 'ФИО', width: 300 },
+    { field: 'birthday', headerName: 'Год рождения', width: 200 },
+    { field: 'nowTrainer', headerName: 'Личный тренер', width: 300 },
+    { field: 'school', headerName: 'Ведомственная принадлежность', width: 300 },
+    { field: 'telephone', headerName: 'Телефон', width: 200 },
 ];
 
 export default function TableSportsmen({sportsmen}) {

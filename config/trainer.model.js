@@ -36,6 +36,10 @@ const TrainerSchema = new mongoose.Schema({
     listArresters: {
         type: String,
         require: false,
+    },
+    listBest: {
+        type: String,
+        require: false,
     }
 });
 

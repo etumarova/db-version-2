@@ -10,6 +10,7 @@ import { queryClient } from 'features/queryClient';
 import { useMutation, useQuery } from 'react-query';
 import { UserContext } from 'context/UserContext';
 import {DataGrid, ruRU} from '@material-ui/data-grid';
+import {setIndexToObject} from '../../services/utils';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -32,17 +33,25 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const columnsTransfer = [
-    { field: 'id', headerName: 'ID', width: 95 },
+    { field: 'index', headerName: 'ID', width: 95 },
     { field: 'name', headerName: 'ФИО спортсмена', width: 300 },
-    { field: 'school', headerName: 'Наименование организации', width: 265 },
+    { field: 'school', headerName: 'Наименование организации', width: 300 },
     { field: 'year', headerName: 'Год передачи', width: 170 },
 ];
 
 const columnsArresters = [
-    { field: 'id', headerName: 'ID', width: 95 },
+    { field: 'index', headerName: 'ID', width: 95 },
     { field: 'name', headerName: 'ФИО спортсмена', width: 300 },
     { field: 'sportTitul', headerName: 'Спортивное звание', width: 300 },
     { field: 'year', headerName: 'Год присвоения', width: 250 },
+];
+
+const columnsBestSportsman = [
+    { field: 'index', headerName: 'ID', width: 95 },
+    { field: 'name', headerName: 'ФИО спортсмена', width: 300 },
+    { field: 'rankCompetition', headerName: 'Ранг соревнований', width: 300 },
+    { field: 'date', headerName: 'Дата', width: 150 },
+    { field: 'location', headerName: 'Место проведения', width: 300 },
 ];
 
 export default function CreateTrainer() {
@@ -66,6 +75,9 @@ export default function CreateTrainer() {
     const [listArresters, setListArresters] = useState([]);
     const [isImageLoading, setIsImageLoading] = useState(false);
     const [formattedArresters, setFormattedArresters] = useState([]);
+    const [bestSportsman, setBestSportsman] = useState({ name: '', rankCompetition: '', date: '', location: '' });
+    const [listBest, setListBest] = useState([]);
+    const [formattedBestSportsman, setFormattedBestSportsman] = useState([]);
 
     const shouldFetchTrainer = !!id;
     const { data: trainerData } = useQuery(['trainers', id], () => fetchTrainerById(id), {
@@ -102,6 +114,7 @@ export default function CreateTrainer() {
             setSchool(trainer.school);
             setListTransfer(JSON.parse(trainer.listTransfer));
             setListArresters(JSON.parse(trainer.listArresters));
+            setListBest(JSON.parse(trainer.listBest));
         }
     }, [trainer]);
 
@@ -127,8 +140,9 @@ export default function CreateTrainer() {
     });
 
 
-    const defaultFormattedTransfer = listTransfer?.map(element => ({ ...element, id: element._id}
-    )) || [];
+    const defaultFormattedTransfer = listTransfer?.map(
+        (element, index) => setIndexToObject({...element, id: index}, index)
+    ) || [];
 
     useEffect(() => {
         setFormattedTransfer(defaultFormattedTransfer)
@@ -136,7 +150,6 @@ export default function CreateTrainer() {
 
     const addTransfer = e => {
         e.preventDefault();
-        console.log(transfer);
         if (transfer) {
             setListTransfer([...listTransfer, transfer]);
             setTransfer({ name: '', school: '', year: '' });
@@ -162,8 +175,9 @@ export default function CreateTrainer() {
         setFormattedTransfer(arr);
     }, [listTransfer]);
 
-    const defaultFormattedArresters = listArresters?.map(element => ({ ...element, id: element._id}
-    )) || [];
+    const defaultFormattedArresters = listArresters?.map(
+        (element, index) => setIndexToObject({...element, id: index}, index)
+    ) || [];
 
     useEffect(() => {
         setFormattedArresters(defaultFormattedArresters)
@@ -171,7 +185,6 @@ export default function CreateTrainer() {
 
     const addArresters = e => {
         e.preventDefault();
-        console.log(arresters);
         if (arresters) {
             setListArresters([...listArresters, arresters]);
             setArresters({ name: '', sportTitul: '', year: '' });
@@ -197,6 +210,42 @@ export default function CreateTrainer() {
         setFormattedArresters(arr);
     }, [listArresters]);
 
+    const defaultFormattedBestSportsman = listBest?.map(
+        (element, index) => setIndexToObject({...element, id: index}, index)
+    ) || [];
+
+    useEffect(() => {
+        setFormattedBestSportsman(defaultFormattedBestSportsman)
+    }, [isLoading])
+
+    const addBestSportsman = e => {
+        e.preventDefault();
+        if (bestSportsman) {
+            setListBest([...listBest, bestSportsman]);
+            setBestSportsman({ name: '', rankCompetition: '', date: '', location: '' });
+        }
+    };
+
+    const deleteBestSportsmanCeill = rowData => {
+        // eslint-disable-next-line no-restricted-globals
+        const answer = confirm(
+            `           Удалить спортсмена: ${rowData.name},
+           Ранг соревнований - ${rowData.rankCompetition},
+           Дата - ${rowData.date},
+           Место проведения - ${rowData.location}.`
+        );
+        if (answer) {
+            const newList = listBest.filter(result => result.id !== rowData.id);
+            setListBest(newList);
+        }
+    };
+
+    useEffect(() => {
+        const arr = listBest;
+        arr.forEach((el, idx) => (el['id'] = idx + 1));
+        setFormattedBestSportsman(arr);
+    }, [listBest]);
+
     const saveData = e => {
         e.preventDefault();
         const data = {
@@ -211,6 +260,7 @@ export default function CreateTrainer() {
             telephone,
             listTransfer: JSON.stringify(listTransfer),
             listArresters: JSON.stringify(listArresters),
+            listBest: JSON.stringify(listBest),
         };
         saveTrainerMutation.mutate(data);
     };
@@ -230,6 +280,8 @@ export default function CreateTrainer() {
             telephone,
             listTransfer: JSON.stringify(listTransfer),
             listArresters: JSON.stringify(listArresters),
+            listBest: JSON.stringify(listBest),
+
         };
         editTrainerMutation.mutate(data);
     };
@@ -448,6 +500,88 @@ export default function CreateTrainer() {
                         rowsPerPageOptions={[5, 10, 15]}
                         className="table-style"
                         onRowClick={e => deleteArrestersCeill(e.row)}
+                    />
+                </div>
+            </div>
+            <div>
+                <div style={{marginTop: 20}}>
+                    <TextField
+                        label="ФИО спортсмена"
+                        className={classes.textField}
+                        placeholder="Введите ФИО спортсмена"
+                        variant="outlined"
+                        onChange={e => {
+                            setBestSportsman({
+                                ...bestSportsman,
+                                [e.target.name]: e.target.value,
+                            });
+                        }}
+                        inputProps={{
+                            name: 'name',
+                        }}
+                        value={bestSportsman.name}
+                    />
+                    <TextField
+                        label="Ранг соревнований"
+                        className={classes.textField}
+                        placeholder="Введите ранг соревнований"
+                        variant="outlined"
+                        onChange={e => {
+                            setBestSportsman({
+                                ...bestSportsman,
+                                [e.target.name]: e.target.value,
+                            });
+                        }}
+                        inputProps={{
+                            name: 'rankCompetition',
+                        }}
+                        value={bestSportsman.rankCompetition}
+                    />
+                    <TextField
+                        label="Дата"
+                        className={classes.textField}
+                        placeholder="Введите дату"
+                        variant="outlined"
+                        onChange={e => {
+                            setBestSportsman({
+                                ...bestSportsman,
+                                [e.target.name]: e.target.value,
+                            });
+                        }}
+                        inputProps={{
+                            name: 'date',
+                        }}
+                        value={bestSportsman.date}
+                    />
+                    <TextField
+                        label="Место проведения"
+                        className={classes.textField}
+                        placeholder="Введите место проведения"
+                        variant="outlined"
+                        onChange={e => {
+                            setBestSportsman({
+                                ...bestSportsman,
+                                [e.target.name]: e.target.value,
+                            });
+                        }}
+                        inputProps={{
+                            name: 'location',
+                        }}
+                        value={bestSportsman.location}
+                    />
+                    <Button variant="contained" color="primary" onClick={addBestSportsman}>
+                        Добавить результат
+                    </Button>
+                </div>
+                <div style={{ height: 500, width: '100%', marginBottom: 5, }}>
+                    <DataGrid
+                        localeText={ruRU.props.MuiDataGrid.localeText}
+                        rows={formattedBestSportsman}
+                        columns={columnsBestSportsman}
+                        pageSize={15}
+                        rowsPerPageOptions={[5, 10, 15]}
+                        className="table-style"
+                        onRowClick={e => deleteBestSportsmanCeill(e.row)}
                     />
                 </div>
             </div>

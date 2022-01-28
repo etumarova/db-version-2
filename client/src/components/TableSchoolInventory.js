@@ -1,6 +1,5 @@
 import React from 'react';
 import { DataGrid, ruRU } from '@material-ui/data-grid';
-import { useHistory } from 'react-router';
 import {setIndexToObject} from '../services/utils';
 
 const columns = [
@@ -12,7 +11,6 @@ const columns = [
 ];
 
 export default function TableSchoolInventory({inventories}) {
-    const history = useHistory();
     inventories = JSON.parse(inventories);
     const transformedInventoriesData = inventories?.map(
         (element, index) => setIndexToObject({...element, id: index}, index)
@@ -26,10 +24,6 @@ export default function TableSchoolInventory({inventories}) {
                 columns={columns}
                 pageSize={15}
                 className="table-style"
-                onRowClick={e => {
-                    //const schoolId = e.row.id;
-                    history.push(`/mySchool/${e.row.id}`);
-                }}
             />
         </div>
     );
