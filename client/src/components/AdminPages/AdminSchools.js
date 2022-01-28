@@ -49,7 +49,7 @@ const columns = [
     { field: 'city', headerName: 'Город', width: 170 },
     { field: 'telephone', headerName: 'Телефон', width: 150 },
     { field: 'email', headerName: 'Электронная почта', width: 250 },
-    { field: 'delete', headerName: '', width: 80 },
+    { field: 'delete', headerName: ' ', width: 80 },
 ];
 
 export default function AdminSchools() {

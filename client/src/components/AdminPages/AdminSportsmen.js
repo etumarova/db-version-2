@@ -41,7 +41,7 @@ const columns = [
     { field: 'nowTrainer', headerName: 'Личный тренер', width: 200 },
     { field: 'school', headerName: 'Школа', width: 200 },
     { field: 'telephone', headerName: 'Телефон2', width: 150 },
-    { field: 'delete', headerName: '', width: 80 },
+    { field: 'delete', headerName: ' ', width: 80 },
 ];
 
 export default function AdminSportsmen() {
