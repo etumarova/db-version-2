@@ -33,25 +33,32 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const columnsTransfer = [
-    { field: 'index', headerName: 'ID', width: 95 },
+    { field: 'id', headerName: 'ID', width: 95 },
     { field: 'name', headerName: 'ФИО спортсмена', width: 300 },
     { field: 'school', headerName: 'Наименование организации', width: 300 },
     { field: 'year', headerName: 'Год передачи', width: 170 },
 ];
 
 const columnsArresters = [
-    { field: 'index', headerName: 'ID', width: 95 },
+    { field: 'id', headerName: 'ID', width: 95 },
     { field: 'name', headerName: 'ФИО спортсмена', width: 300 },
     { field: 'sportTitul', headerName: 'Спортивное звание', width: 300 },
     { field: 'year', headerName: 'Год присвоения', width: 250 },
 ];
 
 const columnsBestSportsman = [
-    { field: 'index', headerName: 'ID', width: 95 },
+    { field: 'id', headerName: 'ID', width: 95 },
     { field: 'name', headerName: 'ФИО спортсмена', width: 300 },
     { field: 'rankCompetition', headerName: 'Ранг соревнований', width: 300 },
     { field: 'date', headerName: 'Дата', width: 150 },
     { field: 'location', headerName: 'Место проведения', width: 300 },
+];
+
+const columnsInNationalTeam = [
+    { field: 'id', headerName: 'ID', width: 95 },
+    { field: 'name', headerName: 'ФИО спортсмена', width: 300 },
+    { field: 'category', headerName: 'Категория списочного состава', width: 300 },
+    { field: 'year', headerName: 'Год', width: 150 },
 ];
 
 export default function CreateTrainer() {
@@ -78,6 +85,9 @@ export default function CreateTrainer() {
     const [bestSportsman, setBestSportsman] = useState({ name: '', rankCompetition: '', date: '', location: '' });
     const [listBest, setListBest] = useState([]);
     const [formattedBestSportsman, setFormattedBestSportsman] = useState([]);
+    const [inNationalTeam, setInNationalTeam] = useState({ name: '', category: '', year: '' });
+    const [listInNationalTeam, setListInNationalTeam] = useState([]);
+    const [formattedInNationalTeam, setFormattedInNationalTeam] = useState([]);
 
     const shouldFetchTrainer = !!id;
     const { data: trainerData } = useQuery(['trainers', id], () => fetchTrainerById(id), {
@@ -115,6 +125,7 @@ export default function CreateTrainer() {
             setListTransfer(JSON.parse(trainer.listTransfer));
             setListArresters(JSON.parse(trainer.listArresters));
             setListBest(JSON.parse(trainer.listBest));
+            setListInNationalTeam(JSON.parse(trainer.listInNationalTeam));
         }
     }, [trainer]);
 
@@ -140,13 +151,13 @@ export default function CreateTrainer() {
     });
 
 
-    const defaultFormattedTransfer = listTransfer?.map(
-        (element, index) => setIndexToObject({...element, id: index}, index)
-    ) || [];
-
-    useEffect(() => {
-        setFormattedTransfer(defaultFormattedTransfer)
-    }, [isLoading])
+    // const defaultFormattedTransfer = listTransfer?.map(
+    //     (element, index) => setIndexToObject({...element, id: index}, index)
+    // ) || [];
+    //
+    // useEffect(() => {
+    //     setFormattedTransfer(defaultFormattedTransfer)
+    // }, [isLoading])
 
     const addTransfer = e => {
         e.preventDefault();
@@ -175,13 +186,13 @@ export default function CreateTrainer() {
         setFormattedTransfer(arr);
     }, [listTransfer]);
 
-    const defaultFormattedArresters = listArresters?.map(
-        (element, index) => setIndexToObject({...element, id: index}, index)
-    ) || [];
-
-    useEffect(() => {
-        setFormattedArresters(defaultFormattedArresters)
-    }, [isLoading])
+    // const defaultFormattedArresters = listArresters?.map(
+    //     (element, index) => setIndexToObject({...element, id: index}, index)
+    // ) || [];
+    //
+    // useEffect(() => {
+    //     setFormattedArresters(defaultFormattedArresters)
+    // }, [isLoading])
 
     const addArresters = e => {
         e.preventDefault();
@@ -210,13 +221,13 @@ export default function CreateTrainer() {
         setFormattedArresters(arr);
     }, [listArresters]);
 
-    const defaultFormattedBestSportsman = listBest?.map(
-        (element, index) => setIndexToObject({...element, id: index}, index)
-    ) || [];
-
-    useEffect(() => {
-        setFormattedBestSportsman(defaultFormattedBestSportsman)
-    }, [isLoading])
+    // const defaultFormattedBestSportsman = listBest?.map(
+    //     (element, index) => setIndexToObject({...element, id: index}, index)
+    // ) || [];
+    //
+    // useEffect(() => {
+    //     setFormattedBestSportsman(defaultFormattedBestSportsman)
+    // }, [isLoading])
 
     const addBestSportsman = e => {
         e.preventDefault();
@@ -246,6 +257,41 @@ export default function CreateTrainer() {
         setFormattedBestSportsman(arr);
     }, [listBest]);
 
+    // const defaultFormattedInNationalTeam = listInNationalTeam?.map(
+    //     (element, index) => setIndexToObject({...element, id: index}, index)
+    // ) || [];
+    //
+    // useEffect(() => {
+    //     setFormattedInNationalTeam(defaultFormattedInNationalTeam)
+    // }, [isLoading])
+
+    const addInNationalTeam = e => {
+        e.preventDefault();
+        if (inNationalTeam) {
+            setListInNationalTeam([...listInNationalTeam, inNationalTeam]);
+            setInNationalTeam({ name: '', category: '', year: '' });
+        }
+    };
+
+    const deleteInNationalTeamCeill = rowData => {
+        // eslint-disable-next-line no-restricted-globals
+        const answer = confirm(
+            `           Удалить спортсмена: ${rowData.name},
+           Категория списочного состава - ${rowData.category},
+           Год  - ${rowData.year}.`
+        );
+        if (answer) {
+            const newList = listInNationalTeam.filter(result => result.id !== rowData.id);
+            setListInNationalTeam(newList);
+        }
+    };
+
+    useEffect(() => {
+        const arr = listInNationalTeam;
+        arr.forEach((el, idx) => (el['id'] = idx + 1));
+        setFormattedInNationalTeam(arr);
+    }, [listInNationalTeam]);
+
     const saveData = e => {
         e.preventDefault();
         const data = {
@@ -261,6 +307,7 @@ export default function CreateTrainer() {
             listTransfer: JSON.stringify(listTransfer),
             listArresters: JSON.stringify(listArresters),
             listBest: JSON.stringify(listBest),
+            listInNationalTeam: JSON.stringify(listInNationalTeam),
         };
         saveTrainerMutation.mutate(data);
     };
@@ -281,6 +328,7 @@ export default function CreateTrainer() {
             listTransfer: JSON.stringify(listTransfer),
             listArresters: JSON.stringify(listArresters),
             listBest: JSON.stringify(listBest),
+            listInNationalTeam: JSON.stringify(listInNationalTeam),
 
         };
         editTrainerMutation.mutate(data);
@@ -582,6 +630,72 @@ export default function CreateTrainer() {
                         rowsPerPageOptions={[5, 10, 15]}
                         className="table-style"
                         onRowClick={e => deleteBestSportsmanCeill(e.row)}
+                    />
+                </div>
+            </div>
+            <div>
+                <div style={{marginTop: 20}}>
+                    <TextField
+                        label="ФИО спортсмена"
+                        className={classes.textField}
+                        placeholder="Введите ФИО спортсмена"
+                        variant="outlined"
+                        onChange={e => {
+                            setInNationalTeam({
+                                ...inNationalTeam,
+                                [e.target.name]: e.target.value,
+                            });
+                        }}
+                        inputProps={{
+                            name: 'name',
+                        }}
+                        value={inNationalTeam.name}
+                    />
+                    <TextField
+                        label="Категория списочного состава"
+                        className={classes.textField}
+                        placeholder="Введите категорию списочного состава"
+                        variant="outlined"
+                        onChange={e => {
+                            setInNationalTeam({
+                                ...inNationalTeam,
+                                [e.target.name]: e.target.value,
+                            });
+                        }}
+                        inputProps={{
+                            name: 'category',
+                        }}
+                        value={inNationalTeam.category}
+                    />
+                    <TextField
+                        label="Год"
+                        className={classes.textField}
+                        placeholder="Введите год "
+                        variant="outlined"
+                        onChange={e => {
+                            setInNationalTeam({
+                                ...inNationalTeam,
+                                [e.target.name]: e.target.value,
+                            });
+                        }}
+                        inputProps={{
+                            name: 'year',
+                        }}
+                        value={inNationalTeam.year}
+                    />
+                    <Button variant="contained" color="primary" onClick={addInNationalTeam}>
+                        Добавить результат
+                    </Button>
+                </div>
+                <div style={{ height: 500, width: '100%', marginBottom: 5, }}>
+                    <DataGrid
+                        localeText={ruRU.props.MuiDataGrid.localeText}
+                        rows={formattedInNationalTeam}
+                        columns={columnsInNationalTeam}
+                        pageSize={15}
+                        rowsPerPageOptions={[5, 10, 15]}
+                        className="table-style"
+                        onRowClick={e => deleteInNationalTeamCeill(e.row)}
                     />
                 </div>
             </div>

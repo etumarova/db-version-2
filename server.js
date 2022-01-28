@@ -543,6 +543,7 @@ app.post('/saveTrainer', (req, res) => {
         listTransfer,
         listArresters,
         listBest,
+        listInNationalTeam,
     } = req.body;
 
     TrainerModel.create({
@@ -558,6 +559,7 @@ app.post('/saveTrainer', (req, res) => {
         listTransfer,
         listArresters,
         listBest,
+        listInNationalTeam,
     })
         .then(() => res.sendStatus(200))
         .catch(err => res.status(500).json(err.toString()));
@@ -578,6 +580,7 @@ app.post('/editTrainer', (req, res) => {
         listTransfer,
         listArresters,
         listBest,
+        listInNationalTeam,
     } = req.body;
     TrainerModel.updateOne(
         {
@@ -597,6 +600,7 @@ app.post('/editTrainer', (req, res) => {
                 listTransfer,
                 listArresters,
                 listBest,
+                listInNationalTeam,
             },
         },
         (err, result) => {

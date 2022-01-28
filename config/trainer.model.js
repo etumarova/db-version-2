@@ -40,7 +40,11 @@ const TrainerSchema = new mongoose.Schema({
     listBest: {
         type: String,
         require: false,
-    }
+    },
+    listInNationalTeam: {
+        type: String,
+        require: false,
+    },
 });
 
 module.exports = mongoose.model('trainer', TrainerSchema);

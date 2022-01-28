@@ -9,6 +9,7 @@ import { fetchSportsmenByTrainerId } from 'services/sportsmen';
 import TableTransfer from '../TableTransfer';
 import TableArrestersPreparation from '../TableArrestersPreparation';
 import TableBestSportsmen from '../TableBestSportsmens';
+import TableInNationalTeam from '../TableInNationalTeam';
 
 export default function TrainerPage() {
     const { id } = useParams();
@@ -121,7 +122,8 @@ export default function TrainerPage() {
                     </div>
                     <TableTransfer transfer={trainer.listTransfer}></TableTransfer>
                     <TableArrestersPreparation arresters={trainer.listArresters}></TableArrestersPreparation>
-                    <TableBestSportsmen best={trainer.listBest}> </TableBestSportsmen>
+                    <TableBestSportsmen best={trainer.listBest}></TableBestSportsmen>
+                    <TableInNationalTeam inNationalTeam={trainer.listInNationalTeam}></TableInNationalTeam>
                 </div>
             )}
         </div>
