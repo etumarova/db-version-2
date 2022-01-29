@@ -19,19 +19,16 @@ export const saveSportsman = data =>
     });
 
 export const editSportsman = data =>
-    {
-        console.log("onEdit", data);
-        fetch('/editSportsman', {
-            method: 'post',
-            headers: {
-            Accept: 'application/json, text/plain, */*',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        });
-    }
+    fetch('/editSportsman', {
+        method: 'post',
+        headers: {
+        Accept: 'application/json, text/plain, */*',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
 
-    export const deleteSportsman = data =>
+export const deleteSportsman = data =>
     fetch('/deleteSportsman', {
         method: 'post',
         headers: {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, {useState, useEffect, useContext, useCallback} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { useDropzone } from 'react-dropzone';
@@ -16,6 +16,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import { queryClient } from 'features/queryClient';
 import { UserContext } from 'context/UserContext';
 import { fetchTrainersBySchoolId } from 'services/trainer';
+import {fetchSchools} from '../../services/school';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -57,7 +58,7 @@ export default function CreateSportsmen() {
     const [fTrainer, setFTrainer] = useState(null);
     const [placeStudy, setPlaceStudy] = useState(null);
     const [enrolmentDate, setEnrolmentDate] = useState(null);
-    const [school, setSchool] = useState(null);
+    const [selectedSchoolId, setSelectedSchoolId] = useState(null);
     const [result, setResult] = useState({ competition: '', discipline: '', place: '' });
     const [listResults, setListResults] = useState([]);
     const [resultRows, setResultRows] = useState([]);
@@ -79,13 +80,14 @@ export default function CreateSportsmen() {
     const { data: sportsmanData } = useQuery(['sportsmen', id], () => fetchSportsmanById(id), {
         enabled: shouldFetch,
     });
+    const { data: schoolsData } = useQuery('schools', fetchSchools);
     const { sportsman } = sportsmanData || {};
     const schoolId = !isAdmin && (sportsman?.schoolId || userSub);
     const { data: trainerData } = useQuery(
-        ['trainers', sportsman?.schoolId],
-        () => fetchTrainersBySchoolId(schoolId),
+        ['trainers', userSub],
+        () => fetchTrainersBySchoolId(userSub),
         {
-            enabled: !!schoolId,
+            enabled: !!schoolId && selectedSchoolId === userSub,   // disabling useQuery when change sportman's school
         }
     );
     const { trainers } = trainerData || {};
@@ -103,6 +105,13 @@ export default function CreateSportsmen() {
         },
         onError: error => console.log(error),
     });
+
+    const onSchoolChange = useCallback((e) => {
+        setSelectedSchoolId(e.target.value);
+        if (userSub !== e.target.value) {
+            setNowTrainer(null);
+        }
+    }, [setNowTrainer, setSelectedSchoolId, userSub]);
 
     useEffect(() => {
         if (sportsman) {
@@ -124,7 +133,7 @@ export default function CreateSportsmen() {
             setDad(sportsman.dad);
             setDadPhone(sportsman.dadPhone);
             setLivingAddress(sportsman.livingAddress);
-            setSchool(sportsman.school)
+            setSelectedSchoolId(sportsman.schoolId)
         }
     }, [sportsman]);
 
@@ -151,8 +160,9 @@ export default function CreateSportsmen() {
 
     const saveData = e => {
         e.preventDefault();
+        const schoolName = schoolsData.find((school) => school.userId === selectedSchoolId)?.name;
         const data = {
-            schoolId: userSub,
+            schoolId: selectedSchoolId,
             photo,
             enrolmentDate,
             placeStudy,
@@ -160,7 +170,7 @@ export default function CreateSportsmen() {
             birthday,
             fTrainer,
             nowTrainer,
-            school,
+            school: schoolName,
             address,
             telephone: telephone,
             listResults: JSON.stringify(listResults),
@@ -177,10 +187,11 @@ export default function CreateSportsmen() {
     };
 
     const editData = e => {
+        const schoolName = schoolsData.find((school) => school.userId === selectedSchoolId)?.name;
         e.preventDefault();
         const data = {
             _id: sportsman._id,
-            schoolId: sportsman.schoolId, // I should not have to specify parameters i don't want to update
+            schoolId: selectedSchoolId, // I should not have to specify parameters i don't want to update
             photo,
             name,
             enrolmentDate,
@@ -188,7 +199,7 @@ export default function CreateSportsmen() {
             birthday,
             fTrainer,
             nowTrainer,
-            school,
+            school: schoolName,
             address,
             telephone,
             listResults: JSON.stringify(listResults),
@@ -427,17 +438,18 @@ export default function CreateSportsmen() {
                     }}
                 />
 
-                <TextField
-                    label="Ведомственная принадлежность"
-                    className={classes.textField}
-                    value={school}
-                    placeholder="Введите спортивный клуб"
-                    variant="outlined"
-                    onChange={e => setSchool(e.target.value)}
-                    InputLabelProps={{
-                        shrink: !!school,
-                    }}
-                />
+                <FormControl className={classes.formControl}>
+                    <InputLabel shrink={true}>Ведомственная принадлежность</InputLabel>
+                    <Select
+                        value={selectedSchoolId}
+                        onChange={ onSchoolChange }>
+                        <MenuItem value="">Не выбрано</MenuItem>
+                        {schoolsData &&
+                            schoolsData.map((school) => (
+                                <MenuItem value={school.userId}>{school.name}</MenuItem>
+                            ))}
+                    </Select>
+                </FormControl>
 
                 <TextField
                     label="Отчисление"
