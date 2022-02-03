@@ -434,6 +434,9 @@ export default function CreateEditSchool() {
 
             <div>
                 <div>
+                    <Typography variant="h5" component="h6" gutterBottom>
+                        Материально-техническое обеспечение
+                    </Typography>
                     <TextField
                         label="Инвентарь"
                         className={classes.textField}

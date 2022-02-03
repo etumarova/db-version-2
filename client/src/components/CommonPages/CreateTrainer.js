@@ -11,6 +11,7 @@ import { useMutation, useQuery } from 'react-query';
 import { UserContext } from 'context/UserContext';
 import {DataGrid, ruRU} from '@material-ui/data-grid';
 import {setIndexToObject} from '../../services/utils';
+import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -421,6 +422,9 @@ export default function CreateTrainer() {
             <div></div>
             <div>
                 <div>
+                    <Typography variant="h5" component="h6" gutterBottom>
+                        Передача в высшее звено
+                    </Typography>
                     <TextField
                         label="ФИО спортсмена"
                         className={classes.textField}
@@ -487,6 +491,9 @@ export default function CreateTrainer() {
             </div>
             <div>
                 <div>
+                    <Typography variant="h5" component="h6" gutterBottom>
+                        Подготовка разрядников
+                    </Typography>
                     <TextField
                         label="ФИО спортсмена"
                         className={classes.textField}
@@ -553,6 +560,9 @@ export default function CreateTrainer() {
             </div>
             <div>
                 <div style={{marginTop: 20}}>
+                    <Typography variant="h5" component="h6" gutterBottom>
+                        Лучшие спортсмены
+                    </Typography>
                     <TextField
                         label="ФИО спортсмена"
                         className={classes.textField}
@@ -635,6 +645,9 @@ export default function CreateTrainer() {
             </div>
             <div>
                 <div style={{marginTop: 20}}>
+                    <Typography variant="h5" component="h6" gutterBottom>
+                        Спортсмены, включенные в списочный состав НК (сборных) команд Республики Беларусь
+                    </Typography>
                     <TextField
                         label="ФИО спортсмена"
                         className={classes.textField}
