@@ -1,37 +1,78 @@
-import React from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import { Link } from 'react-router-dom';
+import {Link, useHistory} from 'react-router-dom';
 import { useContext } from 'react';
 import { UserContext } from 'context/UserContext';
 import { useParams } from 'react-router';
-import { useQuery } from 'react-query';
-import { fetchCompetitionById } from 'services/competition';
+import {useMutation, useQuery} from 'react-query';
+import {fetchCompetitionById, saveCompetition} from 'services/competition';
 import { Image } from 'cloudinary-react';
 import { deleteCompetition } from "services/competition";
+import DropzoneComponent from './FileUploadPage';
+import {queryClient} from '../../features/queryClient';
+import {downloadFileByUrl} from '../../services/utils';
+import {makeStyles} from '@material-ui/core/styles';
+
+const useStyles = makeStyles(theme => ({
+    root: {
+        marginRight: '20px',
+    },
+
+}));
 
 export default function CompetitionPage() {
+    const history = useHistory();
+    const classes = useStyles();
+    const [competition, setCompetition] = useState({});
     const { id } = useParams();
-    const { data } = useQuery(['competitions', id], () => fetchCompetitionById(id));
-    const { competition } = data || {};
-
+    const { data: competitionData } = useQuery(['competitions', id], () => fetchCompetitionById(id));
     const { isAdmin } = useContext(UserContext);
 
-    const discipline = competition?.discipline ? JSON.parse(competition.discipline) : [];
+    useEffect(() => {
+        if (competitionData?.competition) {
+            setCompetition({
+                ...competitionData.competition,
+                file: JSON.parse(competitionData.competition.file || null),
+            })
+        }
+    }, [competitionData]);
 
+    const deleteCompetitionMutation = useMutation(deleteCompetition, {
+        onSuccess: () => {
+            queryClient.invalidateQueries('competitions');
+            history.goBack();
+        },
+        onError: error => console.log(error),
+    });
+
+    const handleDelete = useCallback(() => {
+        deleteCompetitionMutation.mutate({_id: id})
+    },[deleteCompetitionMutation]);
+
+    const handleDownloadClick = useCallback(() => {
+        if (competition?.file?.fileContent) {
+            // expect fileContent already as Base64
+            downloadFileByUrl(competition.file.fileName, competition.file.fileContent);
+        }
+    }, [competition]);
+
+    const discipline = competition?.discipline ? JSON.parse(competition?.discipline) : [];
     return (
         <div>
             {isAdmin && (
                 <div>
-                    <div style={{ float: 'right', marginTop: '10px' }}>
-                        <Link to={`/calendary`}>
-                            <Button variant="contained" color="primary" onClick={() => deleteCompetition({_id: id})}>
-                                Удалить
-                            </Button>
-                        </Link>
+                    <div style={{ float: 'right', marginTop: '10px', marginLeft: '10px' }}>
+
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={ handleDelete }>
+                            Удалить
+                        </Button>
                     </div>
                     <div> </div>
-                    <div style={{ float: 'right', marginTop: '10px' }}>
+                    <div style={{ float: 'right', marginTop: '10px', marginLeft: '10px' }}>
                         <Link to={`/createCompetition/${id}`}>
                             <Button variant="contained" color="primary">
                                 Редактировать
@@ -116,14 +157,21 @@ export default function CompetitionPage() {
                             display: 'flex',
                             flexFlow: 'column',
                             justifyContent: 'end',
-                            margin: '10px',
+                            marginLeft: '10px',
                         }}
                     >
+                        <Typography variant="h5" component="h6" gutterBottom>
+                            Описание мероприятия
+                        </Typography>
                         <Typography variant="body1" gutterBottom>
                             {competition.description}
                         </Typography>
                     </div>
-
+                    <div className='discipline-header'>
+                        <Typography variant="h5" component="h6" gutterBottom>
+                            Дисциплины
+                        </Typography>
+                    </div>
                     {discipline.map(el => {
                         return (
                             <div style={{ marginLeft: '10px' }}>
@@ -133,6 +181,20 @@ export default function CompetitionPage() {
                             </div>
                         );
                     })}
+                    {competition.file && (
+                        <div className='file-download'>
+                            <Typography variant="h5" component="h6" gutterBottom>
+                                Прикреплённый файл
+                            </Typography>
+                            <div className='abc'>
+                                <Typography className={classes.root} variant="body1" gutterBottom>
+                                    {competition.file.fileName}
+                                </Typography>
+                                <Button className={classes.root} variant="contained" color="primary" onClick={handleDownloadClick}>Скачать</Button>
+                            </div>
+
+                        </div>
+                    )}
                 </div>
             )}
         </div>

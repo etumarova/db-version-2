@@ -44,5 +44,9 @@ const CompetitionSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
+    file: {
+        type: String,
+        require: false,
+    },
 });
 module.exports = mongoose.model('competition', CompetitionSchema);
