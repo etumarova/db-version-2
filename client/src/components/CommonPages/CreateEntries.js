@@ -379,6 +379,7 @@ export default function CreateEntries() {
                     rows={rowTabel}
                     columns={headersTabel}
                     pageSize={15}
+                    rowsPerPageOptions={[5, 10, 15]}
                     className="table-style"
                     onCellClick={e => deleteCeill(e)}
                 />

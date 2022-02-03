@@ -511,6 +511,7 @@ export default function CreateEditSchool() {
                         rows={formattedSportsmen}
                         columns={columns}
                         pageSize={15}
+                        rowsPerPageOptions={[5, 10, 15]}
                         className="table-style"
                         onRowClick={e => deleteCeill(e.row)}
                     />

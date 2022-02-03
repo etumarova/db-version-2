@@ -57,6 +57,7 @@ export default function MyEntries() {
                         rows={entriesData}
                         columns={columns}
                         pageSize={15}
+                        rowsPerPageOptions={[5, 10, 15]}
                         className="table-style"
                         onRowClick={e => {
                             history.push(`/entry/${e.row.id}`);

@@ -56,11 +56,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const columns = [
-    { field: 'index', headerName: 'ID', width: 80 },
+    { field: 'index', headerName: 'ID', width: 95 },
     { field: 'name', headerName: 'Название мероприятия', width: 370 },
     { field: 'school', headerName: 'Школа', width: 350 },
-    { field: 'deadLine', headerName: 'Прием заявок до', width: 180 },
-    { field: 'dateSend', headerName: 'Дата получения', width: 220 },
+    { field: 'deadLine', headerName: 'Прием заявок до', width: 300 },
+    { field: 'dateSend', headerName: 'Дата получения', width: 250 },
 ];
 
 const headersCSV = [
@@ -115,6 +115,7 @@ export default function AdminEntries() {
 
         return (
             defaultFormattedEntries?.map((entry, index) => {
+                console.log(competition);
                 const transformedValue = {
                     id: entry._id,
                     name: competition.name,

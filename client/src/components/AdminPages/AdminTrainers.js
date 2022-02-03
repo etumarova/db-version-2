@@ -99,6 +99,7 @@ export default function AdminTrainers() {
                         rows={formattedTrainer}
                         columns={columns}
                         pageSize={15}
+                        rowsPerPageOptions={[5, 10, 15]}
                         className="table-style"
                         onCellClick={e => {
                             if(e.field === "delete"){

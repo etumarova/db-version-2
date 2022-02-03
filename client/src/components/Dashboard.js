@@ -194,13 +194,6 @@ function Dashboard() {
                                         {drawerItems.map(({ text, path }, index) => (
                                             <Link to={path} key={path}>
                                                 <ListItem button key={text}>
-                                                    <ListItemIcon>
-                                                        {index % 2 === 0 ? (
-                                                            <InboxIcon />
-                                                        ) : (
-                                                            <MailIcon />
-                                                        )}
-                                                    </ListItemIcon>
                                                     {text}
                                                 </ListItem>
                                             </Link>

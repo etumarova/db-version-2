@@ -123,6 +123,7 @@ export default function AdminPage() {
                         rows={formattedUsers}
                         columns={columns}
                         pageSize={15}
+                        rowsPerPageOptions={[5, 10, 15]}
                         className="table-style"
                         onRowClick={e => {
                             setSelect(e.id)

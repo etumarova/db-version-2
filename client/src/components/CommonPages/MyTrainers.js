@@ -50,6 +50,7 @@ export default function MyTrainers() {
                         rows={formattedTrainers}
                         columns={columns}
                         pageSize={15}
+                        rowsPerPageOptions={[5, 10, 15]}
                         className="table-style"
                         onRowClick={e => {
                             const trainerId = e.row.id;

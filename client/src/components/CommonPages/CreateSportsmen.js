@@ -543,6 +543,7 @@ export default function CreateSportsmen() {
                         rows={resultRows}
                         columns={headers}
                         pageSize={15}
+                        rowsPerPageOptions={[5, 10, 15]}
                         className="table-style"
                         onRowClick={e => deleteCeill(e.row)}
                     />
