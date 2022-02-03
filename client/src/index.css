@@ -92,3 +92,32 @@ a {
 .col-md-8 {
     margin: 5px;
 }
+
+.hidden-button {
+    visibility: hidden;
+}
+
+.file-input {
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+.file-download-nupker {
+    margin-left: 10px;
+    margin-bottom: 2em;
+}
+
+.discipline-header {
+    margin-left: 10px;
+}
+
+.load-or-clear {
+    display: flex;
+}
+
+.competition-edit {
+    width: 100%;
+}
+
+.abc {
+    display: flex;
+}

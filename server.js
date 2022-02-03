@@ -289,6 +289,7 @@ app.post('/competitions/save', (req, res) => {
         description,
         email,
         discipline,
+        file,
     } = req.body;
 
     CompetitionModel.create({
@@ -304,6 +305,7 @@ app.post('/competitions/save', (req, res) => {
         description,
         email,
         discipline,
+        file,
     })
         .then(() => res.sendStatus(200))
         .catch(err => res.status(500).json(err.toString()));
@@ -324,6 +326,7 @@ app.post('/competitions/edit', (req, res) => {
         description,
         email,
         discipline,
+        file,
     } = req.body;
 
     CompetitionModel.updateOne(
@@ -344,6 +347,7 @@ app.post('/competitions/edit', (req, res) => {
                 description,
                 email,
                 discipline,
+                file,
             },
         },
         (err, result) => {

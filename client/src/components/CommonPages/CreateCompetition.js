@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { useDropzone } from 'react-dropzone';
@@ -10,6 +10,11 @@ import { fetchCompetitionById, saveCompetition, editCompetition } from 'services
 import { useHistory, useParams } from 'react-router-dom';
 import { queryClient } from 'features/queryClient';
 import { useMutation, useQuery } from 'react-query';
+import DropzoneComponent from './FileUploadPage';
+import FileInput from '../FileInput';
+import '../../index.css';
+import {readFileAsBase64} from '../../services/utils';
+import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -48,6 +53,11 @@ export default function CreateCompetition() {
     const [telephone, setTelephone] = useState(null);
     const [place, setPlace] = useState(null);
     const [description, setDescription] = useState(null);
+    const [file, setFile] = useState({
+        fileName: null,
+        fileContent: null,
+        fileContentType: null,
+    });
     const [discipline, setDiscipline] = useState([]);
     const [term, setTerm] = useState(null);
     const classes = useStyles();
@@ -86,6 +96,10 @@ export default function CreateCompetition() {
             setPlace(competition.place);
             setDescription(competition.description);
             setDiscipline(JSON.parse(competition.discipline));
+
+            if (competition.file) {
+                setFile(JSON.parse(competition.file));
+            }
         }
     }, [competition]);
 
@@ -110,7 +124,7 @@ export default function CreateCompetition() {
 
     const saveData = e => {
         e.preventDefault();
-        const data = {
+        let data = {
             logo: logo,
             name: name,
             startDate: startDate,
@@ -123,14 +137,16 @@ export default function CreateCompetition() {
             description: description,
             discipline: JSON.stringify(discipline),
         };
-        saveCompetitionMutation.mutate(data);
 
-        // socket.emit('addCompetition', data);
+        if (file.fileName && file.fileContent) {
+            data.file = JSON.stringify(file);
+        }
+        saveCompetitionMutation.mutate(data);
     };
 
     const editData = e => {
         e.preventDefault();
-        const data = {
+        let data = {
             _id: competition._id,
             logo: logo,
             name: name,
@@ -144,6 +160,10 @@ export default function CreateCompetition() {
             description: description,
             discipline: JSON.stringify(discipline),
         };
+
+        if (file.fileName && file.fileContent) {
+            data.file = JSON.stringify(file);
+        }
         editCompetitionMutation.mutate(data);
     };
 
@@ -158,6 +178,28 @@ export default function CreateCompetition() {
         newArr.splice(index, 1);
         setDiscipline(newArr);
     };
+
+    const handleCompetitionFileChange = useCallback((e) => {
+        const file = e.target.files[0];
+
+        if (file) {
+            readFileAsBase64(file, (content) => {
+                setFile({
+                    fileName: file.name,
+                    fileContent: content,
+                    fileContentType: file.type,
+                });
+            });
+        }
+    }, []);
+
+    const handleCompetitionFileClear = useCallback(() => {
+        setFile({
+            fileName: null,
+            fileContent: null,
+            fileContentType: null,
+        });
+    }, []);
 
     return (
         <div className={classes.root}>
@@ -277,6 +319,9 @@ export default function CreateCompetition() {
             />
 
             <div style={{ width: '100%', marginBottom: '2em' }}>
+                <Typography variant="h5" component="h6" gutterBottom>
+                    Дисциплины
+                </Typography>
                 {discipline.map((todo, index) => {
                     return (
                         <div style={{ margin: '0' }}>
@@ -310,8 +355,10 @@ export default function CreateCompetition() {
                     </Button>
                 </form>
             </div>
-
-            <div>
+            <div className='file-input' >
+                <FileInput file={file} onChange={handleCompetitionFileChange} onClear={handleCompetitionFileClear}/>
+            </div>
+            <div className='competition-edit'>
                 {competition ? (
                     <Button variant="contained" color="primary" onClick={editData}>
                         Редактировать

@@ -10,9 +10,30 @@ const searchByName = (data, value, setFormattedUsers) => {
     setFormattedUsers(searchedUsers)
 }
 
+const readFileAsBase64 = (file, callback) => {
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+        callback(e.target.result);
+    };
+    reader.readAsDataURL(file);
+}
+
+const downloadFileByUrl = (fileName, urlOrBase64) => {
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = urlOrBase64;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+}
+
 export {
     setIndexToObject,
     searchByName,
+    readFileAsBase64,
+    downloadFileByUrl,
 }
 
 
