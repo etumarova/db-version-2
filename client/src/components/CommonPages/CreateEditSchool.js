@@ -106,7 +106,13 @@ export default function CreateEditSchool() {
         id? fetchSchoolById(id) : fetchSchoolByUserId(userId)
     );
     const { school } = data || {};
-    userId = school.userId;
+
+    if (school) {
+        userId = school?.userId;
+    } else {
+        userId = id || user?.sub;
+    }
+
     const saveSchoolMutation = useMutation(saveSchool, {
         onSuccess: () => {
             queryClient.invalidateQueries('schools');
