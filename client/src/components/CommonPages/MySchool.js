@@ -92,6 +92,22 @@ export default function MySchool() {
                                 </div>
                                 <hr />
                                 <div className="row">
+                                    <div className="col-sm-3 text-secondary">Заместитель директора</div>
+
+                                    <div className="col-sm-9">
+                                        <h6 className="mb-0">{school.deputeDirector1}</h6>
+                                    </div>
+                                </div>
+                                <hr />
+                                <div className="row">
+                                    <div className="col-sm-3 text-secondary">Заместитель директора</div>
+
+                                    <div className="col-sm-9">
+                                        <h6 className="mb-0">{school.deputeDirector2}</h6>
+                                    </div>
+                                </div>
+                                <hr />
+                                <div className="row">
                                     <div className="col-sm-3 text-secondary">Регион</div>
 
                                     <div className="col-sm-9">

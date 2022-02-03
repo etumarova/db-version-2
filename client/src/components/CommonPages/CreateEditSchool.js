@@ -87,6 +87,8 @@ export default function CreateEditSchool() {
     const [name, setName] = useState('');
     const [director, setDirector] = useState('');
     const [deputeDirector, setDeputeDirector] = useState('');
+    const [deputeDirector1, setDeputeDirector1] = useState('');
+    const [deputeDirector2, setDeputeDirector2] = useState('');
     const [photo, setPhoto] = useState(null);
     const [directorPhone, setDirectorPhone] = useState('');
     const [description, setDescription] = useState('');
@@ -171,6 +173,8 @@ export default function CreateEditSchool() {
         setName(data.name);
         setDirector(data.director);
         setDeputeDirector(data.deputeDirector);
+        setDeputeDirector1(data.deputeDirector1);
+        setDeputeDirector2(data.deputeDirector2);
         setDirectorPhone(data.directorPhone);
         setEmail(data.email);
         setDescription(data.description);
@@ -214,6 +218,8 @@ export default function CreateEditSchool() {
             name,
             director,
             deputeDirector,
+            deputeDirector1,
+            deputeDirector2,
             directorPhone,
             email,
             description,
@@ -237,6 +243,8 @@ export default function CreateEditSchool() {
             name,
             director,
             deputeDirector,
+            deputeDirector1,
+            deputeDirector2,
             directorPhone,
             email,
             description,
@@ -300,6 +308,26 @@ export default function CreateEditSchool() {
                     style={{ margin: 8 }}
                     value={deputeDirector}
                     onChange={e => setDeputeDirector(e.target.value)}
+                    margin="normal"
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                />
+                <TextField
+                    label="Заместитель директора"
+                    style={{ margin: 8 }}
+                    value={deputeDirector1}
+                    onChange={e => setDeputeDirector1(e.target.value)}
+                    margin="normal"
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                />
+                <TextField
+                    label="Заместитель директора"
+                    style={{ margin: 8 }}
+                    value={deputeDirector2}
+                    onChange={e => setDeputeDirector2(e.target.value)}
                     margin="normal"
                     InputLabelProps={{
                         shrink: true,

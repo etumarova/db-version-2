@@ -20,6 +20,14 @@ const SchoolSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
+    deputeDirector1: {
+        type: String,
+        require: true,
+    },
+    deputeDirector2: {
+        type: String,
+        require: true,
+    },
     directorPhone: {
         type: String,
       },
