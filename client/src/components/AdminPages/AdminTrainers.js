@@ -4,7 +4,6 @@ import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import InputBase from '@material-ui/core/InputBase';
-import IconButton from '@material-ui/core/IconButton';
 import { Button } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import { fetchTrainers } from 'services/trainer';
@@ -103,7 +102,6 @@ export default function AdminTrainers() {
                         className="table-style"
                         onCellClick={e => {
                             if(e.field === "delete"){
-                                console.log(e)
                                 setFormattedTrainer(formattedTrainer.filter(trainer => trainer._id != e.row.id));
                                 deleteTrainer({_id: e.row.id});
                             } else{

@@ -5,7 +5,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import InputBase from '@material-ui/core/InputBase';
 import { Button } from '@material-ui/core';
-import IconButton from '@material-ui/core/IconButton';
 import { App } from '../../App';
 import SearchIcon from '@material-ui/icons/Search';
 import {deleteuser, fetchUsers} from 'services/users';
@@ -89,7 +88,6 @@ export default function AdminPage() {
 
     const deleteSelectedUsers = () => {
         if(select) {
-            console.log(select);
             deleteuser({_id: select})
         }
     }

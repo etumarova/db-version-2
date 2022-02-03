@@ -20,7 +20,6 @@ export const saveSchool = data => {
 
 export const editSchool = data => {
     if(!data.photo) data.photo = "vdsamwwv2pdsgiowvluh";
-    console.log("onEditData", data);
     fetch('/schools/edit', {
         method: 'post',
         headers: {

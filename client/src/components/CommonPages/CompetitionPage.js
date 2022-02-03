@@ -9,7 +9,6 @@ import {useMutation, useQuery} from 'react-query';
 import {fetchCompetitionById, saveCompetition} from 'services/competition';
 import { Image } from 'cloudinary-react';
 import { deleteCompetition } from "services/competition";
-import DropzoneComponent from './FileUploadPage';
 import {queryClient} from '../../features/queryClient';
 import {downloadFileByUrl} from '../../services/utils';
 import {makeStyles} from '@material-ui/core/styles';

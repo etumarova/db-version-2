@@ -139,7 +139,6 @@ export default function CreateEditSchool() {
 
     const addInventories = e => {
         e.preventDefault();
-        console.log(inventories);
         if (inventories) {
             setListInventories([...listInventories, inventories]);
             setInventories({ inventories_name: '', inventories_nomination: '', inventories_count: '', inventories_date: '' });

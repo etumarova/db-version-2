@@ -10,7 +10,6 @@ import { fetchCompetitionById, saveCompetition, editCompetition } from 'services
 import { useHistory, useParams } from 'react-router-dom';
 import { queryClient } from 'features/queryClient';
 import { useMutation, useQuery } from 'react-query';
-import DropzoneComponent from './FileUploadPage';
 import FileInput from '../FileInput';
 import '../../index.css';
 import {readFileAsBase64} from '../../services/utils';

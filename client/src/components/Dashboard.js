@@ -95,7 +95,6 @@ function Dashboard() {
 
     useEffect(() => {
         const checkUserRole = async () => {
-            console.log(user);
             const res = await fetch(`/checkUserRole/`, {
                 method: 'post',
                 headers: {

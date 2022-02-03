@@ -4,16 +4,11 @@ import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import InputBase from '@material-ui/core/InputBase';
-import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
 import { fetchSchools } from 'services/school';
 import { useQuery } from 'react-query';
 import { useHistory } from 'react-router';
-import { deleteSportsman } from 'services/sportsmen';
 import { deleteSchool } from "services/school";
-import TableSchoolInventory from 'components/TableSchoolInventory';
-import {fetchTrainers} from "../../services/trainer";
-import {Button} from "@material-ui/core";
 import {searchByName, setIndexToObject} from '../../services/utils';
 
 
@@ -97,13 +92,10 @@ export default function AdminSchools() {
                         pageSize={15}
                         className="table-style"
                         onCellClick={e => {
-                            console.log("123");
                             if(e.field === "delete"){
-                                console.log("111");
                                 setFormattedSchools(formattedSchools.filter(school => school._id != e.row.id));
                                 deleteSchool({_id: e.row.id});
                             } else{
-                                console.log("1114");
                                 history.push(`/mySchool/${e.row.id}`);
                             }
                         }}

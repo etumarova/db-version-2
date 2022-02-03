@@ -30,8 +30,6 @@ export default function SportsmenPage() {
         })
         : [];
 
-    console.log(results);
-
     return (
         <>
             {sportsman && (
