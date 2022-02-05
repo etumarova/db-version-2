@@ -10,7 +10,7 @@ import { fetchSportsmen } from 'services/sportsmen';
 import { useQuery } from 'react-query';
 import { useHistory } from 'react-router';
 import { deleteSportsman } from 'services/sportsmen';
-import {searchByName, setIndexToObject} from '../../services/utils';
+import {searchByNameAndSchool, setIndexToObject} from '../../services/utils';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -74,7 +74,7 @@ export default function AdminSportsmen() {
                     <InputBase
                         onChange={(e) => {
                             setValue(e.target.value)
-                            searchByName(defaultFormattedSportsmen, e.target.value, setFormattedSportsmen)
+                            searchByNameAndSchool(defaultFormattedSportsmen, e.target.value, setFormattedSportsmen)
                         }}
                         value={value}
                         className={classes.input}

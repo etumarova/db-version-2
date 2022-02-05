@@ -10,7 +10,7 @@ import { fetchTrainers } from 'services/trainer';
 import { useQuery } from 'react-query';
 import { useHistory } from 'react-router';
 import { deleteTrainer } from 'services/trainer';
-import {searchByName, setIndexToObject} from '../../services/utils';
+import {searchByNameAndSchool, setIndexToObject} from '../../services/utils';
 
 
 const useStyles = makeStyles(theme => ({
@@ -82,7 +82,7 @@ export default function AdminTrainers() {
                     <InputBase
                         onChange={(e) => {
                             setValue(e.target.value)
-                            searchByName(defaultFormattedTrainer, e.target.value, setFormattedTrainer)
+                            searchByNameAndSchool(defaultFormattedTrainer, e.target.value, setFormattedTrainer)
                         }}
                         value={value}
                         className={classes.input}
