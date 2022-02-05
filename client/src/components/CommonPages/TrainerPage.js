@@ -10,6 +10,7 @@ import TableTransfer from '../TableTransfer';
 import TableArrestersPreparation from '../TableArrestersPreparation';
 import TableBestSportsmen from '../TableBestSportsmens';
 import TableInNationalTeam from '../TableInNationalTeam';
+import TableTrainersGroups from '../TableTrainersGroups';
 
 export default function TrainerPage() {
     const { id } = useParams();
@@ -120,6 +121,7 @@ export default function TrainerPage() {
                             </div>
                         )}
                     </div>
+                    <TableTrainersGroups groups={trainer.listGroups}></TableTrainersGroups>
                     <TableTransfer transfer={trainer.listTransfer}></TableTransfer>
                     <TableArrestersPreparation arresters={trainer.listArresters}></TableArrestersPreparation>
                     <TableBestSportsmen best={trainer.listBest}></TableBestSportsmen>

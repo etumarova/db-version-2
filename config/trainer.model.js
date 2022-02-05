@@ -45,6 +45,10 @@ const TrainerSchema = new mongoose.Schema({
         type: String,
         require: false,
     },
+    listGroups: {
+        type: String,
+        require: false,
+    },
 });
 
 module.exports = mongoose.model('trainer', TrainerSchema);

@@ -5,25 +5,25 @@ import Typography from '@material-ui/core/Typography';
 
 const columns = [
     { field: 'index', headerName: 'ID', width: 95 },
-    { field: 'name', headerName: 'ФИО спортсмена', width: 300 },
-    { field: 'school', headerName: 'Наименование организации', width: 300 },
-    { field: 'year', headerName: 'Год передачи', width: 170 },
+    { field: 'groupName', headerName: 'Группа', width: 300 },
+    { field: 'amount', headerName: 'Количество занимающихся', width: 275 },
 ];
 
-export default function TableTransfer({transfer}) {
-    transfer = JSON.parse(transfer);
-    const transformedTransferData = transfer?.map(
+export default function TableTrainersGroups({groups}) {
+    groups = JSON.parse(groups);
+    const transformedTrainersGroupsData = groups.map(
         (element, index) => setIndexToObject({...element, id: index}, index)
     )
+
 
     return (
         <div style={{ height: 500, width: '100%', marginTop: 50, }}>
             <Typography variant="h5" component="h6" gutterBottom>
-                Передача в высшее звено
+                Группы
             </Typography>
             <DataGrid
                 localeText={ruRU.props.MuiDataGrid.localeText}
-                rows={transformedTransferData}
+                rows={transformedTrainersGroupsData}
                 columns={columns}
                 pageSize={15}
                 rowsPerPageOptions={[5, 10, 15]}
@@ -32,4 +32,3 @@ export default function TableTransfer({transfer}) {
         </div>
     );
 }
-

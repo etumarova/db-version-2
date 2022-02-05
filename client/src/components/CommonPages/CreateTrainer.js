@@ -33,6 +33,12 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
+const columnsGroups = [
+    { field: 'id', headerName: 'ID', width: 95 },
+    { field: 'groupName', headerName: 'Группа', width: 300 },
+    { field: 'amount', headerName: 'Количество занимающихся', width: 275 },
+];
+
 const columnsTransfer = [
     { field: 'id', headerName: 'ID', width: 95 },
     { field: 'name', headerName: 'ФИО спортсмена', width: 300 },
@@ -61,7 +67,6 @@ const columnsInNationalTeam = [
     { field: 'category', headerName: 'Категория списочного состава', width: 300 },
     { field: 'year', headerName: 'Год', width: 150 },
 ];
-
 export default function CreateTrainer() {
     const { userSub } = useContext(UserContext);
     const { id } = useParams();
@@ -89,6 +94,9 @@ export default function CreateTrainer() {
     const [inNationalTeam, setInNationalTeam] = useState({ name: '', category: '', year: '' });
     const [listInNationalTeam, setListInNationalTeam] = useState([]);
     const [formattedInNationalTeam, setFormattedInNationalTeam] = useState([]);
+    const [groups, setGroups] = useState({ groupName: '', amount: ''});
+    const [listGroups, setListGroups] = useState([]);
+    const [formattedGroups, setFormattedGroups] = useState([]);
 
     const shouldFetchTrainer = !!id;
     const { data: trainerData } = useQuery(['trainers', id], () => fetchTrainerById(id), {
@@ -127,6 +135,8 @@ export default function CreateTrainer() {
             setListArresters(JSON.parse(trainer.listArresters));
             setListBest(JSON.parse(trainer.listBest));
             setListInNationalTeam(JSON.parse(trainer.listInNationalTeam));
+            setListInNationalTeam(JSON.parse(trainer.listInNationalTeam));
+            setListGroups(JSON.parse(trainer.listGroups));
         }
     }, [trainer]);
 
@@ -293,6 +303,33 @@ export default function CreateTrainer() {
         setFormattedInNationalTeam(arr);
     }, [listInNationalTeam]);
 
+    const addGroups = e => {
+        e.preventDefault();
+        if (groups) {
+            setListGroups([...listGroups, groups]);
+            setGroups({ groupName: '', amount: '' });
+        }
+    };
+
+    const deleteGroupsCeill = rowData => {
+        // eslint-disable-next-line no-restricted-globals
+        const answer = confirm(
+            `           Удалить группу: ${rowData.groupName},
+           Количество занимающихся - ${rowData.amount}.`
+        );
+        if (answer) {
+            const newList = listGroups.filter(result => result.id !== rowData.id);
+            setListGroups(newList);
+        }
+    };
+
+    useEffect(() => {
+        const arr = listGroups;
+        arr.forEach((el, idx) => (el['id'] = idx + 1));
+        setFormattedGroups(arr);
+    }, [listGroups]);
+
+
     const saveData = e => {
         e.preventDefault();
         const data = {
@@ -309,6 +346,7 @@ export default function CreateTrainer() {
             listArresters: JSON.stringify(listArresters),
             listBest: JSON.stringify(listBest),
             listInNationalTeam: JSON.stringify(listInNationalTeam),
+            listGroups: JSON.stringify(listGroups),
         };
         saveTrainerMutation.mutate(data);
     };
@@ -330,6 +368,7 @@ export default function CreateTrainer() {
             listArresters: JSON.stringify(listArresters),
             listBest: JSON.stringify(listBest),
             listInNationalTeam: JSON.stringify(listInNationalTeam),
+            listGroups: JSON.stringify(listGroups),
 
         };
         editTrainerMutation.mutate(data);
@@ -420,6 +459,59 @@ export default function CreateTrainer() {
                 />
             </div>
             <div></div>
+            <div>
+                <div>
+                    <Typography variant="h5" component="h6" gutterBottom>
+                        Группы
+                    </Typography>
+                    <TextField
+                        label="Название группы"
+                        className={classes.textField}
+                        placeholder="Введите название группы"
+                        variant="outlined"
+                        onChange={e => {
+                            setGroups({
+                                ...groups,
+                                [e.target.name]: e.target.value,
+                            });
+                        }}
+                        inputProps={{
+                            name: 'groupName',
+                        }}
+                        value={groups.groupName}
+                    />
+                    <TextField
+                        label="Количество занимающихся"
+                        className={classes.textField}
+                        placeholder="Введите количество занимающихся"
+                        variant="outlined"
+                        onChange={e => {
+                            setGroups({
+                                ...groups,
+                                [e.target.name]: e.target.value,
+                            });
+                        }}
+                        inputProps={{
+                            name: 'amount',
+                        }}
+                        value={groups.amount}
+                    />
+                    <Button variant="contained" color="primary" onClick={addGroups}>
+                        Добавить результат
+                    </Button>
+                </div>
+                <div style={{ height: 500, width: '100%', marginBottom: 25, }}>
+                    <DataGrid
+                        localeText={ruRU.props.MuiDataGrid.localeText}
+                        rows={formattedGroups}
+                        columns={columnsGroups}
+                        rowsPerPageOptions={[5, 10, 15]}
+                        pageSize={15}
+                        className="table-style"
+                        onRowClick={e => deleteGroupsCeill(e.row)}
+                    />
+                </div>
+            </div>
             <div>
                 <div>
                     <Typography variant="h5" component="h6" gutterBottom>
