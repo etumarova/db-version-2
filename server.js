@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
 const path = require('path');
 const cors = require('cors');
 const PORT = process.env.PORT || 3001;
@@ -15,6 +14,13 @@ const TrainerModel = require('./config/trainer.model');
 const EntryModel = require('./config/entry.model');
 const UserModel = require('./config/user.model');
 
+app.use(express.json({limit: '15mb'}));
+app.use(express.urlencoded( {
+        extended: true,
+        limit: '15mb',
+        parameterLimit: 50000,
+    }
+));
 app.use(express.json());
 
 const buildMongoQuery = (possibleQueryParams, reqQuery) => {
