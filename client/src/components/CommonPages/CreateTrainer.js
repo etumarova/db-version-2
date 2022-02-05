@@ -79,6 +79,7 @@ export default function CreateTrainer() {
     const [studentNumber, setStudentNumber] = useState(null);
     const [telephone, setTelephone] = useState(null);
     const [experience, setExperience] = useState(null);
+    const [employment, setEmployment] = useState(null);
     const [school, setSchool] = useState(null);
     const classes = useStyles();
     const [isLoading, setIsLoading] = React.useState(true);
@@ -133,6 +134,7 @@ export default function CreateTrainer() {
             setTelephone(trainer.telephone);
             setSchool(trainer.school);
             setExperience(trainer.experience);
+            setEmployment(trainer.employment);
             setListTransfer(JSON.parse(trainer.listTransfer));
             setListArresters(JSON.parse(trainer.listArresters));
             setListBest(JSON.parse(trainer.listBest));
@@ -345,6 +347,7 @@ export default function CreateTrainer() {
             school,
             telephone,
             experience,
+            employment,
             listTransfer: JSON.stringify(listTransfer),
             listArresters: JSON.stringify(listArresters),
             listBest: JSON.stringify(listBest),
@@ -368,6 +371,7 @@ export default function CreateTrainer() {
             school,
             telephone,
             experience,
+            employment,
             listTransfer: JSON.stringify(listTransfer),
             listArresters: JSON.stringify(listArresters),
             listBest: JSON.stringify(listBest),
@@ -468,6 +472,14 @@ export default function CreateTrainer() {
                     variant="outlined"
                     value={experience}
                     onChange={e => setExperience(e.target.value)}
+                />
+                <TextField
+                    label="Штатный/совместитель"
+                    className={classes.textField}
+                    placeholder="Введите штатный/совместитель"
+                    variant="outlined"
+                    value={employment}
+                    onChange={e => setEmployment(e.target.value)}
                 />
             </div>
 

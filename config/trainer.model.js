@@ -32,6 +32,9 @@ const TrainerSchema = new mongoose.Schema({
     experience: {
         type: String,
     },
+    employment: {
+        type: String,
+    },
     listTransfer: {
         type: String,
         require: false,

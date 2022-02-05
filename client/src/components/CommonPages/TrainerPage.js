@@ -120,6 +120,14 @@ export default function TrainerPage() {
                                         <div className="col-sm-9 text-secondary">
                                             {trainer.experience}
                                         </div>
+                                    </div><hr />
+                                    <div className="row">
+                                        <div className="col-sm-3">
+                                            <h6 className="mb-0">Штатный/совместитель</h6>
+                                        </div>
+                                        <div className="col-sm-9 text-secondary">
+                                            {trainer.employment}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
