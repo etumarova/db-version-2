@@ -78,6 +78,7 @@ export default function CreateTrainer() {
     const [laborCategory, setLaborCategory] = useState(null);
     const [studentNumber, setStudentNumber] = useState(null);
     const [telephone, setTelephone] = useState(null);
+    const [experience, setExperience] = useState(null);
     const [school, setSchool] = useState(null);
     const classes = useStyles();
     const [isLoading, setIsLoading] = React.useState(true);
@@ -131,6 +132,7 @@ export default function CreateTrainer() {
             setStudentNumber(trainer.studentNumber);
             setTelephone(trainer.telephone);
             setSchool(trainer.school);
+            setExperience(trainer.experience);
             setListTransfer(JSON.parse(trainer.listTransfer));
             setListArresters(JSON.parse(trainer.listArresters));
             setListBest(JSON.parse(trainer.listBest));
@@ -342,6 +344,7 @@ export default function CreateTrainer() {
             studentNumber,
             school,
             telephone,
+            experience,
             listTransfer: JSON.stringify(listTransfer),
             listArresters: JSON.stringify(listArresters),
             listBest: JSON.stringify(listBest),
@@ -364,6 +367,7 @@ export default function CreateTrainer() {
             studentNumber,
             school,
             telephone,
+            experience,
             listTransfer: JSON.stringify(listTransfer),
             listArresters: JSON.stringify(listArresters),
             listBest: JSON.stringify(listBest),
@@ -457,7 +461,16 @@ export default function CreateTrainer() {
                     value={school}
                     onChange={e => setSchool(e.target.value)}
                 />
+                <TextField
+                    label="Опыт работы"
+                    className={classes.textField}
+                    placeholder="Введите опыт работы"
+                    variant="outlined"
+                    value={experience}
+                    onChange={e => setExperience(e.target.value)}
+                />
             </div>
+
             <div></div>
             <div>
                 <div>

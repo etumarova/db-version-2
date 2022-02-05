@@ -29,6 +29,9 @@ const TrainerSchema = new mongoose.Schema({
     telephone: {
         type: String,
     },
+    experience: {
+        type: String,
+    },
     listTransfer: {
         type: String,
         require: false,
