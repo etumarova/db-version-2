@@ -306,6 +306,7 @@ app.post('/competitions/save', (req, res) => {
         file,
         education,
         schedule,
+        rank,
     } = req.body;
 
     CompetitionModel.create({
@@ -324,6 +325,7 @@ app.post('/competitions/save', (req, res) => {
         file,
         education,
         schedule,
+        rank,
     })
         .then(() => res.sendStatus(200))
         .catch(err => res.status(500).json(err.toString()));
@@ -347,6 +349,7 @@ app.post('/competitions/edit', (req, res) => {
         file,
         education,
         schedule,
+        rank,
     } = req.body;
 
     CompetitionModel.updateOne(
@@ -370,6 +373,7 @@ app.post('/competitions/edit', (req, res) => {
                 file,
                 education,
                 schedule,
+                rank,
             },
         },
         (err, result) => {

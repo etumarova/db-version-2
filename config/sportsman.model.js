@@ -71,6 +71,9 @@ const SportsmanSchema = new mongoose.Schema({
     schedule: {
         type: String,
     },
+    rank: {
+        type: String,
+    },
 
 });
 
