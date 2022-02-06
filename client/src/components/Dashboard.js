@@ -45,7 +45,7 @@ import { createTheme, ThemeProvider } from '@material-ui/core';
 
 const adminPanelItems = [
     { text: 'Школы', path: '/adminSchools' },
-    { text: 'Тренера', path: '/adminTrainers' },
+    { text: 'Тренеры', path: '/adminTrainers' },
     { text: 'Спортсмены', path: '/adminSportsmen' },
     { text: 'Календарь соревнований', path: '/calendary' },
     { text: 'Заявки', path: '/adminEntries' },
