@@ -53,9 +53,6 @@ const SportsmanSchema = new mongoose.Schema({
     dadPhone: {
         type: String,
     },
-    placeStudy: {
-        type: String,
-    },
     unenrolmentDate: {
         type: String,
     },
@@ -66,6 +63,9 @@ const SportsmanSchema = new mongoose.Schema({
         type: String,
     },
     livingAddress: {
+        type: String,
+    },
+    education: {
         type: String,
     },
 

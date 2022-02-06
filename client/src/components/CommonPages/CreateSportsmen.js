@@ -59,6 +59,7 @@ export default function CreateSportsmen() {
     const [fTrainer, setFTrainer] = useState(null);
     const [placeStudy, setPlaceStudy] = useState(null);
     const [enrolmentDate, setEnrolmentDate] = useState(null);
+    const [education, setEducation] = useState(null);
     const [selectedSchoolId, setSelectedSchoolId] = useState(null);
     const [result, setResult] = useState({ competition: '', date: '', place: '', competitionResult: '' });
     const [listResults, setListResults] = useState([]);
@@ -134,7 +135,8 @@ export default function CreateSportsmen() {
             setDad(sportsman.dad);
             setDadPhone(sportsman.dadPhone);
             setLivingAddress(sportsman.livingAddress);
-            setSelectedSchoolId(sportsman.schoolId)
+            setSelectedSchoolId(sportsman.schoolId);
+            setEducation(sportsman.education);
         }
     }, [sportsman]);
 
@@ -182,7 +184,8 @@ export default function CreateSportsmen() {
             mumPhone,
             dad,
             dadPhone,
-            livingAddress, 
+            livingAddress,
+            education,
         };
         saveSportsmanMutation.mutate(data);
     };
@@ -211,7 +214,8 @@ export default function CreateSportsmen() {
             mumPhone,
             dad,
             dadPhone,
-            livingAddress, 
+            livingAddress,
+            education,
         };
         editSportsmanMutation.mutate(data);
     };
@@ -453,6 +457,18 @@ export default function CreateSportsmen() {
                 </FormControl>
 
                 <TextField
+                    label="Образование"
+                    id="outlined-margin-none"
+                    className={classes.textField}
+                    placeholder="Введите образование"
+                    value={education}
+                    variant="outlined"
+                    onChange={e => setEducation(e.target.value)}
+                    InputLabelProps={{
+                        shrink: !!education,
+                    }}
+                />
+                <TextField
                     label="Отчисление"
                     id="outlined-margin-none"
                     className={classes.textField}
@@ -464,7 +480,6 @@ export default function CreateSportsmen() {
                         shrink: !!unenrolmentDate,
                     }}
                 />
-
                 <TextField
                     label="Причина отчисления"
                     id="outlined-margin-none"
