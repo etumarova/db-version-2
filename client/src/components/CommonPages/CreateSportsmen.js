@@ -62,6 +62,7 @@ export default function CreateSportsmen() {
     const [education, setEducation] = useState(null);
     const [schedule, setSchedule] = useState(null);
     const [rank, setRank] = useState(null);
+    const [assignment, setAssignment] = useState(null);
     const [selectedSchoolId, setSelectedSchoolId] = useState(null);
     const [result, setResult] = useState({ competition: '', date: '', place: '', competitionResult: '' });
     const [listResults, setListResults] = useState([]);
@@ -141,6 +142,7 @@ export default function CreateSportsmen() {
             setEducation(sportsman.education);
             setSchedule(sportsman.schedule);
             setRank(sportsman.rank);
+            setAssignment(sportsman.assignment);
         }
     }, [sportsman]);
 
@@ -192,6 +194,7 @@ export default function CreateSportsmen() {
             education,
             schedule,
             rank,
+            assignment,
         };
         saveSportsmanMutation.mutate(data);
     };
@@ -224,6 +227,7 @@ export default function CreateSportsmen() {
             education,
             schedule,
             rank,
+            assignment,
         };
         editSportsmanMutation.mutate(data);
     };
@@ -497,6 +501,18 @@ export default function CreateSportsmen() {
                     onChange={e => setRank(e.target.value)}
                     InputLabelProps={{
                         shrink: !!rank,
+                    }}
+                />
+                <TextField
+                    label="Приказ о присвоении"
+                    id="outlined-margin-none"
+                    className={classes.textField}
+                    placeholder="Введите приказ о присвоении"
+                    value={assignment}
+                    variant="outlined"
+                    onChange={e => setAssignment(e.target.value)}
+                    InputLabelProps={{
+                        shrink: !!assignment,
                     }}
                 />
                 <TextField
