@@ -68,6 +68,9 @@ const SportsmanSchema = new mongoose.Schema({
     education: {
         type: String,
     },
+    schedule: {
+        type: String,
+    },
 
 });
 

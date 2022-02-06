@@ -60,6 +60,7 @@ export default function CreateSportsmen() {
     const [placeStudy, setPlaceStudy] = useState(null);
     const [enrolmentDate, setEnrolmentDate] = useState(null);
     const [education, setEducation] = useState(null);
+    const [schedule, setSchedule] = useState(null);
     const [selectedSchoolId, setSelectedSchoolId] = useState(null);
     const [result, setResult] = useState({ competition: '', date: '', place: '', competitionResult: '' });
     const [listResults, setListResults] = useState([]);
@@ -137,6 +138,7 @@ export default function CreateSportsmen() {
             setLivingAddress(sportsman.livingAddress);
             setSelectedSchoolId(sportsman.schoolId);
             setEducation(sportsman.education);
+            setSchedule(sportsman.schedule);
         }
     }, [sportsman]);
 
@@ -186,6 +188,7 @@ export default function CreateSportsmen() {
             dadPhone,
             livingAddress,
             education,
+            schedule,
         };
         saveSportsmanMutation.mutate(data);
     };
@@ -216,6 +219,7 @@ export default function CreateSportsmen() {
             dadPhone,
             livingAddress,
             education,
+            schedule,
         };
         editSportsmanMutation.mutate(data);
     };
@@ -455,7 +459,6 @@ export default function CreateSportsmen() {
                             ))}
                     </Select>
                 </FormControl>
-
                 <TextField
                     label="Образование"
                     id="outlined-margin-none"
@@ -466,6 +469,18 @@ export default function CreateSportsmen() {
                     onChange={e => setEducation(e.target.value)}
                     InputLabelProps={{
                         shrink: !!education,
+                    }}
+                />
+                <TextField
+                    label="Расписание занятий"
+                    id="outlined-margin-none"
+                    className={classes.textField}
+                    placeholder="Введите расписание занятий"
+                    value={schedule}
+                    variant="outlined"
+                    onChange={e => setSchedule(e.target.value)}
+                    InputLabelProps={{
+                        shrink: !!schedule,
                     }}
                 />
                 <TextField
