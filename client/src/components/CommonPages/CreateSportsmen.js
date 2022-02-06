@@ -41,8 +41,9 @@ const useStyles = makeStyles(theme => ({
 const headers = [
     { field: 'id', headerName: 'ID', width: 95 },
     { field: 'competition', headerName: 'Наименование соревнования', width: 400 },
-    { field: 'discipline', headerName: 'Дисциплина', width: 150 },
-    { field: 'place', headerName: 'Место', width: 150 },
+    { field: 'date', headerName: 'Дата', width: 150 },
+    { field: 'place', headerName: 'Место проведения', width: 200 },
+    { field: 'competitionResult', headerName: 'Результат', width: 150 },
 ];
 
 export default function CreateSportsmen() {
@@ -59,7 +60,7 @@ export default function CreateSportsmen() {
     const [placeStudy, setPlaceStudy] = useState(null);
     const [enrolmentDate, setEnrolmentDate] = useState(null);
     const [selectedSchoolId, setSelectedSchoolId] = useState(null);
-    const [result, setResult] = useState({ competition: '', discipline: '', place: '' });
+    const [result, setResult] = useState({ competition: '', date: '', place: '', competitionResult: '' });
     const [listResults, setListResults] = useState([]);
     const [resultRows, setResultRows] = useState([]);
     const [unenrolmentDate, setUnenrolmentDate] = useState(null);
@@ -219,7 +220,7 @@ export default function CreateSportsmen() {
         e.preventDefault();
         if (result?.competition?.length !== 0) {
             setListResults([...listResults, result]);
-            setResult({ competition: '', discipline: '', place: '' });
+            setResult({ competition: '', date: '', place: '', competitionResult: '' });
             // buildTableRows([...listResults, result]);
         }
     };
@@ -227,7 +228,7 @@ export default function CreateSportsmen() {
     const deleteCeill = rowData => {
         // eslint-disable-next-line no-restricted-globals
         const answer = confirm(
-            `Удалить результат: ${rowData.competition}, Класс -${rowData.discipline}, Место - ${rowData.place} ?`
+            `Удалить результат: ${rowData.competition}, Класс -${rowData.date}, Место - ${rowData.place}, Место - ${rowData.competitionResult} ?`
         );
         if (answer) {
             const newList = listResults.filter(result => result.id !== rowData.id);
@@ -498,9 +499,9 @@ export default function CreateSportsmen() {
                         value={result.competition}
                     />
                     <TextField
-                        label="Дисциплина"
+                        label="Дата"
                         className={classes.textField}
-                        placeholder="Введите дисциплину"
+                        placeholder="Введите дату"
                         variant="outlined"
                         onChange={e => {
                             setResult({
@@ -509,14 +510,14 @@ export default function CreateSportsmen() {
                             });
                         }}
                         inputProps={{
-                            name: 'discipline',
+                            name: 'date',
                         }}
-                        value={result.discipline}
+                        value={result.date}
                     />
                     <TextField
-                        label="Место"
+                        label="Место проведения"
                         className={classes.textField}
-                        placeholder="Введите место"
+                        placeholder="Введите место проведения"
                         variant="outlined"
                         onChange={e => {
                             setResult({
@@ -528,6 +529,21 @@ export default function CreateSportsmen() {
                             name: 'place',
                         }}
                         value={result.place}
+                    /><TextField
+                        label="Результат"
+                        className={classes.textField}
+                        placeholder="Введите результат"
+                        variant="outlined"
+                        onChange={e => {
+                            setResult({
+                                ...result,
+                                [e.target.name]: e.target.value,
+                            });
+                        }}
+                        inputProps={{
+                            name: 'competitionResult',
+                        }}
+                        value={result.competitionResult}
                     />
                     <Button variant="contained" color="primary" onClick={addResult}>
                         Добавить результат

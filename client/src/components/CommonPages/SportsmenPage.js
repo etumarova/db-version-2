@@ -8,10 +8,11 @@ import { fetchSportsmanById } from 'services/sportsmen';
 import {setIndexToObject} from '../../services/utils';
 
 const columns = [
-    { field: 'index', headerName: 'ID', width: 30 },
-    { field: 'competition', headerName: 'Спортивное мероприятие', width: 300 },
-    { field: 'discipline', headerName: 'Дисциплина', width: 150 },
-    { field: 'place', headerName: 'Место', width: 150 },
+    { field: 'index', headerName: 'ID', width: 95 },
+    { field: 'competition', headerName: 'Наименование соревнования', width: 400 },
+    { field: 'date', headerName: 'Дата', width: 175 },
+    { field: 'place', headerName: 'Место проведения', width: 200 },
+    { field: 'competitionResult', headerName: 'Результат', width: 150 },
 ];
 
 export default function SportsmenPage() {
