@@ -130,6 +130,15 @@ export default function SportsmenPage() {
                                     <hr />
                                     <div className="row">
                                         <div className="col-sm-3">
+                                            <h6 className="mb-0">Образование</h6>
+                                        </div>
+                                        <div className="col-sm-9 text-secondary">
+                                            {sportsman.education}
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div className="row">
+                                        <div className="col-sm-3">
                                             <h6 className="mb-0">Ведомственная принадлежность</h6>
                                         </div>
                                         <div className="col-sm-9 text-secondary">
@@ -202,19 +211,19 @@ export default function SportsmenPage() {
                                     <hr />
                                     <div className="row">
                                         <div className="col-sm-3">
-                                            <h6 className="mb-0">Образование</h6>
+                                            <h6 className="mb-0">Расписание занятий</h6>
                                         </div>
                                         <div className="col-sm-9 text-secondary">
-                                            {sportsman.education}
+                                            {sportsman.schedule}
                                         </div>
                                     </div>
                                     <hr />
                                     <div className="row">
                                         <div className="col-sm-3">
-                                            <h6 className="mb-0">Расписание занятий</h6>
+                                            <h6 className="mb-0">Группа</h6>
                                         </div>
                                         <div className="col-sm-9 text-secondary">
-                                            {sportsman.schedule}
+                                            {sportsman.group}
                                         </div>
                                     </div>
                                     <hr />

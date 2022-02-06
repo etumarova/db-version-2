@@ -77,6 +77,9 @@ const SportsmanSchema = new mongoose.Schema({
     assignment: {
         type: String,
     },
+    group: {
+        type: String,
+    },
 
 });
 

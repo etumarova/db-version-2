@@ -62,6 +62,7 @@ export default function CreateSportsmen() {
     const [education, setEducation] = useState(null);
     const [schedule, setSchedule] = useState(null);
     const [rank, setRank] = useState(null);
+    const [group, setGroup] = useState(null);
     const [assignment, setAssignment] = useState(null);
     const [selectedSchoolId, setSelectedSchoolId] = useState(null);
     const [result, setResult] = useState({ competition: '', date: '', place: '', competitionResult: '' });
@@ -143,6 +144,7 @@ export default function CreateSportsmen() {
             setSchedule(sportsman.schedule);
             setRank(sportsman.rank);
             setAssignment(sportsman.assignment);
+            setGroup(sportsman.group);
         }
     }, [sportsman]);
 
@@ -195,6 +197,7 @@ export default function CreateSportsmen() {
             schedule,
             rank,
             assignment,
+            group,
         };
         saveSportsmanMutation.mutate(data);
     };
@@ -228,6 +231,7 @@ export default function CreateSportsmen() {
             schedule,
             rank,
             assignment,
+            group,
         };
         editSportsmanMutation.mutate(data);
     };
@@ -378,6 +382,18 @@ export default function CreateSportsmen() {
                     }}
                 />
                 <TextField
+                    label="Образование"
+                    id="outlined-margin-none"
+                    className={classes.textField}
+                    placeholder="Введите образование"
+                    value={education}
+                    variant="outlined"
+                    onChange={e => setEducation(e.target.value)}
+                    InputLabelProps={{
+                        shrink: !!education,
+                    }}
+                />
+                <TextField
                     label="Адрес регистрации"
                     id="margin-none"
                     style={{ margin: 8 }}
@@ -467,18 +483,7 @@ export default function CreateSportsmen() {
                             ))}
                     </Select>
                 </FormControl>
-                <TextField
-                    label="Образование"
-                    id="outlined-margin-none"
-                    className={classes.textField}
-                    placeholder="Введите образование"
-                    value={education}
-                    variant="outlined"
-                    onChange={e => setEducation(e.target.value)}
-                    InputLabelProps={{
-                        shrink: !!education,
-                    }}
-                />
+
                 <TextField
                     label="Расписание занятий"
                     id="outlined-margin-none"
@@ -489,6 +494,18 @@ export default function CreateSportsmen() {
                     onChange={e => setSchedule(e.target.value)}
                     InputLabelProps={{
                         shrink: !!schedule,
+                    }}
+                />
+                <TextField
+                    label="Группа"
+                    id="outlined-margin-none"
+                    className={classes.textField}
+                    placeholder="Введите группу"
+                    value={group}
+                    variant="outlined"
+                    onChange={e => setGroup(e.target.value)}
+                    InputLabelProps={{
+                        shrink: !!group,
                     }}
                 />
                 <TextField
