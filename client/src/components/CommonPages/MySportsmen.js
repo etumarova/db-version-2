@@ -12,16 +12,6 @@ export default function MySportsmen() {
     const { data } = useQuery(['sportsmen', userSub], () => fetchSportsmenBySchoolId(userSub));
     const { sportsmen } = data || {};
 
-    const formattedSportsmen = useMemo(
-        () =>
-            sportsmen?.map(sportsman => ({
-                ...sportsman,
-                nowTrainer: sportsman.nowTrainer?.name || '-',
-                id: sportsman._id,
-            })) || [],
-        [sportsmen]
-    );
-
     return (
         <div>
             <div style={{ float: 'right' }}>
@@ -34,7 +24,7 @@ export default function MySportsmen() {
             <Typography variant="h3" component="h4" gutterBottom>
                 Мои спортсмены
             </Typography>
-            {sportsmen && <TableSportsmen sportsmen={formattedSportsmen} />}
+            {sportsmen && <TableSportsmen sportsmen={sportsmen} />}
         </div>
     );
 }
