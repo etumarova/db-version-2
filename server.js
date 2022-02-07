@@ -304,11 +304,6 @@ app.post('/competitions/save', (req, res) => {
         email,
         discipline,
         file,
-        education,
-        schedule,
-        rank,
-        assignment,
-        group,
     } = req.body;
 
     CompetitionModel.create({
@@ -325,11 +320,6 @@ app.post('/competitions/save', (req, res) => {
         email,
         discipline,
         file,
-        education,
-        schedule,
-        rank,
-        assignment,
-        group,
     })
         .then(() => res.sendStatus(200))
         .catch(err => res.status(500).json(err.toString()));
@@ -351,11 +341,6 @@ app.post('/competitions/edit', (req, res) => {
         email,
         discipline,
         file,
-        education,
-        schedule,
-        rank,
-        assignment,
-        group,
     } = req.body;
 
     CompetitionModel.updateOne(
@@ -377,11 +362,6 @@ app.post('/competitions/edit', (req, res) => {
                 email,
                 discipline,
                 file,
-                education,
-                schedule,
-                rank,
-                assignment,
-                group,
             },
         },
         (err, result) => {
@@ -433,7 +413,12 @@ app.post('/saveSportsman', (req, res) => {
         mumPhone,
         dad,
         dadPhone,
-        livingAddress, 
+        livingAddress,
+        education,
+        schedule,
+        rank,
+        assignment,
+        group,
     } = req.body;
 
     SportsmanModel.create({
@@ -456,7 +441,12 @@ app.post('/saveSportsman', (req, res) => {
         mumPhone,
         dad,
         dadPhone,
-        livingAddress, 
+        livingAddress,
+        education,
+        schedule,
+        rank,
+        assignment,
+        group,
     })
         .then(() => res.sendStatus(200))
         .catch(err => res.status(500).json(err.toString()));
@@ -508,7 +498,12 @@ app.post('/editSportsman', (req, res) => {
         mumPhone,
         dad,
         dadPhone,
-        livingAddress, 
+        livingAddress,
+        education,
+        schedule,
+        rank,
+        assignment,
+        group,
     } = req.body;
 
     SportsmanModel.updateOne(
@@ -536,7 +531,12 @@ app.post('/editSportsman', (req, res) => {
                 mumPhone,
                 dad,
                 dadPhone,
-                livingAddress, 
+                livingAddress,
+                education,
+                schedule,
+                rank,
+                assignment,
+                group,
             },
         },
         (err, result) => {
