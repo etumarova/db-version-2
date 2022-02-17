@@ -629,7 +629,7 @@ export default function CreateSportsmen() {
                     </Button>
                 </div>
 
-                <Typography variant="h5" component="h6" gutterBottom>
+                <Typography style={{ marginTop: "10px" }} variant="h5" component="h6" gutterBottom>
                     Результаты выступления на соревнованиях
                 </Typography>
 
