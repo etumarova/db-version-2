@@ -99,6 +99,8 @@ export default function CreateTrainer() {
     const [groups, setGroups] = useState({ groupName: '', amount: ''});
     const [listGroups, setListGroups] = useState([]);
     const [formattedGroups, setFormattedGroups] = useState([]);
+    const [nameError, setNameError] = useState(false);
+    const [schoolError, setSchoolError] = useState(false);
 
     const shouldFetchTrainer = !!id;
     const { data: trainerData } = useQuery(['trainers', id], () => fetchTrainerById(id), {
@@ -336,6 +338,8 @@ export default function CreateTrainer() {
 
     const saveData = e => {
         e.preventDefault();
+        setNameError(false);
+        setSchoolError(false);
         const data = {
             schoolId,
             photo,
@@ -354,11 +358,23 @@ export default function CreateTrainer() {
             listInNationalTeam: JSON.stringify(listInNationalTeam),
             listGroups: JSON.stringify(listGroups),
         };
-        saveTrainerMutation.mutate(data);
+
+        if (name === null || name === '') {
+            setNameError(true)
+        }
+        if (school === null || school === '') {
+            setSchoolError(true)
+        }
+
+        if (name && school) {
+            saveTrainerMutation.mutate(data);
+        }
     };
 
     const editData = e => {
         e.preventDefault();
+        setNameError(false);
+        setSchoolError(false);
         const data = {
             _id: trainer._id,
             schoolId,
@@ -379,7 +395,17 @@ export default function CreateTrainer() {
             listGroups: JSON.stringify(listGroups),
 
         };
-        editTrainerMutation.mutate(data);
+
+        if (name === null || name === '') {
+            setNameError(true)
+        }
+        if (school === null || school === '') {
+            setSchoolError(true)
+        }
+
+        if (name && school) {
+            editTrainerMutation.mutate(data);
+        }
     };
 
     return (
@@ -407,6 +433,8 @@ export default function CreateTrainer() {
                     InputLabelProps={{
                         shrink: true,
                     }}
+                    error={nameError}
+                    required
                 />
                 <TextField
                     id="date"
@@ -464,6 +492,8 @@ export default function CreateTrainer() {
                     variant="outlined"
                     value={school}
                     onChange={e => setSchool(e.target.value)}
+                    error={schoolError}
+                    required
                 />
                 <TextField
                     label="Опыт работы"

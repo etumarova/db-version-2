@@ -17,6 +17,7 @@ import { queryClient } from 'features/queryClient';
 import { UserContext } from 'context/UserContext';
 import { fetchTrainersBySchoolId } from 'services/trainer';
 import {fetchSchools} from '../../services/school';
+import {FormHelperText} from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -31,7 +32,7 @@ const useStyles = makeStyles(theme => ({
     },
     formControl: {
         margin: theme.spacing(1),
-        minWidth: 120,
+        minWidth: 150,
     },
     selectEmpty: {
         marginTop: theme.spacing(2),
@@ -76,6 +77,9 @@ export default function CreateSportsmen() {
     const [dad, setDad] = useState(null);
     const [dadPhone, setDadPhone] = useState(null);
     const [livingAddress, setLivingAddress] = useState(null);
+    const [nameError, setNameError] = useState(false);
+    const [nowTrainerError, setNowTrainerError] = useState(false);
+    const [selectedSchoolIdError, setSelectedSchoolIdError] = useState(false);
     const classes = useStyles();
 
     const { userSub, isAdmin } = useContext(UserContext);
@@ -171,6 +175,9 @@ export default function CreateSportsmen() {
 
     const saveData = e => {
         e.preventDefault();
+        setNameError(false);
+        setNowTrainerError(false);
+        setSelectedSchoolIdError(false);
         const schoolName = schoolsData.find((school) => school.userId === selectedSchoolId)?.name;
         const data = {
             schoolId: selectedSchoolId,
@@ -199,12 +206,29 @@ export default function CreateSportsmen() {
             assignment,
             group,
         };
-        saveSportsmanMutation.mutate(data);
+
+        if (name === null || name === '') {
+            setNameError(true)
+        }
+        if (selectedSchoolId === null || selectedSchoolId === '') {
+            setSelectedSchoolIdError(true)
+        }
+
+        if (nowTrainer === null || nowTrainer === '') {
+            setNowTrainerError(true)
+        }
+
+        if (name && selectedSchoolId && nowTrainer) {
+            saveSportsmanMutation.mutate(data);
+        }
     };
 
     const editData = e => {
-        const schoolName = schoolsData.find((school) => school.userId === selectedSchoolId)?.name;
         e.preventDefault();
+        setNameError(false);
+        setNowTrainerError(false);
+        setSelectedSchoolIdError(false);
+        const schoolName = schoolsData.find((school) => school.userId === selectedSchoolId)?.name;
         const data = {
             _id: sportsman._id,
             schoolId: selectedSchoolId, // I should not have to specify parameters i don't want to update
@@ -233,7 +257,21 @@ export default function CreateSportsmen() {
             assignment,
             group,
         };
-        editSportsmanMutation.mutate(data);
+
+        if (name === null || name === '') {
+            setNameError(true)
+        }
+        if (selectedSchoolId === null || selectedSchoolId === '') {
+            setSelectedSchoolIdError(true)
+        }
+
+        if (nowTrainer === null || nowTrainer === '') {
+            setNowTrainerError(true)
+        }
+
+        if (name && selectedSchoolId && nowTrainer) {
+            editSportsmanMutation.mutate(data);
+        }
     };
 
     const addResult = e => {
@@ -295,6 +333,8 @@ export default function CreateSportsmen() {
                     InputLabelProps={{
                         shrink: !!name,
                     }}
+                    error={nameError}
+                    required
                 />
                 <TextField
                     id="date"
@@ -434,7 +474,11 @@ export default function CreateSportsmen() {
                     }}
                 />
 
-                <FormControl className={classes.formControl}>
+                <FormControl
+                    className={classes.formControl}
+                    error={nowTrainerError}
+                    required
+                >
                     <InputLabel shrink={true}>Личный тренер</InputLabel>
                     <Select value={nowTrainer} onChange={e => setNowTrainer(e.target.value)}>
                         <MenuItem value="">None</MenuItem>
@@ -471,7 +515,11 @@ export default function CreateSportsmen() {
                     }}
                 />
 
-                <FormControl className={classes.formControl}>
+                <FormControl
+                    className={classes.formControl}
+                    error={selectedSchoolIdError}
+                    required
+                >
                     <InputLabel shrink={true}>Ведомственная принадлежность</InputLabel>
                     <Select
                         value={selectedSchoolId}
